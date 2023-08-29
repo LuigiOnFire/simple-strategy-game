@@ -29,10 +29,26 @@ class GameState():
         self.map[move.startRow][move.startCol] = -1
         self.map[move.endRow][move.endCol] = move.pieceMoved
         self.moveLog.append(move) #log the move for later reference
-        self.blueToMove = not self.blueToMove
+        self.blueToMove = not self.blueToMove    
+    
+    def undoMove(self):
+        if len(self.moveLog) != 0:
+            move = self.moveLog.pop()
+            self.map[move.startRow][move.startCol] = move.pieceMoved
+            self.map[move.endRow][move.endCol] = move.pieceCaptured
 
-    # def getAllPossibleMoves(self):
-
+    def getAllMoves(self):
+        moves = [Move((0, 4), (1, 4), self.map)]
+        for r in range(len(self.map)):
+            for c in range(len(self.map[r])):
+                unitIndex = self.map[r][c]
+                if unitIndex != -1:
+                    piece = self.unitList[unitIndex]
+                    turn = piece.team
+                    if (turn == "red" and not self.blueToMove) or (turn == "blue" and self.blueToMove):                                        
+                        pass
+        return moves
+                        
 
 class Move():
     def __init__(self, startSq, endSq, map):
@@ -42,7 +58,13 @@ class Move():
         self.endCol = endSq[1]
         self.pieceMoved = map[self.startRow][self.startCol]
         self.pieceCaptured = map[self.endRow][self.endCol]
+        self.MoveID = self.startRow * pow(11, 3) + self.startCol * pow(11, 2) + self.endRow * 11 + self.endCol * 1
 
+def __eq__(self, other):
+    if isinstance(other, Move):
+        return self.moveID == other.moveID
+    return False
+    
 
 class ArmyUnit:
     def __init__(self, **kwargs):
@@ -59,7 +81,6 @@ class ArmyUnit:
     def team(self):
         return self._team
 
-
 class FootSoldier(ArmyUnit):
     def __init__(self, team):
         kwargs = {
@@ -70,4 +91,4 @@ class FootSoldier(ArmyUnit):
             "unit_name": "footsoldier"
         }
         super().__init__(**kwargs)
-        self._team = team
+        self._team = team        

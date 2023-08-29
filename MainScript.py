@@ -28,6 +28,8 @@ def main():
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     gs = EngineScript.GameState()
+    validMoves = gs.getAllMoves()
+    moveMade = False # flag variable for when a move is made
     loadImages()
     running = True
     sqSelected = () #tracks the row and the column
@@ -59,11 +61,19 @@ def main():
                     playerClicks.append(sqSelected)
                 if len(playerClicks) == 2: #player has made two different clicks
                     move = EngineScript.Move(playerClicks[0], playerClicks[1], gs.map)
-                    gs.makeMove(move)
+                    if move in validMoves:
+                        gs.makeMove(move)
+                        moveMade = True
                     sqSelected = ()
                     playerClicks = []
+            elif e.type == p.KEYDOWN:  # later move this to menu
+                if e.key == p.K_z:
+                    gs.undoMove()
+                    validMoves = gs.getAllMoves()
 
-
+        if moveMade:
+            validMoves = gs.getAllMoves()
+            moveMade = False
         drawGameState(screen, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
