@@ -50,16 +50,25 @@ def main():
                 running = False
             elif e.type == p.MOUSEBUTTONDOWN:
                 location = p.mouse.get_pos()
-                print(f"{playerClicks}")
                 col = location[0] // SQ_SIZE
                 row = (location[1] - WALLSIZE) // SQ_SIZE
                 if sqSelected == (row, col):
                     sqSelected = ()
                     playerClicks = []
-                else:
+                if len(playerClicks) == 0:
+                    if gs.squareContainsUnit(row, col): # make sure the square is nonempty
+                        sqSelected = (row, col)
+                        playerClicks.append(sqSelected)
+                        print(f"{playerClicks}")
+                        # the square is now selected
+                        # calculate the moves and highlight the squares here
+                        unitToMove = gs.unitList[gs.map[row][col]]                        
+                        validMoves = gs.getValidMoves(row, col, unitToMove.move_range)
+                elif len(playerClicks) == 1: #player has made two different clicks
                     sqSelected = (row, col)
                     playerClicks.append(sqSelected)
-                if len(playerClicks) == 2: #player has made two different clicks
+                    print(f"{playerClicks}")
+
                     move = EngineScript.Move(playerClicks[0], playerClicks[1], gs.map)
                     if move in validMoves:
                         gs.makeMove(move)
@@ -71,9 +80,7 @@ def main():
                     gs.undoMove()
                     validMoves = gs.getAllMoves()
 
-        if moveMade:
-            validMoves = gs.getAllMoves()
-            moveMade = False
+        moveMade = False
         drawGameState(screen, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
