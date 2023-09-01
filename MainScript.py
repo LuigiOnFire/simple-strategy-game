@@ -79,8 +79,9 @@ def main():
                 if e.key == p.K_z:
                     gs.undoMove()
                     validMoves = gs.getAllMoves()
-
-        moveMade = False
+        if moveMade:
+            animateMove(gs.moveLog[-1], screen, clock, gs)
+            moveMade = False
         drawGameState(screen, gs, validMoves, sqSelected)
         clock.tick(MAX_FPS)
         p.display.flip()
@@ -88,7 +89,7 @@ def main():
 def highlightSqures(screen, gs, validMoves, sqSelected):
     if sqSelected != ():
         r, c = sqSelected
-        s = p.Surface((SQ_SIZE - SCALE, SQ_SIZE - SCALE))
+        s = p.Surface((SQ_SIZE - SCALE / 2, SQ_SIZE - SCALE / 2))
         s.set_alpha(100) # 255 is opaque
         s.fill(p.Color('blue'))
         screen.blit(s, (c*(SQ_SIZE), r*(SQ_SIZE) + WALLSIZE)) # add y offset later
@@ -119,6 +120,25 @@ def drawPieces(screen, map, unitList):
                 thisTeam = thisUnit.team()
                 screen.blit(IMAGES[thisTeam, thisType], p.Rect(c*SQ_SIZE, r*SQ_SIZE+WALLSIZE, SQ_SIZE, SQ_SIZE))
 
+def animateMove(move, screen, clock, gs):
+    global colors
+    coords = []
+    dR = move.endRow - move.startRow
+    dC = move.endCol - move.startCol
+    framesPerSquare = 10
+    frameCount = (abs(dR) + abs(dC)) + framesPerSquare
+    for frame in range(frameCount + 1):
+        r, c = (move.startRow + dR*frame/frameCount, move.startCol + dC*frame/frameCount)
+        drawBoard(screen)
+        drawPieces(screen, gs.map, gs.unitList)
+        # erase the piece from its ending square
+        endSquare = p.Rect(move.endCol*SQ_SIZE, move.endRow*SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE)
+        screen.blit(BOARDART, endSquare, endSquare)
+        # show moving piece
+        screen.blit(IMAGES[gs.unitList[move.pieceMoved].team(), gs.unitList[move.pieceMoved].unit_name()], p.Rect(c*SQ_SIZE, r*SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE))
+        p.display.flip()
+        clock.tick(60)
+        
 
 if __name__ == "__main__":
     main()
