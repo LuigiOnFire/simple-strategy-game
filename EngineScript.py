@@ -121,7 +121,7 @@ class ArmyUnit:
         return self._unit_name
 
     def team(self):
-        return self._team
+        return self._team # team should really be an enum
 
 class FootSoldier(ArmyUnit):
     def __init__(self, team):

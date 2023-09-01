@@ -81,13 +81,26 @@ def main():
                     validMoves = gs.getAllMoves()
 
         moveMade = False
-        drawGameState(screen, gs)
+        drawGameState(screen, gs, validMoves, sqSelected)
         clock.tick(MAX_FPS)
         p.display.flip()
 
+def highlightSqures(screen, gs, validMoves, sqSelected):
+    if sqSelected != ():
+        r, c = sqSelected
+        s = p.Surface((SQ_SIZE - SCALE, SQ_SIZE - SCALE))
+        s.set_alpha(100) # 255 is opaque
+        s.fill(p.Color('blue'))
+        screen.blit(s, (c*(SQ_SIZE), r*(SQ_SIZE) + WALLSIZE)) # add y offset later
+        s.fill(p.Color('blue'))
+        for move in validMoves:
+            if move.startRow == r and move.startCol == c:
+                screen.blit(s, (move.endCol*SQ_SIZE, move.endRow*SQ_SIZE + WALLSIZE)) # add y offset later
 
-def drawGameState(screen, gs):
+
+def drawGameState(screen, gs, validMoves, sqSelected):
     drawBoard(screen)
+    highlightSqures(screen, gs, validMoves, sqSelected)
     drawPieces(screen, gs.map, gs.unitList)
 
 
