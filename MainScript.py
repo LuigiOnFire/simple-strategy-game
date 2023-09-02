@@ -2,16 +2,21 @@ import pygame as p
 import EngineScript
 
 SCALE = 4
-WIDTH = 128*SCALE
-HEIGHT = 192*SCALE
 BOARD_X = 8
 BOARD_Y = 11
 SQ_SIZE = 16*SCALE
+BOARD_WIDTH = BOARD_X*SQ_SIZE
+BOARD_HEIGHT = BOARD_Y*SQ_SIZE
+WALLSIZE = 8*SCALE
+MENU_WIDTH = BOARD_WIDTH
+MENU_HEIGHT = 16*SCALE # one square for now
+WIDTH = 128*SCALE
+HEIGHT = 192*SCALE
 MAX_FPS = 15
 IMAGES = {}
 BOARDART = p.image.load("Sprites/field.png")
-BOARDART = p.transform.scale(BOARDART, (WIDTH, HEIGHT))
-WALLSIZE = 8*SCALE
+BOARDART = p.transform.scale(BOARDART, (BOARD_WIDTH, BOARD_HEIGHT))
+
 
 def loadImages():
     teams = ["b", "r"]
@@ -103,6 +108,7 @@ def drawGameState(screen, gs, validMoves, sqSelected):
     drawBoard(screen)
     highlightSqures(screen, gs, validMoves, sqSelected)
     drawPieces(screen, gs.map, gs.unitList)
+    drawMenu(gs.menu)
 
 
 def drawBoard(screen):
@@ -121,7 +127,6 @@ def drawPieces(screen, map, unitList):
                 screen.blit(IMAGES[thisTeam, thisType], p.Rect(c*SQ_SIZE, r*SQ_SIZE+WALLSIZE, SQ_SIZE, SQ_SIZE))
 
 def animateMove(move, screen, clock, gs):
-    global colors
     coords = []
     dR = move.endRow - move.startRow
     dC = move.endCol - move.startCol
@@ -137,8 +142,22 @@ def animateMove(move, screen, clock, gs):
         # show moving piece
         screen.blit(IMAGES[gs.unitList[move.pieceMoved].team(), gs.unitList[move.pieceMoved].unit_name()], p.Rect(c*SQ_SIZE, r*SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE))
         p.display.flip()
-        clock.tick(60)
-        
+        clock.tick(60)        
+
+def drawMenu(menu, screen):
+    menu_bg = p.Surface((MENU_WIDTH, MENU_HEIGHT))
+    menu_bg.fill(p.Color('black'))
+    screen.blit(0, BOARD_HEIGHT, menu_bg)
+    starting_x = SCALE*2 # two scaled "pixels"
+    starting_y = BOARD_HEIGHT + SCALE*2
+    button_spacing_x = SQ_SIZE * 3
+    draw_x = SCALE*2
+    draw_y = starting_y
+    for button in menu.buttons:
+        pass
+
+
+
 
 if __name__ == "__main__":
     main()
