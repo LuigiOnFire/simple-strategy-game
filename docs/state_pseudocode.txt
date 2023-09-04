@@ -53,7 +53,6 @@ pseudocode for display:
             AnimateTurnBanner(turn)
 
 MapEventHandler(mouse_pos, gs.map, gs.game_state):
-    if gs.game_state = awaiting_unit_selection
+    if gs.game_state = awaiting_unit_selection:
         (tile_x, tile_y) = get_tile(mouse_pos)
-
-
+        
