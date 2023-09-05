@@ -26,6 +26,7 @@ class GameState():
         self.blueToMove = True
         self.moveLog = []
         self.unitList = [FootSoldier("b"), FootSoldier("b"), FootSoldier("r"), FootSoldier("r")]
+        self.step = Phase.AWAITING_UNIT_SELECTION
 
     def makeMove(self, move):
         self.map[move.startRow][move.startCol] = -1
@@ -83,10 +84,7 @@ class GameState():
             return False
         no_unit = (self.map[r][c] < 0)
         return no_unit
-        
-                
-
-
+                        
     # for each 1 to move range
         # look at the pair (row + j, col + (move_range - j))
             # make sure no part of that goes over max or min
@@ -137,5 +135,11 @@ class FootSoldier(ArmyUnit):
         super().__init__(**kwargs)
         self._team = team        
 
-class GameState(Enum):
-    AWAITING_UNIT_SELECTION
+class Phase(Enum):
+    AWAITING_UNIT_SELECTION = 0
+    UNIT_SELECTED = 1
+    ANIMATING_MOVE = 2
+    AWAITING_MENU_INSTRUCTION = 3
+    SELECTING_TARGET = 4
+    ANIMATING_INSTRUCTION = 5
+    TURN_TRANSITION = 6

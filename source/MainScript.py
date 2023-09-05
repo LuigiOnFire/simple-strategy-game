@@ -80,8 +80,13 @@ def highlightSqures(screen, gs, validMoves, sqSelected):
                 screen.blit(s, (move.endCol*SQ_SIZE, move.endRow*SQ_SIZE + WALLSIZE)) # add y offset later
 
 
-def draw_game_state(screen, gs, validMoves, sqSelected, gameState):
-    if gameState = 
+def draw_game_state(screen, gs, validMoves, sqSelected, phase):
+    if phase == gs.Phase.AWAITING_UNIT_SELECTION:
+        display_map(screen, gs)
+        display_menu(screen, gs)
+        display_units(None)
+
+
 
 
 def drawBoard(screen):
