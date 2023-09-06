@@ -1,5 +1,6 @@
 import pygame as p
 import EngineScript
+import AnimAction
 
 SCALE = 4
 BOARD_X = 8
@@ -85,8 +86,25 @@ def draw_game_state(screen, gs, validMoves, sqSelected, phase):
         display_map(screen, gs)
         display_menu(screen, gs)
         display_units(None)
+    elif phase == gs.Phase.UNIT_SELECTED:
+        display_map(screen, gs)
+        display_menu(screen, gs)
+        highligh_spaces(gs.activeUnit, gs.map)
+        display_units(None)
+    elif phase == gs.Phase.ANIMATING_MOVE:
+        display_map(screen, gs)
+        display_menu(screen, gs)
+        display_units(screen, gs.activeUnit, AnimAction.Moving)
+    elif phase == gs.Phase.AWAITING_MENU_INSTRUCTION:
+        display_map(screen, gs)
+        display_menu(screen, gs)
+        display_units(None)
+    elif phase == gs.Phase.SELECTING_TARGET:
+        display_map(screen, gs)
+        display_menu(screen, gs)
+        highlight_spaces(screen, gs, map)
 
-
+    
 
 
 def drawBoard(screen):
