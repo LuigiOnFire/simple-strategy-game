@@ -83,35 +83,43 @@ def highlightSqures(screen, gs, validMoves, sqSelected):
 
 def draw_game_state(screen, gs, validMoves, sqSelected, phase):
     if phase == gs.Phase.AWAITING_UNIT_SELECTION:
-        display_map(screen, gs)
+        display_map(screen)
         display_menu(screen, gs)
-        display_units(None)
+        display_units(screen, map, gs.unitList, [])
     elif phase == gs.Phase.UNIT_SELECTED:
-        display_map(screen, gs)
+        display_map(screen)
         display_menu(screen, gs)
         highligh_spaces(gs.activeUnit, gs.map)
-        display_units(None)
+        display_units(screen, map, gs.unitList, [])
     elif phase == gs.Phase.ANIMATING_MOVE:
-        display_map(screen, gs)
+        display_map(screen)
         display_menu(screen, gs)
-        display_units(screen, gs.activeUnit, AnimAction.Moving)
+        display_units(screen, gs.activeUnit)
     elif phase == gs.Phase.AWAITING_MENU_INSTRUCTION:
-        display_map(screen, gs)
+        display_map(screen)
         display_menu(screen, gs)
         display_units(None)
     elif phase == gs.Phase.SELECTING_TARGET:
-        display_map(screen, gs)
+        display_map(screen)
         display_menu(screen, gs)
         highlight_spaces(screen, gs, map)
+    elif phase == gs.Phase.ANIMATING_INSTRUCTION:
+        display_map(screen)
+        display_menu(screen, gs)
+        display_units(gs.activeUnit, AnimAction.Attacking)
+    elif phase == gs.Phase.TURN_TRANSITION:
+        display_map(screen)
+        display_menu(screen, gs)
+        animate_turn_banner()
 
     
 
 
-def drawBoard(screen):
+def display_map(screen):
     screen.blit(BOARDART, p.Rect(0, 0, WIDTH, HEIGHT))
 
 
-def drawPieces(screen, map, unitList):
+def display_units(screen, map, unitList):
     for r in range(BOARD_Y):
         for c in range(BOARD_X):
             # print(f"the vertical value is {r*SQ_SIZE+WALLSIZE}")
