@@ -56,3 +56,29 @@ MapEventHandler(mouse_pos, gs.map, gs.game_state):
     if gs.game_state = awaiting_unit_selection:
         (tile_x, tile_y) = get_tile(mouse_pos)
         
+def display_units(screen, map, unitList):
+    for r in range(BOARD_Y):
+        for c in range(BOARD_X):
+            # print(f"the vertical value is {r*SQ_SIZE+WALLSIZE}")
+            index = map[r][c]
+            if index != -1:
+                thisUnit = unitList[index]
+                thisType = thisUnit.unit_name()
+                thisTeam = thisUnit.team()
+                screen.blit(IMAGES[thisTeam, thisType], p.Rect(c*SQ_SIZE, r*SQ_SIZE+WALLSIZE, SQ_SIZE, SQ_SIZE))
+
+def display units:
+    for each unit:
+        if no_action:
+            anim_still(unit)
+        if moving:
+            anim_moving(unit)
+        if attacking:
+            anim_attacking(unit)
+        if taking_daming:
+            anim_taking_damage(unit)
+    
+def anim_still(unit, r, c):
+    just get the unit type
+    and the unit team
+    and blit it in its location

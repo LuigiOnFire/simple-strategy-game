@@ -46,7 +46,8 @@ def main():
         "hit_points": 1,
         "max_hit_points": 1,
         "unit_name": "Foot Soldier",
-        "team": "blue"
+        "team": "blue",
+        "anim_action": AnimAction.STILL
     }
     thisUnit = EngineScript.FootSoldier
     #thisUnit = EngineScript.ArmyUnit(kwargs)
@@ -126,12 +127,12 @@ def display_units(screen, map, unitList):
             index = map[r][c]
             if index != -1:
                 thisUnit = unitList[index]
-                thisType = thisUnit.unit_name()
-                thisTeam = thisUnit.team()
-                screen.blit(IMAGES[thisTeam, thisType], p.Rect(c*SQ_SIZE, r*SQ_SIZE+WALLSIZE, SQ_SIZE, SQ_SIZE))
+                anim_action = thisUnit.anim_action
+                if anim_action == AnimAction.STILL:
+                    animate_still(index, r, c)
+                
 
 def animateMove(move, screen, clock, gs):
-    coords = []
     dR = move.endRow - move.startRow
     dC = move.endCol - move.startCol
     framesPerSquare = 10
@@ -153,15 +154,13 @@ def drawMenu(menu, screen):
     menu_bg.fill(p.Color('black'))
     screen.blit(0, BOARD_HEIGHT, menu_bg)
     button_width = SCALE
-    starting_x = SCALE*2 # two scaled "pixels"
-    starting_y = BOARD_HEIGHT + SCALE*2
+    starting_x = SCALE * 2 # two scaled "pixels"
+    starting_y = BOARD_HEIGHT + SCALE * 2
     button_spacing_x = SQ_SIZE * 3
     draw_x = SCALE*2
     draw_y = starting_y
     for button in menu.buttons:
         button_s = p.Surface(())
-
-
 
 
 if __name__ == "__main__":
