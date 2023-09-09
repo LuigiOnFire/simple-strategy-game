@@ -47,7 +47,8 @@ def main():
         "max_hit_points": 1,
         "unit_name": "Foot Soldier",
         "team": "blue",
-        "anim_action": AnimAction.STILL
+        "anim_action": AnimAction.STILL, 
+        "anim_timer" : 0
     }
     thisUnit = EngineScript.FootSoldier
     #thisUnit = EngineScript.ArmyUnit(kwargs)
@@ -114,8 +115,6 @@ def draw_game_state(screen, gs, validMoves, sqSelected, phase):
         animate_turn_banner()
 
     
-
-
 def display_map(screen):
     screen.blit(BOARDART, p.Rect(0, 0, WIDTH, HEIGHT))
 
@@ -130,6 +129,12 @@ def display_units(screen, map, unitList):
                 anim_action = thisUnit.anim_action
                 if anim_action == AnimAction.STILL:
                     animate_still(index, r, c)
+                if anim_action == AnimAction.MOVING:
+                    animate_moving(index, r, c)
+                if anim_action == AnimAction.ATTACKING:
+                    animate_attacking(index, r, c)
+                if anim_action == AnimAction.TAKING_DAMAGE:
+                    anim_taking_damage(unit)
                 
 
 def animateMove(move, screen, clock, gs):
@@ -147,7 +152,7 @@ def animateMove(move, screen, clock, gs):
         # show moving piece
         screen.blit(IMAGES[gs.unitList[move.pieceMoved].team(), gs.unitList[move.pieceMoved].unit_name()], p.Rect(c*SQ_SIZE, r*SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE))
         p.display.flip()
-        clock.tick(60)        
+        clock.tick(60)
 
 def drawMenu(menu, screen):
     menu_bg = p.Surface((MENU_WIDTH, MENU_HEIGHT))

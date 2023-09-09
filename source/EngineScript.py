@@ -117,6 +117,7 @@ class ArmyUnit:
         self._team = "blue"
         self._unit_name = kwargs["unit_name"]
         self.anim_action = kwargs["anim_action"]
+        self.anim_timer = kwargs["anim_timer"]
 
     def unit_name(self):
         return self._unit_name
@@ -132,7 +133,8 @@ class FootSoldier(ArmyUnit):
             "hit_points": 1,
             "max_hit_points": 1,
             "unit_name": "footsoldier",
-            "anim_action": AnimAction.STILL
+            "anim_action": AnimAction.STILL,
+            "anim_timer" : 0
         }
         super().__init__(**kwargs)
         self._team = team        
