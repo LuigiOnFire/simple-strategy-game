@@ -137,7 +137,13 @@ def display_units(screen, map, unitList):
                     anim_taking_damage(unit)
                 
 
-def animateMove(move, screen, clock, gs):
+def animate_still(index, r, c):
+    thisUnit = unitList[index]
+    thisType = thisUnit.unit_name()
+    thisTeam = thisUnit.team()
+    screen.blit(IMAGES[thisTeam, thisType], p.Rect(c*SQ_SIZE, r*SQ_SIZE+WALLSIZE, SQ_SIZE, SQ_SIZE))
+
+def animate_move(move, screen, clock, gs):
     dR = move.endRow - move.startRow
     dC = move.endCol - move.startCol
     framesPerSquare = 10
