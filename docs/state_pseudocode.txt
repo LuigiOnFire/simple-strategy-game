@@ -16,6 +16,23 @@ pseudocode for input handling:
                 mouse_pos = GetMousePosition()
                 MenuEventHandler(mouse_pos, gs.map, gs.menu)
 
+def map_event_handler(mouse_pos, gs.map, gs.selected_unit):
+    get_phase
+    if phase == ANIMATING_MOVE or AWAITING_MENU_INSTRUCTION or ANIMATING_INSTRUCTION or TURN_TRANSITION:
+        return
+    (r,c) = get_the_row_and_col(mouse_pos)
+    if phase == AWAITING_UNIT_SELECTION:
+        pass # OBVIOUS PLACEHOLDER
+    if phase == UNIT_SELECTED:
+        if check_square_occupied(r, c):
+            return
+        gs.selected_unit = 
+
+    if phase == SELECTING_TARGET:
+        pass # OBVIOUS PLACEHOLDER
+    
+
+
 pseudocode for display:
     switch currentState:
         awaitingUnitSelection:# no need to do anything special for now
@@ -68,17 +85,22 @@ def display_units(screen, map, unitList):
                 screen.blit(IMAGES[thisTeam, thisType], p.Rect(c*SQ_SIZE, r*SQ_SIZE+WALLSIZE, SQ_SIZE, SQ_SIZE))
 
 def display units:
-    for each unit:
-        if no_action:
-            anim_still(unit)
-        if moving:
-            anim_moving(unit)
-        if attacking:
-            anim_attacking(unit)
-        if taking_daming:
-            anim_taking_damage(unit)
+    for each row:
+        for each col:
+            if no_action:
+                anim_still(unit)
+            if moving:
+                anim_moving(unit)
+            if attacking:
+                anim_attacking(unit)
+            if taking_daming:
+                anim_taking_damage(unit)
     
 def anim_still(unit, r, c):
     just get the unit type
     and the unit team
     and blit it in its location
+
+anim_moving(unit, r, c):
+    get the unit type and team
+    
