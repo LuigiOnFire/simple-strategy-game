@@ -16,7 +16,7 @@ pseudocode for input handling:
                 mouse_pos = GetMousePosition()
                 MenuEventHandler(mouse_pos, gs.map, gs.menu)
 
-def map_event_handler(mouse_pos, gs.map, gs.selected_unit):
+def map_event_handler(mouse_pos, gs.map, gs.selected_unit_index):
     get_phase
     if phase == ANIMATING_MOVE or AWAITING_MENU_INSTRUCTION or ANIMATING_INSTRUCTION or TURN_TRANSITION:
         return
@@ -26,7 +26,9 @@ def map_event_handler(mouse_pos, gs.map, gs.selected_unit):
     if phase == UNIT_SELECTED:
         if check_square_occupied(r, c):
             return
-        gs.selected_unit = 
+        unit_list[gs.selected_unit_index].anim_action = AnimAction.MOVING
+        gs.phase = Phase.ANIMATING_MOVE
+        # WHERE to save target position? On unit? in gs? in main?
 
     if phase == SELECTING_TARGET:
         pass # OBVIOUS PLACEHOLDER
