@@ -118,6 +118,8 @@ class ArmyUnit:
         self._unit_name = kwargs["unit_name"]
         self.anim_action = kwargs["anim_action"]
         self.anim_timer = kwargs["anim_timer"]
+        self.anim_end_time = kwargs["anim_end_time"]
+        self.anim_ref_square = kwargs["anim_ref_square"]
 
     def unit_name(self):
         return self._unit_name
