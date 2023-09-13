@@ -20,20 +20,28 @@ def map_event_handler(mouse_pos, gs.map, gs.selected_unit_index):
     get_phase
     if phase == ANIMATING_MOVE or AWAITING_MENU_INSTRUCTION or ANIMATING_INSTRUCTION or TURN_TRANSITION:
         return
-    (r,c) = get_the_row_and_col(mouse_pos)
+    ref_square = get_the_row_and_col(mouse_pos)
     if phase == AWAITING_UNIT_SELECTION:
-        pass # OBVIOUS PLACEHOLDER
+        select_unit(ref_square)
     if phase == UNIT_SELECTED:
-        if check_square_occupied(r, c):
-            return
-        unit_list[gs.selected_unit_index].anim_action = AnimAction.MOVING
-        gs.phase = Phase.ANIMATING_MOVE
-        # WHERE to save target position? On unit? in gs? in main?
+        prep_unit_move(ref_square, gs)
+        
 
     if phase == SELECTING_TARGET:
         pass # OBVIOUS PLACEHOLDER
     
-
+def prep_unit_move(ref_square, gs):
+    if check_square_occupied(ref_square):
+            return
+        ref_square = (r, c)
+        start_square = gs.selected_unit_location
+        distance = sqrt((start_square(0)-ref_square(0))**2 + (start_square(1)-ref_square(1))**2)
+        frmes_per_square = 10
+        duration = distance*frames_per_square
+        anim = MovingAnim(duration, ref_square)
+        unit = unit_list[gs.selected_unit_index]
+        unit.anim = anim
+        gs.phase = Phase.ANIMATING_MOVE
 
 pseudocode for display:
     switch currentState:
@@ -89,14 +97,15 @@ def display_units(screen, map, unitList):
 def display units:
     for each row:
         for each col:
-            if no_action:
-                anim_still(unit)
-            if moving:
-                anim_moving(unit)
-            if attacking:
-                anim_attacking(unit)
-            if taking_daming:
-                anim_taking_damage(unit)
+            get unit
+                if unit.action == no_action:
+                    anim_still(unit)
+                if moving:
+                    anim_moving(unit)
+                if attacking:
+                    anim_attacking(unit)
+                if taking_daming:
+                    anim_taking_damage(unit)
     
 def anim_still(unit, r, c):
     just get the unit type

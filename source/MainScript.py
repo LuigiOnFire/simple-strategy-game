@@ -59,7 +59,7 @@ def main():
             elif e.type == p.MOUSEBUTTONDOWN:
                 target = p.mouse.get_pos()
                 if is_in_map(target):
-                    map_event_handler(target, gs.map)
+                    map_event_handler(target)
                 elif is_in_menu(target):
                     menu_event_handler(target, gs.map, gs.menu)
             elif e.type == p.KEYDOWN:  # later move this to menu
@@ -69,6 +69,16 @@ def main():
         draw_game_state(screen, gs, validMoves, sqSelected)
         clock.tick(MAX_FPS)
         p.display.flip()
+
+def map_event_handler(mouse_pos, gs):
+    phase = gs.phase
+    if phase == ANIMATING_MOVE or AWAITING_MENU_INSTRUCTION or ANIMATING_INSTRUCTION or TURN_TRANSITION:
+        return
+    selected_square = get_the_row_and_col(mouse_pos)
+    if phase == AWAITING_UNIT_SELECTION:
+        select_space(selected_square) # also need to support buying
+    if phase == UNIT_SELECTED:
+        prep_unit_move(selected_square, gs)
 
 def highlightSqures(screen, gs, validMoves, sqSelected):
     if sqSelected != ():
@@ -82,6 +92,14 @@ def highlightSqures(screen, gs, validMoves, sqSelected):
             if move.startRow == r and move.startCol == c:
                 screen.blit(s, (move.endCol*SQ_SIZE, move.endRow*SQ_SIZE + WALLSIZE)) # add y offset later
 
+def select_space(selected_square, gs):
+    if square_is_occupised(selected_square):
+        gs.select_space = gs.unit_list[selected_square[0]][selected_square[1]]
+        gs.selected_square = selected_square
+        gs.phase = Phase.UNIT_SELECTED
+    elif square_can_produce(selected_square, gs.production_tiles):
+        gs.selected_square = selected_square
+        gs.phase = Phase.UNIT_SELECTED
 
 def draw_game_state(screen, gs, validMoves, sqSelected, phase):
     if phase == gs.Phase.AWAITING_UNIT_SELECTION:
@@ -124,18 +142,30 @@ def display_units(screen, map, unitList):
         for c in range(BOARD_X):
             # print(f"the vertical value is {r*SQ_SIZE+WALLSIZE}")
             index = map[r][c]
+            coords = (r, c)
             if index != -1:
                 thisUnit = unitList[index]
-                anim_action = thisUnit.anim_action
-                if anim_action == AnimAction.STILL:
-                    animate_still(index, r, c)
-                if anim_action == AnimAction.MOVING:
-                    animate_moving(index, r, c)
-                if anim_action == AnimAction.ATTACKING:
-                    animate_attacking(index, r, c)
-                if anim_action == AnimAction.TAKING_DAMAGE:
-                    anim_taking_damage(unit)
+                anim = thisUnit.anim
+                if anim == AnimAction.STILL:
+                    animate_still(index, coords)
+                if anim == AnimAction.MOVING:
+                    animate_moving(index, coords)
+                if anim == AnimAction.ATTACKING:
+                    animate_attacking(index, coords)
+                if anim == AnimAction.TAKING_DAMAGE:
+                    anim_taking_damage(unit, coords)
                 
+def prep_unit_move(ref_square, gs):
+    if check_square_occupied(ref_square):
+        return
+    start_square = gs.selected_unit_location
+    distance = sqrt((start_square(0)-ref_square(0))**2 + (start_square(1)-ref_square(1))**2)
+    frmes_per_square = 10 # change this as you like
+    duration = distance*frames_per_square
+    anim = MovingAnim(duration, ref_square)
+    unit = unit_list[gs.selected_unit_index]
+    unit.anim = anim
+    gs.phase = Phase.ANIMATING_MOVE
 
 def animate_still(index, r, c):
     thisUnit = unitList[index]
@@ -173,6 +203,10 @@ def drawMenu(menu, screen):
     for button in menu.buttons:
         button_s = p.Surface(())
 
+def square_can_produce(square, production_tiles):
+    if square in gs.production:
+        return true
+    return false
 
 if __name__ == "__main__":
     main()
