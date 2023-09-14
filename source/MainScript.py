@@ -1,6 +1,6 @@
 import pygame as p
 import EngineScript
-import AnimAction
+import Anim
 
 SCALE = 4
 BOARD_X = 8
@@ -47,8 +47,7 @@ def main():
         "max_hit_points": 1,
         "unit_name": "Foot Soldier",
         "team": "blue",
-        "anim_action": AnimAction.STILL, 
-        "anim_timer" : 0
+        "anim": Anim.StillAnim, 
     }
     thisUnit = EngineScript.FootSoldier
     #thisUnit = EngineScript.ArmyUnit(kwargs)
@@ -79,6 +78,10 @@ def map_event_handler(mouse_pos, gs):
         select_space(selected_square) # also need to support buying
     if phase == UNIT_SELECTED:
         prep_unit_move(selected_square, gs)
+
+def menu_event_handler(mouse_pos, gs):
+    # fill in later
+    pass
 
 def highlightSqures(screen, gs, validMoves, sqSelected):
     if sqSelected != ():

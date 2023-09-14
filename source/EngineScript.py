@@ -1,4 +1,5 @@
 from enum import Enum
+import Anim
 
 class GameState():
     def __init__(self):
@@ -120,10 +121,7 @@ class ArmyUnit:
         self._max_hit_points = kwargs["max_hit_points"]
         self._team = "blue"
         self._unit_name = kwargs["unit_name"]
-        self.anim_action = kwargs["anim_action"]
-        self.anim_timer = kwargs["anim_timer"]
-        self.anim_end_time = kwargs["anim_end_time"]
-        self.anim_ref_square = kwargs["anim_ref_square"]
+        self.anim = kwargs["anim"]
 
     def unit_name(self):
         return self._unit_name
@@ -139,8 +137,7 @@ class FootSoldier(ArmyUnit):
             "hit_points": 1,
             "max_hit_points": 1,
             "unit_name": "footsoldier",
-            "anim_action": AnimAction.STILL,
-            "anim_timer" : 0
+            "anim": Anim.StillAnim,            
         }
         super().__init__(**kwargs)
         self._team = team        
