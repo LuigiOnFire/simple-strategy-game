@@ -19,3 +19,8 @@ class DamageAnim:
     def __init__(self, ref_square):
         self.timer = 0
         self.duration = CONST_ATTACK_DURATION # this will be a constant    
+
+class TakingDamageAnim:
+    def __init__(self, ref_square):
+        self.timer = 0
+        self.duration = CONST_ATTACK_DURATION # this will be a constant

@@ -137,7 +137,7 @@ class FootSoldier(ArmyUnit):
             "hit_points": 1,
             "max_hit_points": 1,
             "unit_name": "footsoldier",
-            "anim": Anim.StillAnim,            
+            "anim": Anim.StillAnim(),            
         }
         super().__init__(**kwargs)
         self._team = team        

@@ -104,59 +104,63 @@ def select_space(selected_square, gs):
         gs.selected_square = selected_square
         gs.phase = Phase.UNIT_SELECTED
 
-def draw_game_state(screen, gs, validMoves, sqSelected, phase):
-    if phase == gs.Phase.AWAITING_UNIT_SELECTION:
+def draw_game_state(screen, gs, validMoves, sqSelected):
+    if gs.phase == EngineScript.Phase.AWAITING_UNIT_SELECTION:
         display_map(screen)
         display_menu(screen, gs)
-        display_units(screen, map, gs.unitList, [])
-    elif phase == gs.Phase.UNIT_SELECTED:
+        display_units(screen, gs)
+    elif gs.phase == gs.Phase.UNIT_SELECTED:
         display_map(screen)
         display_menu(screen, gs)
         highligh_spaces(gs.activeUnit, gs.map)
-        display_units(screen, map, gs.unitList, [])
-    elif phase == gs.Phase.ANIMATING_MOVE:
+        display_units(screen, gs)
+    elif gs.phase == gs.Phase.ANIMATING_MOVE:
         display_map(screen)
         display_menu(screen, gs)
-        display_units(screen, gs.activeUnit)
-    elif phase == gs.Phase.AWAITING_MENU_INSTRUCTION:
+        display_units(screen, gs)
+    elif gs.phase == gs.Phase.AWAITING_MENU_INSTRUCTION:
         display_map(screen)
         display_menu(screen, gs)
-        display_units(None)
-    elif phase == gs.Phase.SELECTING_TARGET:
+        display_units(screen, gs)
+    elif gs.phase == gs.Phase.SELECTING_TARGET:
         display_map(screen)
         display_menu(screen, gs)
+        display_units(screen, gs)
         highlight_spaces(screen, gs, map)
-    elif phase == gs.Phase.ANIMATING_INSTRUCTION:
+    elif gs.phase == gs.Phase.ANIMATING_INSTRUCTION:
         display_map(screen)
         display_menu(screen, gs)
-        display_units(gs.activeUnit, AnimAction.Attacking)
-    elif phase == gs.Phase.TURN_TRANSITION:
+        display_units(screen, gs)
+    elif gs.phase == gs.Phase.TURN_TRANSITION:
         display_map(screen)
         display_menu(screen, gs)
+        display_units(screen, gs)
         animate_turn_banner()
 
     
 def display_map(screen):
     screen.blit(BOARDART, p.Rect(0, 0, WIDTH, HEIGHT))
 
+def display_menu(screeen, gs):
+    pass
 
-def display_units(screen, map, unitList):
+def display_units(screen, gs):
     for r in range(BOARD_Y):
         for c in range(BOARD_X):
             # print(f"the vertical value is {r*SQ_SIZE+WALLSIZE}")
-            index = map[r][c]
+            index = gs.map[r][c]
             coords = (r, c)
             if index != -1:
-                thisUnit = unitList[index]
+                thisUnit = gs.unitList[index]
                 anim = thisUnit.anim
-                if anim == AnimAction.STILL:
-                    animate_still(index, coords)
-                if anim == AnimAction.MOVING:
-                    animate_moving(index, coords)
-                if anim == AnimAction.ATTACKING:
-                    animate_attacking(index, coords)
-                if anim == AnimAction.TAKING_DAMAGE:
-                    anim_taking_damage(unit, coords)
+                if isinstance(anim, Anim.StillAnim):
+                    animate_still(index, coords, thisUnit, screen)
+                if isinstance(anim, Anim.MovingAnim):
+                    animate_moving(index, coords, thisUnit, screen)
+                if isinstance(anim, Anim.AttackAnim):
+                    animate_attacking(index, coords, thisUnit, screen)
+                if isinstance(anim, Anim.TakingDamageAnim):
+                    anim_taking_damage(unit, coords, thisUnit, screen)
                 
 def prep_unit_move(ref_square, gs):
     if check_square_occupied(ref_square):
@@ -170,8 +174,8 @@ def prep_unit_move(ref_square, gs):
     unit.anim = anim
     gs.phase = Phase.ANIMATING_MOVE
 
-def animate_still(index, r, c):
-    thisUnit = unitList[index]
+def animate_still(index, coords, thisUnit, screen):
+    (r, c) = coords
     thisType = thisUnit.unit_name()
     thisTeam = thisUnit.team()
     screen.blit(IMAGES[thisTeam, thisType], p.Rect(c*SQ_SIZE, r*SQ_SIZE+WALLSIZE, SQ_SIZE, SQ_SIZE))
