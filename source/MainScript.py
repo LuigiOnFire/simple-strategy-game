@@ -3,20 +3,20 @@ import EngineScript
 import Anim
 
 SCALE = 4
-BOARD_X = 8
-BOARD_Y = 11
+MAP_X = 8
+MAP_Y = 11
 SQ_SIZE = 16*SCALE
-BOARD_WIDTH = BOARD_X*SQ_SIZE
-BOARD_HEIGHT = BOARD_Y*SQ_SIZE
 WALLSIZE = 8*SCALE
-MENU_WIDTH = BOARD_WIDTH
-MENU_HEIGHT = 16*SCALE # one square for now
-WIDTH = 128*SCALE
-HEIGHT = 192*SCALE
+MAP_WIDTH = MAP_X * SQ_SIZE
+MAP_HEIGHT = MAP_Y * SQ_SIZE + WALLSIZE * 2
+MENU_WIDTH = MAP_WIDTH
+MENU_HEIGHT = 16 * SCALE # one square for now
+WIDTH = 128 * SCALE
+HEIGHT = 192 * SCALE
 MAX_FPS = 15
 IMAGES = {}
 BOARDART = p.image.load("Sprites/field.png")
-BOARDART = p.transform.scale(BOARDART, (BOARD_WIDTH, BOARD_HEIGHT))
+BOARDART = p.transform.scale(BOARDART, (MAP_WIDTH, MAP_HEIGHT))
 
 
 def loadImages():
@@ -139,14 +139,14 @@ def draw_game_state(screen, gs, validMoves, sqSelected):
 
     
 def display_map(screen):
-    screen.blit(BOARDART, p.Rect(0, 0, WIDTH, HEIGHT))
+    screen.blit(BOARDART, p.Rect(0, 0, MAP_WIDTH, MAP_HEIGHT))
 
 def display_menu(screeen, gs):
     pass
 
 def display_units(screen, gs):
-    for r in range(BOARD_Y):
-        for c in range(BOARD_X):
+    for r in range(MAP_Y):
+        for c in range(MAP_X):
             # print(f"the vertical value is {r*SQ_SIZE+WALLSIZE}")
             index = gs.map[r][c]
             coords = (r, c)
@@ -200,10 +200,10 @@ def animate_move(move, screen, clock, gs):
 def drawMenu(menu, screen):
     menu_bg = p.Surface((MENU_WIDTH, MENU_HEIGHT))
     menu_bg.fill(p.Color('black'))
-    screen.blit(0, BOARD_HEIGHT, menu_bg)
+    screen.blit(0, MAP_HEIGHT, menu_bg)
     button_width = SCALE
     starting_x = SCALE * 2 # two scaled "pixels"
-    starting_y = BOARD_HEIGHT + SCALE * 2
+    starting_y = MAP_HEIGHT + SCALE * 2
     button_spacing_x = SQ_SIZE * 3
     draw_x = SCALE*2
     draw_y = starting_y

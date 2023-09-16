@@ -108,8 +108,6 @@ def drawGameState(screen, gs, validMoves, sqSelected):
     drawBoard(screen)
     highlightSqures(screen, gs, validMoves, sqSelected)
     drawPieces(screen, gs.map, gs.unitList)
-    drawMenu(gs.menu)
-
 
 def drawBoard(screen):
     screen.blit(BOARDART, p.Rect(0, 0, WIDTH, HEIGHT))
@@ -144,18 +142,18 @@ def animateMove(move, screen, clock, gs):
         p.display.flip()
         clock.tick(60)        
 
-def drawMenu(menu, screen):
-    menu_bg = p.Surface((MENU_WIDTH, MENU_HEIGHT))
-    menu_bg.fill(p.Color('black'))
-    screen.blit(0, BOARD_HEIGHT, menu_bg)
-    button_width = 
-    starting_x = SCALE*2 # two scaled "pixels"
-    starting_y = BOARD_HEIGHT + SCALE*2
-    button_spacing_x = SQ_SIZE * 3
-    draw_x = SCALE*2
-    draw_y = starting_y
-    for button in menu.buttons:
-        button_s = p.Surface(())
+# def drawMenu(menu, screen):
+#     menu_bg = p.Surface((MENU_WIDTH, MENU_HEIGHT))
+#     menu_bg.fill(p.Color('black'))
+#     screen.blit(0, BOARD_HEIGHT, menu_bg)
+#     button_width = 
+#     starting_x = SCALE*2 # two scaled "pixels"
+#     starting_y = BOARD_HEIGHT + SCALE*2
+#     button_spacing_x = SQ_SIZE * 3
+#     draw_x = SCALE*2
+#     draw_y = starting_y
+#     for button in menu.buttons:
+#         button_s = p.Surface(())
 
 
 
