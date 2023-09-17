@@ -58,7 +58,7 @@ def main():
             elif e.type == p.MOUSEBUTTONDOWN:
                 target = p.mouse.get_pos()
                 if is_in_map(target):
-                    map_event_handler(target)
+                    map_event_handler(target, gs)
                 elif is_in_menu(target):
                     menu_event_handler(target, gs.map, gs.menu)
             elif e.type == p.KEYDOWN:  # later move this to menu
@@ -71,11 +71,15 @@ def main():
 
 def map_event_handler(mouse_pos, gs):
     phase = gs.phase
-    if phase == ANIMATING_MOVE or AWAITING_MENU_INSTRUCTION or ANIMATING_INSTRUCTION or TURN_TRANSITION:
+    if phase in {
+        EngineScript.Phase.ANIMATING_MOVE, 
+        EngineScript.Phase.AWAITING_MENU_INSTRUCTION, 
+        EngineScript.Phase.ANIMATING_INSTRUCTION, 
+        EngineScript.Phase.TURN_TRANSITION}:
         return
     selected_square = get_the_row_and_col(mouse_pos)
-    if phase == AWAITING_UNIT_SELECTION:
-        select_space(selected_square) # also need to support buying
+    if phase == EngineScript.Phase.AWAITING_UNIT_SELECTION:
+        select_space(selected_square, gs) # also need to support buying
     if phase == UNIT_SELECTED:
         prep_unit_move(selected_square, gs)
 
@@ -96,7 +100,7 @@ def highlightSqures(screen, gs, validMoves, sqSelected):
                 screen.blit(s, (move.endCol*SQ_SIZE, move.endRow*SQ_SIZE + WALLSIZE)) # add y offset later
 
 def select_space(selected_square, gs):
-    if square_is_occupised(selected_square):
+    if gs.square_is_occupised(selected_square):
         gs.select_space = gs.unit_list[selected_square[0]][selected_square[1]]
         gs.selected_square = selected_square
         gs.phase = Phase.UNIT_SELECTED
@@ -214,6 +218,16 @@ def square_can_produce(square, production_tiles):
     if square in gs.production:
         return true
     return false
+
+def is_in_map(pos):
+    return pos[1] < MAP_HEIGHT
+
+def get_the_row_and_col(pos):
+    x = pos[0] // SQ_SIZE
+    y = (pos[1] - WALLSIZE) // SQ_SIZE
+    return (x, y)
+
+def select_space
 
 if __name__ == "__main__":
     main()
