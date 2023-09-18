@@ -166,7 +166,7 @@ def display_units(screen, gs):
                     anim_taking_damage(unit, coords, thisUnit, screen)
                 
 def prep_unit_move(ref_square, gs):
-    if check_square_occupied(ref_square):
+    if gs.check_square_occupied(ref_square):
         return
     start_square = gs.selected_unit_location
     distance = sqrt((start_square(0)-ref_square(0))**2 + (start_square(1)-ref_square(1))**2)
