@@ -28,7 +28,7 @@ class GameState():
                                 (1, 0), (1, 1),(1, 2) ,(1, 3), (1, 4), (1, 5), (1, 6), (1, 7)]
         self.blueToMove = True
         self.moveLog = []
-        self.unitList = [FootSoldier("b"), FootSoldier("b"), FootSoldier("r"), FootSoldier("r"), FootSoldier("r")]
+        self.unit_list = [FootSoldier("b"), FootSoldier("b"), FootSoldier("r"), FootSoldier("r"), FootSoldier("r")]
         self.phase = Phase.AWAITING_UNIT_SELECTION
         self.selected_unit = None
         self.selected_square = None
@@ -45,22 +45,20 @@ class GameState():
             self.map[move.startRow][move.startCol] = move.pieceMoved
             self.map[move.endRow][move.endCol] = move.pieceCaptured
 
-    def getAllMoves(self):
-        moves = []        
-        for r in range(len(self.map)):
-            for c in range(len(self.map[r])):
-                unitIndex = self.map[r][c]
-                if unitIndex != -1:
-                    piece = self.unitList[unitIndex]
-                    turn = piece.team
-                    if (turn == "red" and not self.blueToMove) or (turn == "blue" and self.blueToMove):                                        
-                        moves = getValidMoves(r, c, piece._move_range)
+    def get_all_moves(self):
+        moves = []
+        piece = self.selected_unit
+        turn = piece._team
+        if (turn == "r" and not self.blueToMove) or (turn == "b" and self.blueToMove):                                        
+            moves = self.get_valid_moves(piece.move_range)
         return moves
                         
     def squareContainsUnit(self, row, col):
         return self.map[row][col] != -1
 
-    def getValidMoves(self, row, col, move_range):
+    def get_valid_moves(self, move_range):
+        col = self.selected_square[0]
+        row = self.selected_square[1]
         moves = []
         for i in range(1, move_range + 1):
             for j in range(1, move_range + 1):
@@ -89,6 +87,13 @@ class GameState():
             return False
         no_unit = (self.map[r][c] < 0)
         return no_unit
+
+    def square_is_occupied(self, square):
+        return self.map[square[1]][square[0]] != -1
+
+    def square_can_produce(self, square):        
+        return square in self.production_tiles
+        
                         
     # for each 1 to move range
         # look at the pair (row + j, col + (move_range - j))
@@ -119,7 +124,7 @@ class ArmyUnit:
         self.move_range = kwargs["move_range"]
         self._hit_points = kwargs["hit_points"]
         self._max_hit_points = kwargs["max_hit_points"]
-        self._team = "blue"
+        self._team = "b"
         self._unit_name = kwargs["unit_name"]
         self.anim = kwargs["anim"]
 

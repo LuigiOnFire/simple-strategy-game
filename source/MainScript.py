@@ -34,7 +34,6 @@ def main():
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     gs = EngineScript.GameState()
-    validMoves = gs.getAllMoves()
     moveMade = False # flag variable for when a move is made
     loadImages()
     running = True
@@ -64,8 +63,7 @@ def main():
             elif e.type == p.KEYDOWN:  # later move this to menu
                 if e.key == p.K_z:
                     gs.undoMove()
-                    validMoves = gs.getAllMoves()        
-        draw_game_state(screen, gs, validMoves, sqSelected)
+        draw_game_state(screen, gs, sqSelected)
         clock.tick(MAX_FPS)
         p.display.flip()
 
@@ -80,43 +78,44 @@ def map_event_handler(mouse_pos, gs):
     selected_square = get_the_row_and_col(mouse_pos)
     if phase == EngineScript.Phase.AWAITING_UNIT_SELECTION:
         select_space(selected_square, gs) # also need to support buying
-    if phase == UNIT_SELECTED:
+    elif phase == EngineScript.Phase.UNIT_SELECTED:
         prep_unit_move(selected_square, gs)
 
 def menu_event_handler(mouse_pos, gs):
     # fill in later
     pass
 
-def highlightSqures(screen, gs, validMoves, sqSelected):
-    if sqSelected != ():
-        r, c = sqSelected
+def highlight_spaces(screen, gs):    
+        c, r = gs.selected_square
         s = p.Surface((SQ_SIZE - SCALE / 2, SQ_SIZE - SCALE / 2))
         s.set_alpha(100) # 255 is opaque
         s.fill(p.Color('blue'))
-        screen.blit(s, (c*(SQ_SIZE), r*(SQ_SIZE) + WALLSIZE)) # add y offset later
+        screen.blit(s, (c*(SQ_SIZE), r*(SQ_SIZE) + WALLSIZE))
         s.fill(p.Color('blue'))
+        validMoves = gs.get_all_moves()
         for move in validMoves:
             if move.startRow == r and move.startCol == c:
-                screen.blit(s, (move.endCol*SQ_SIZE, move.endRow*SQ_SIZE + WALLSIZE)) # add y offset later
+                screen.blit(s, (move.endCol*SQ_SIZE, move.endRow*SQ_SIZE + WALLSIZE))
 
 def select_space(selected_square, gs):
-    if gs.square_is_occupised(selected_square):
-        gs.select_space = gs.unit_list[selected_square[0]][selected_square[1]]
+    if gs.square_is_occupied(selected_square):
+        unit_index = gs.map[selected_square[1]][selected_square[0]]
+        gs.selected_unit = gs.unit_list[unit_index]
         gs.selected_square = selected_square
-        gs.phase = Phase.UNIT_SELECTED
-    elif square_can_produce(selected_square, gs.production_tiles):
+        gs.phase = EngineScript.Phase.UNIT_SELECTED
+    elif gs.square_can_produce(selected_square):
         gs.selected_square = selected_square
-        gs.phase = Phase.UNIT_SELECTED
+        gs.phase = EngineScript.UNIT_SELECTED
 
-def draw_game_state(screen, gs, validMoves, sqSelected):
+def draw_game_state(screen, gs, sqSelected):
     if gs.phase == EngineScript.Phase.AWAITING_UNIT_SELECTION:
         display_map(screen)
         display_menu(screen, gs)
         display_units(screen, gs)
-    elif gs.phase == gs.Phase.UNIT_SELECTED:
+    elif gs.phase == EngineScript.Phase.UNIT_SELECTED:
         display_map(screen)
         display_menu(screen, gs)
-        highligh_spaces(gs.activeUnit, gs.map)
+        highlight_spaces(screen, gs)
         display_units(screen, gs)
     elif gs.phase == gs.Phase.ANIMATING_MOVE:
         display_map(screen)
@@ -130,7 +129,7 @@ def draw_game_state(screen, gs, validMoves, sqSelected):
         display_map(screen)
         display_menu(screen, gs)
         display_units(screen, gs)
-        highlight_spaces(screen, gs, map)
+        highlight_spaces(screen, gs)
     elif gs.phase == gs.Phase.ANIMATING_INSTRUCTION:
         display_map(screen)
         display_menu(screen, gs)
@@ -155,7 +154,7 @@ def display_units(screen, gs):
             index = gs.map[r][c]
             coords = (r, c)
             if index != -1:
-                thisUnit = gs.unitList[index]
+                thisUnit = gs.unit_list[index]
                 anim = thisUnit.anim
                 if isinstance(anim, Anim.StillAnim):
                     animate_still(index, coords, thisUnit, screen)
@@ -192,12 +191,12 @@ def animate_move(move, screen, clock, gs):
     for frame in range(frameCount + 1):
         r, c = (move.startRow + dR*frame/frameCount, move.startCol + dC*frame/frameCount)
         drawBoard(screen)
-        drawPieces(screen, gs.map, gs.unitList)
+        drawPieces(screen, gs.map, gs.unit_list)
         # erase the piece from its ending square
         endSquare = p.Rect(move.endCol*SQ_SIZE, move.endRow*SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE)
         screen.blit(BOARDART, endSquare, endSquare)
         # show moving piece
-        screen.blit(IMAGES[gs.unitList[move.pieceMoved].team(), gs.unitList[move.pieceMoved].unit_name()], p.Rect(c*SQ_SIZE, r*SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE))
+        screen.blit(IMAGES[gs.unit_list[move.pieceMoved].team(), gs.unit_list[move.pieceMoved].unit_name()], p.Rect(c*SQ_SIZE, r*SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE))
         p.display.flip()
         clock.tick(60)
 
@@ -214,8 +213,8 @@ def drawMenu(menu, screen):
     for button in menu.buttons:
         button_s = p.Surface(())
 
-def square_can_produce(square, production_tiles):
-    if square in gs.production:
+def square_can_produce(square, gs):
+    if square in gs.production_tiles:
         return true
     return false
 
@@ -226,8 +225,6 @@ def get_the_row_and_col(pos):
     x = pos[0] // SQ_SIZE
     y = (pos[1] - WALLSIZE) // SQ_SIZE
     return (x, y)
-
-def select_space
 
 if __name__ == "__main__":
     main()
