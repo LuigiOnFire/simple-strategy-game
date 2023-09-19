@@ -23,7 +23,7 @@ class GameState():
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, 2, 3, -1, -1, -1],
-        ] 
+        ]
         self.production_tiles = [(0, 0), (0, 1),(0, 2) ,(0, 3), (0, 4), (0, 5), (0, 6), (0, 7), 
                                 (1, 0), (1, 1),(1, 2) ,(1, 3), (1, 4), (1, 5), (1, 6), (1, 7)]
         self.blueToMove = True
@@ -32,6 +32,7 @@ class GameState():
         self.phase = Phase.AWAITING_UNIT_SELECTION
         self.selected_unit = None
         self.selected_square = None
+        self.next_move = None
 
     def makeMove(self, move):
         self.map[move.startRow][move.startCol] = -1

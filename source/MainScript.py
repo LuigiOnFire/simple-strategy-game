@@ -1,6 +1,7 @@
 import pygame as p
 import EngineScript
 import Anim
+import math
 
 SCALE = 4
 MAP_X = 8
@@ -103,9 +104,9 @@ def select_space(selected_square, gs):
         gs.selected_unit = gs.unit_list[unit_index]
         gs.selected_square = selected_square
         gs.phase = EngineScript.Phase.UNIT_SELECTED
-    elif gs.square_can_produce(selected_square):
-        gs.selected_square = selected_square
-        gs.phase = EngineScript.UNIT_SELECTED
+    # elif gs.square_can_produce(selected_square):
+    #     gs.selected_square = selected_square
+    #     gs.phase = EngineScript.Phase.UNIT_SELECTED
 
 def draw_game_state(screen, gs, sqSelected):
     if gs.phase == EngineScript.Phase.AWAITING_UNIT_SELECTION:
@@ -117,24 +118,24 @@ def draw_game_state(screen, gs, sqSelected):
         display_menu(screen, gs)
         highlight_spaces(screen, gs)
         display_units(screen, gs)
-    elif gs.phase == gs.Phase.ANIMATING_MOVE:
+    elif gs.phase == EngineScript.Phase.ANIMATING_MOVE:
         display_map(screen)
         display_menu(screen, gs)
         display_units(screen, gs)
-    elif gs.phase == gs.Phase.AWAITING_MENU_INSTRUCTION:
+    elif gs.phase == EngineScript.Phase.AWAITING_MENU_INSTRUCTION:
         display_map(screen)
         display_menu(screen, gs)
         display_units(screen, gs)
-    elif gs.phase == gs.Phase.SELECTING_TARGET:
+    elif gs.phase == EngineScript.Phase.SELECTING_TARGET:
         display_map(screen)
         display_menu(screen, gs)
         display_units(screen, gs)
         highlight_spaces(screen, gs)
-    elif gs.phase == gs.Phase.ANIMATING_INSTRUCTION:
+    elif gs.phase == EngineScript.Phase.ANIMATING_INSTRUCTION:
         display_map(screen)
         display_menu(screen, gs)
         display_units(screen, gs)
-    elif gs.phase == gs.Phase.TURN_TRANSITION:
+    elif gs.phase == EngineScript.Phase.TURN_TRANSITION:
         display_map(screen)
         display_menu(screen, gs)
         display_units(screen, gs)
@@ -157,7 +158,7 @@ def display_units(screen, gs):
                 thisUnit = gs.unit_list[index]
                 anim = thisUnit.anim
                 if isinstance(anim, Anim.StillAnim):
-                    animate_still(index, coords, thisUnit, screen)
+                    animate_still(coords, thisUnit, screen)
                 if isinstance(anim, Anim.MovingAnim):
                     animate_moving(index, coords, thisUnit, screen)
                 if isinstance(anim, Anim.AttackAnim):
@@ -166,30 +167,36 @@ def display_units(screen, gs):
                     anim_taking_damage(unit, coords, thisUnit, screen)
                 
 def prep_unit_move(ref_square, gs):
-    if gs.check_square_occupied(ref_square):
+    if gs.square_is_occupied(ref_square):
         return
-    start_square = gs.selected_unit_location
-    distance = sqrt((start_square(0)-ref_square(0))**2 + (start_square(1)-ref_square(1))**2)
-    frmes_per_square = 10 # change this as you like
+    frames_per_square = 10 # change this as desired
+    start_square = gs.selected_square
+    distance = math.sqrt((start_square[0]-ref_square[0])**2 + (start_square[1]-ref_square[1])**2)    
     duration = distance*frames_per_square
-    anim = MovingAnim(duration, ref_square)
-    unit = unit_list[gs.selected_unit_index]
+    anim = Anim.MovingAnim(duration, start_square, ref_square)
+    unit = gs.selected_unit
     unit.anim = anim
-    gs.phase = Phase.ANIMATING_MOVE
+    gs.phase = EngineScript.Phase.ANIMATING_MOVE
 
-def animate_still(index, coords, thisUnit, screen):
+def animate_still(coords, thisUnit, screen):
     (r, c) = coords
     thisType = thisUnit.unit_name()
     thisTeam = thisUnit.team()
     screen.blit(IMAGES[thisTeam, thisType], p.Rect(c*SQ_SIZE, r*SQ_SIZE+WALLSIZE, SQ_SIZE, SQ_SIZE))
 
-def animate_move(move, screen, clock, gs):
-    dR = move.endRow - move.startRow
-    dC = move.endCol - move.startCol
+def animate_moving(coords, thisUnit, screen, gs):
+    anim = thisUnit.anim
+    start_square = anim.start_square
+    end_square = anim.end_square
+
+    # in our square variables, I believe first is column (x), then row (y)
+
+    dR = end_square[1] - start_square[1]
+    dC = end_square[0] - start_square[0]
     framesPerSquare = 10
     frameCount = (abs(dR) + abs(dC)) + framesPerSquare
     for frame in range(frameCount + 1):
-        r, c = (move.startRow + dR*frame/frameCount, move.startCol + dC*frame/frameCount)
+        r, c = (start_square[1] + dR*frame/frameCount, start_square[0] + dC*frame/frameCount)
         drawBoard(screen)
         drawPieces(screen, gs.map, gs.unit_list)
         # erase the piece from its ending square
