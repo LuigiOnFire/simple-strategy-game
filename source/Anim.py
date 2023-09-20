@@ -1,7 +1,9 @@
 CONST_ATTACK_DURATION = 10
 
-class StillAnim:
-    pass
+class StillAnim():
+    def __init__(self, square):
+        self.square = square
+    
 
 class MovingAnim:
     def __init__(self, duration, start_square, end_square):

@@ -34,6 +34,12 @@ class GameState():
         self.selected_square = None
         self.next_move = None
 
+    def setup_still_anims(self):
+        for r in range(MAP_Y):
+            for c in range(MAP_X):
+                if self.map[r][c]:
+                    self.unit_list.
+
     def makeMove(self, move):
         self.map[move.startRow][move.startCol] = -1
         self.map[move.endRow][move.endCol] = move.pieceMoved
@@ -57,7 +63,7 @@ class GameState():
     def squareContainsUnit(self, row, col):
         return self.map[row][col] != -1
 
-    def get_valid_moves(self, move_range):
+    def get_valid_moves(self, move_range): # this is super scuffed and should be made into a proper bfs
         col = self.selected_square[0]
         row = self.selected_square[1]
         moves = []
@@ -143,7 +149,7 @@ class FootSoldier(ArmyUnit):
             "hit_points": 1,
             "max_hit_points": 1,
             "unit_name": "footsoldier",
-            "anim": Anim.StillAnim(),            
+            "anim": Anim.StillAnim((0, 0)),
         }
         super().__init__(**kwargs)
         self._team = team        

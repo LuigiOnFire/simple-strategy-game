@@ -14,7 +14,7 @@ MENU_WIDTH = MAP_WIDTH
 MENU_HEIGHT = 16 * SCALE # one square for now
 WIDTH = 128 * SCALE
 HEIGHT = 192 * SCALE
-MAX_FPS = 15
+MAX_FPS = 30
 IMAGES = {}
 BOARDART = p.image.load("Sprites/field.png")
 BOARDART = p.transform.scale(BOARDART, (MAP_WIDTH, MAP_HEIGHT))
@@ -47,10 +47,10 @@ def main():
         "max_hit_points": 1,
         "unit_name": "Foot Soldier",
         "team": "blue",
-        "anim": Anim.StillAnim, 
+        "anim": Anim.StillAnim(), 
     }
-    thisUnit = EngineScript.FootSoldier
-    #thisUnit = EngineScript.ArmyUnit(kwargs)
+    this_unit = EngineScript.FootSoldier
+    #this_unit = EngineScript.ArmyUnit(kwargs)
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
@@ -155,21 +155,21 @@ def display_units(screen, gs):
             index = gs.map[r][c]
             coords = (r, c)
             if index != -1:
-                thisUnit = gs.unit_list[index]
-                anim = thisUnit.anim
+                this_unit = gs.unit_list[index]
+                anim = this_unit.anim
                 if isinstance(anim, Anim.StillAnim):
-                    animate_still(coords, thisUnit, screen)
+                    animate_still(coords, this_unit, screen)
                 if isinstance(anim, Anim.MovingAnim):
-                    animate_moving(index, coords, thisUnit, screen)
+                    animate_moving(coords, this_unit, screen, gs)
                 if isinstance(anim, Anim.AttackAnim):
-                    animate_attacking(index, coords, thisUnit, screen)
+                    animate_attacking(index, coords, this_unit, screen)
                 if isinstance(anim, Anim.TakingDamageAnim):
-                    anim_taking_damage(unit, coords, thisUnit, screen)
+                    anim_taking_damage(unit, coords, this_unit, screen)
                 
 def prep_unit_move(ref_square, gs):
     if gs.square_is_occupied(ref_square):
         return
-    frames_per_square = 10 # change this as desired
+    frames_per_square = 5 # change this as desired
     start_square = gs.selected_square
     distance = math.sqrt((start_square[0]-ref_square[0])**2 + (start_square[1]-ref_square[1])**2)    
     duration = distance*frames_per_square
@@ -178,14 +178,14 @@ def prep_unit_move(ref_square, gs):
     unit.anim = anim
     gs.phase = EngineScript.Phase.ANIMATING_MOVE
 
-def animate_still(coords, thisUnit, screen):
-    (r, c) = coords
-    thisType = thisUnit.unit_name()
-    thisTeam = thisUnit.team()
+def animate_still(this_unit, screen):
+    (r, c) = this_unit.anim.square
+    thisType = this_unit.unit_name()
+    thisTeam = this_unit.team()
     screen.blit(IMAGES[thisTeam, thisType], p.Rect(c*SQ_SIZE, r*SQ_SIZE+WALLSIZE, SQ_SIZE, SQ_SIZE))
 
-def animate_moving(coords, thisUnit, screen, gs):
-    anim = thisUnit.anim
+def animate_moving(coords, this_unit, screen, gs):
+    anim = this_unit.anim
     start_square = anim.start_square
     end_square = anim.end_square
 
@@ -193,19 +193,18 @@ def animate_moving(coords, thisUnit, screen, gs):
 
     dR = end_square[1] - start_square[1]
     dC = end_square[0] - start_square[0]
-    framesPerSquare = 10
-    frameCount = (abs(dR) + abs(dC)) + framesPerSquare
-    for frame in range(frameCount + 1):
-        r, c = (start_square[1] + dR*frame/frameCount, start_square[0] + dC*frame/frameCount)
-        drawBoard(screen)
-        drawPieces(screen, gs.map, gs.unit_list)
-        # erase the piece from its ending square
-        endSquare = p.Rect(move.endCol*SQ_SIZE, move.endRow*SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE)
-        screen.blit(BOARDART, endSquare, endSquare)
-        # show moving piece
-        screen.blit(IMAGES[gs.unit_list[move.pieceMoved].team(), gs.unit_list[move.pieceMoved].unit_name()], p.Rect(c*SQ_SIZE, r*SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE))
-        p.display.flip()
-        clock.tick(60)
+    dura = this_unit.anim.duration
+    curr = this_unit.anim.timer
+    r, c = (start_square[1] + dR*curr/dura, start_square[0] + dC*curr/dura)
+
+    # show moving piece
+    screen.blit(IMAGES[this_unit.team(), this_unit.unit_name()], p.Rect(c*SQ_SIZE, r*SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE))
+    p.display.flip()
+
+    this_unit.anim.timer += 1
+    if this_unit.anim.timer >= this_unit.anim.duration:
+        this_unit.anim = Anim.StillAnim()
+
 
 def drawMenu(menu, screen):
     menu_bg = p.Surface((MENU_WIDTH, MENU_HEIGHT))
