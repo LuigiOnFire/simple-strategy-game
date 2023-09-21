@@ -1,7 +1,7 @@
 CONST_ATTACK_DURATION = 10
 
 class StillAnim():
-    def __init__(self, square):
+   def __init__(self, square=None):
         self.square = square
     
 

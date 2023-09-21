@@ -40,6 +40,7 @@ def main():
     running = True
     sqSelected = () #tracks the row and the column
     playerClicks = [] #two tuples that keep track of the two squares the player has clicked
+    gs.setup_still_anims()
     kwargs = {
         "attack_range": 1,
         "move_range": 1,
@@ -158,7 +159,7 @@ def display_units(screen, gs):
                 this_unit = gs.unit_list[index]
                 anim = this_unit.anim
                 if isinstance(anim, Anim.StillAnim):
-                    animate_still(coords, this_unit, screen)
+                    animate_still(coords, this_unit,  screen)
                 if isinstance(anim, Anim.MovingAnim):
                     animate_moving(coords, this_unit, screen, gs)
                 if isinstance(anim, Anim.AttackAnim):
@@ -178,8 +179,11 @@ def prep_unit_move(ref_square, gs):
     unit.anim = anim
     gs.phase = EngineScript.Phase.ANIMATING_MOVE
 
-def animate_still(this_unit, screen):
-    (r, c) = this_unit.anim.square
+def animate_still(coords, this_unit, screen): 
+    if this_unit.anim.square == None:
+        (r, c) = coords  
+    else:
+        (r, c) = this_unit.anim.square    
     thisType = this_unit.unit_name()
     thisTeam = this_unit.team()
     screen.blit(IMAGES[thisTeam, thisType], p.Rect(c*SQ_SIZE, r*SQ_SIZE+WALLSIZE, SQ_SIZE, SQ_SIZE))
@@ -203,7 +207,7 @@ def animate_moving(coords, this_unit, screen, gs):
 
     this_unit.anim.timer += 1
     if this_unit.anim.timer >= this_unit.anim.duration:
-        this_unit.anim = Anim.StillAnim()
+        this_unit.anim = Anim.StillAnim((end_square[1], end_square[0]))
 
 
 def drawMenu(menu, screen):

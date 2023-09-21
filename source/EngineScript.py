@@ -35,10 +35,12 @@ class GameState():
         self.next_move = None
 
     def setup_still_anims(self):
-        for r in range(MAP_Y):
-            for c in range(MAP_X):
-                if self.map[r][c]:
-                    self.unit_list.
+        for r in range(len(self.map)):
+            for c in range(len(self.map[0])):
+                index = self.map[r][c]
+                if index > -1:
+                    this_unit = self.unit_list[index]
+                    this_unit.anim = Anim.StillAnim((r, c))
 
     def makeMove(self, move):
         self.map[move.startRow][move.startCol] = -1
