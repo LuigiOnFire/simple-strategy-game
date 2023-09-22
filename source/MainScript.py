@@ -10,8 +10,7 @@ SQ_SIZE = 16*SCALE
 WALLSIZE = 8*SCALE
 MAP_WIDTH = MAP_X * SQ_SIZE
 MAP_HEIGHT = MAP_Y * SQ_SIZE + WALLSIZE * 2
-MENU_WIDTH = MAP_WIDTH
-MENU_HEIGHT = 16 * SCALE # one square for now
+MENU_WIDTH = MAP_WIDTH // 6
 WIDTH = 128 * SCALE
 HEIGHT = 192 * SCALE
 MAX_FPS = 30
@@ -112,34 +111,33 @@ def select_space(selected_square, gs):
 def draw_game_state(screen, gs, sqSelected):
     if gs.phase == EngineScript.Phase.AWAITING_UNIT_SELECTION:
         display_map(screen)
-        display_menu(screen, gs)
         display_units(screen, gs)
-    elif gs.phase == EngineScript.Phase.UNIT_SELECTED:
-        display_map(screen)
         display_menu(screen, gs)
+    elif gs.phase == EngineScript.Phase.UNIT_SELECTED:
+        display_map(screen)        
         highlight_spaces(screen, gs)
         display_units(screen, gs)
-    elif gs.phase == EngineScript.Phase.ANIMATING_MOVE:
-        display_map(screen)
         display_menu(screen, gs)
+    elif gs.phase == EngineScript.Phase.ANIMATING_MOVE:
+        display_map(screen)        
         display_units(screen, gs)
+        display_menu(screen, gs)
     elif gs.phase == EngineScript.Phase.AWAITING_MENU_INSTRUCTION:
         display_map(screen)
-        display_menu(screen, gs)
         display_units(screen, gs)
-    elif gs.phase == EngineScript.Phase.SELECTING_TARGET:
-        display_map(screen)
         display_menu(screen, gs)
+    elif gs.phase == EngineScript.Phase.SELECTING_TARGET:
+        display_map(screen)        
         display_units(screen, gs)
         highlight_spaces(screen, gs)
+        display_menu(screen, gs)
     elif gs.phase == EngineScript.Phase.ANIMATING_INSTRUCTION:
-        display_map(screen)
-        display_menu(screen, gs)
+        display_map(screen)        
         display_units(screen, gs)
+        display_menu(screen, gs)
     elif gs.phase == EngineScript.Phase.TURN_TRANSITION:
-        display_map(screen)
-        display_menu(screen, gs)
-        display_units(screen, gs)
+        display_map(screen)        
+        display_units(screen, gs)        
         animate_turn_banner()
 
     
@@ -147,6 +145,33 @@ def display_map(screen):
     screen.blit(BOARDART, p.Rect(0, 0, MAP_WIDTH, MAP_HEIGHT))
 
 def display_menu(screeen, gs):
+    X_SCREEN_PADDING = WIDTH // 8
+    Y_SCREEN_PADDING = HEIGHT // 8
+    BORDER_PADDING = 2 * SCALE
+    BUTTON_HEIGHT = 12 * SCALE
+    # maybe move MENU_WIDTH here    
+    right_side = True
+    top_side = True
+    if gs.selected_square[1] > MAP_X // 2:
+        right_side = False
+    if gs.selected_square[0] < MAP_Y // 2:
+        left_side = False
+    
+    menu_height = len(gs.menu.buttons)
+
+    if right_side:
+        border_top_left_x = WIDTH - X_SCREEN_PADDING - MENU_WIDTH - 2 * BORDER_PADDING
+    else:
+        border_top_left_x = X_SCREEN_PADDING
+
+    if top_side:
+        border_top_left_y = Y_SCREEN_PADDING
+    else: 
+        border_top_left_y = HEIGHT - Y_SCREEN_PADDING - menu_height * 2 * BORDER_PADDING
+    # display the border
+    # display the body
+    # for each active button
+        # display the icon and the text
     pass
 
 def display_units(screen, gs):
@@ -203,7 +228,6 @@ def animate_moving(coords, this_unit, screen, gs):
 
     # show moving piece
     screen.blit(IMAGES[this_unit.team(), this_unit.unit_name()], p.Rect(c*SQ_SIZE, r*SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE))
-    p.display.flip()
 
     this_unit.anim.timer += 1
     if this_unit.anim.timer >= this_unit.anim.duration:
