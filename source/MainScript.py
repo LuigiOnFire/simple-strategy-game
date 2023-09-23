@@ -144,31 +144,46 @@ def draw_game_state(screen, gs, sqSelected):
 def display_map(screen):
     screen.blit(BOARDART, p.Rect(0, 0, MAP_WIDTH, MAP_HEIGHT))
 
-def display_menu(screeen, gs):
+def display_menu(screen, gs):
     X_SCREEN_PADDING = WIDTH // 8
     Y_SCREEN_PADDING = HEIGHT // 8
     BORDER_PADDING = 2 * SCALE
     BUTTON_HEIGHT = 12 * SCALE
+    border_width = MENU_WIDTH + 2 * BORDER_PADDING    
+
+    border_color = p.Color('gray25')
+    fill_color = p.Color('gray75')
+
     # maybe move MENU_WIDTH here    
     right_side = True
     top_side = True
-    if gs.selected_square[1] > MAP_X // 2:
-        right_side = False
-    if gs.selected_square[0] < MAP_Y // 2:
-        left_side = False
+    if gs.selected_square != None: # later this should probably be an exception
+        if gs.selected_square[1] > MAP_X // 2:
+            right_side = False
+        if gs.selected_square[0] < MAP_Y // 2:
+            left_side = False
     
-    menu_height = len(gs.menu.buttons)
+    # menu_height = len(gs.menu.buttons) * BUTTON_HEIGHT
+    menu_height = 4 * BUTTON_HEIGHT
+    border_height = menu_height + 2 * BORDER_PADDING
 
     if right_side:
-        border_top_left_x = WIDTH - X_SCREEN_PADDING - MENU_WIDTH - 2 * BORDER_PADDING
+        border_top_left_x = WIDTH - X_SCREEN_PADDING - border_width
     else:
         border_top_left_x = X_SCREEN_PADDING
 
     if top_side:
         border_top_left_y = Y_SCREEN_PADDING
     else: 
-        border_top_left_y = HEIGHT - Y_SCREEN_PADDING - menu_height * 2 * BORDER_PADDING
+        border_top_left_y = HEIGHT - Y_SCREEN_PADDING - border_height
+    border_position = (border_top_left_x, border_top_left_y)
+
+
     # display the border
+    border_surface = p.Surface((border_width, border_height))
+    border_surface.fill(border_color)
+    screen.blit(border_surface, border_position)
+
     # display the body
     # for each active button
         # display the icon and the text
