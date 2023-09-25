@@ -18,7 +18,10 @@ class WaitButton(Button):
     def __init__:
         # self.icon = p.image.load()
         self.text = "Wait"
-        self.priorit = 1
+        self.priority = 1
 
 # cancel
 class CancelButton(Button):
+    def __init__:
+        self.text = "Cancel"
+        self.priority = 2
