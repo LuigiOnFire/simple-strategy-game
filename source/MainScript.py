@@ -185,8 +185,11 @@ def display_menu(screen, gs):
     screen.blit(border_surface, border_position)
 
     # display the body
+    
+
     # for each active button
         # display the icon and the text
+        # color in rgb is (255, 255, 127)
     pass
 
 def display_units(screen, gs):
