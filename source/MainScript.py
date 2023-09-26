@@ -10,7 +10,7 @@ SQ_SIZE = 16*SCALE
 WALLSIZE = 8*SCALE
 MAP_WIDTH = MAP_X * SQ_SIZE
 MAP_HEIGHT = MAP_Y * SQ_SIZE + WALLSIZE * 2
-MENU_WIDTH = MAP_WIDTH // 6
+MENU_WIDTH = MAP_WIDTH // 4
 WIDTH = 128 * SCALE
 HEIGHT = 192 * SCALE
 MAX_FPS = 30
@@ -112,16 +112,13 @@ def draw_game_state(screen, gs, sqSelected):
     if gs.phase == EngineScript.Phase.AWAITING_UNIT_SELECTION:
         display_map(screen)
         display_units(screen, gs)
-        display_menu(screen, gs)
     elif gs.phase == EngineScript.Phase.UNIT_SELECTED:
         display_map(screen)        
         highlight_spaces(screen, gs)
         display_units(screen, gs)
-        display_menu(screen, gs)
     elif gs.phase == EngineScript.Phase.ANIMATING_MOVE:
         display_map(screen)        
         display_units(screen, gs)
-        display_menu(screen, gs)
     elif gs.phase == EngineScript.Phase.AWAITING_MENU_INSTRUCTION:
         display_map(screen)
         display_units(screen, gs)
@@ -130,11 +127,9 @@ def draw_game_state(screen, gs, sqSelected):
         display_map(screen)        
         display_units(screen, gs)
         highlight_spaces(screen, gs)
-        display_menu(screen, gs)
     elif gs.phase == EngineScript.Phase.ANIMATING_INSTRUCTION:
         display_map(screen)        
         display_units(screen, gs)
-        display_menu(screen, gs)
     elif gs.phase == EngineScript.Phase.TURN_TRANSITION:
         display_map(screen)        
         display_units(screen, gs)        
@@ -147,12 +142,12 @@ def display_map(screen):
 def display_menu(screen, gs):
     X_SCREEN_PADDING = WIDTH // 8
     Y_SCREEN_PADDING = HEIGHT // 8
-    BORDER_PADDING = 2 * SCALE
+    BORDER_PADDING = 1 * SCALE
     BUTTON_HEIGHT = 12 * SCALE
     border_width = MENU_WIDTH + 2 * BORDER_PADDING    
 
     border_color = p.Color('gray25')
-    fill_color = p.Color('gray75')
+    body_color = p.Color('gray50')
 
     # maybe move MENU_WIDTH here    
     right_side = True
@@ -163,8 +158,7 @@ def display_menu(screen, gs):
         if gs.selected_square[0] < MAP_Y // 2:
             left_side = False
     
-    # menu_height = len(gs.menu.buttons) * BUTTON_HEIGHT
-    menu_height = 4 * BUTTON_HEIGHT
+    menu_height = len(gs.menu.buttons) * BUTTON_HEIGHT    
     border_height = menu_height + 2 * BORDER_PADDING
 
     if right_side:
@@ -178,6 +172,10 @@ def display_menu(screen, gs):
         border_top_left_y = HEIGHT - Y_SCREEN_PADDING - border_height
     border_position = (border_top_left_x, border_top_left_y)
 
+    body_top_left_x = border_top_left_x + BORDER_PADDING
+    body_top_left_y = border_top_left_y + BORDER_PADDING
+    body_position = (body_top_left_x, body_top_left_y)
+
 
     # display the border
     border_surface = p.Surface((border_width, border_height))
@@ -185,7 +183,10 @@ def display_menu(screen, gs):
     screen.blit(border_surface, border_position)
 
     # display the body
-    
+    body_surface = p.Surface((MENU_WIDTH, menu_height))
+    body_surface.fill(body_color)
+    screen.blit(body_surface, body_position)
+
 
     # for each active button
         # display the icon and the text
@@ -222,14 +223,24 @@ def prep_unit_move(ref_square, gs):
     unit.anim = anim
     gs.phase = EngineScript.Phase.ANIMATING_MOVE
 
+    # move to new method
+    adj_squares = [(ref_square[0] + 1, ref_square[1]), (ref_square[0] - 1, ref_square[1]), (ref_square[0], ref_square[1] + 1), (ref_square[0], ref_square[1] - 1)]
+    for adj_square in adj_squares:        
+        # if it's in range AND if it's occupied
+        if gs.square_is_occupied(adj_square):
+            gs.menu.buttons.push(GameMenu.AttackButton())
+            break
+    gs.menu.buttons.push(GameMenu.WaitButton())
+    gs.menu.buttons.push(GameMenu.CancelButton())
+
 def animate_still(coords, this_unit, screen): 
     if this_unit.anim.square == None:
         (r, c) = coords  
     else:
         (r, c) = this_unit.anim.square    
-    thisType = this_unit.unit_name()
-    thisTeam = this_unit.team()
-    screen.blit(IMAGES[thisTeam, thisType], p.Rect(c*SQ_SIZE, r*SQ_SIZE+WALLSIZE, SQ_SIZE, SQ_SIZE))
+    this_type = this_unit.unit_name()
+    this_team = EngineScript.Team.to_string(this_unit.team())
+    screen.blit(IMAGES[this_team, this_type], p.Rect(c*SQ_SIZE, r*SQ_SIZE+WALLSIZE, SQ_SIZE, SQ_SIZE))
 
 def animate_moving(coords, this_unit, screen, gs):
     anim = this_unit.anim
@@ -245,6 +256,8 @@ def animate_moving(coords, this_unit, screen, gs):
     r, c = (start_square[1] + dR*curr/dura, start_square[0] + dC*curr/dura)
 
     # show moving piece
+    this_team = this_unit.team.to_string()    
+
     screen.blit(IMAGES[this_unit.team(), this_unit.unit_name()], p.Rect(c*SQ_SIZE, r*SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE))
 
     this_unit.anim.timer += 1

@@ -1,5 +1,6 @@
 from enum import Enum
 import Anim
+import GameMenu
 
 class GameState():
     def __init__(self):
@@ -28,11 +29,12 @@ class GameState():
                                 (1, 0), (1, 1),(1, 2) ,(1, 3), (1, 4), (1, 5), (1, 6), (1, 7)]
         self.blueToMove = True
         self.moveLog = []
-        self.unit_list = [FootSoldier("b"), FootSoldier("b"), FootSoldier("r"), FootSoldier("r"), FootSoldier("r")]
+        self.unit_list = [FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.RED), FootSoldier(Team.RED)]
         self.phase = Phase.AWAITING_UNIT_SELECTION
         self.selected_unit = None
         self.selected_square = None
         self.next_move = None
+        self.menu = GameMenu.GameMenu()
 
     def setup_still_anims(self):
         for r in range(len(self.map)):
@@ -69,24 +71,10 @@ class GameState():
         col = self.selected_square[0]
         row = self.selected_square[1]
         moves = []
-        for i in range(1, move_range + 1):
-            for j in range(1, move_range + 1):
-                rt = row + j
-                ct = col + (i - j)
-                if self.validatePair(rt, ct):
-                    moves.append((Move((row, col), (rt, ct), self.map)))
-                rt = row + (i - j)
-                ct = col + j
-                if self.validatePair(rt, ct):
-                    moves.append((Move((row, col), (rt, ct), self.map)))
-                rt = row - j
-                ct = col - (i - j)
-                if self.validatePair(rt, ct):
-                    moves.append((Move((row, col), (rt, ct), self.map)))
-                rt = row + (i - j)
-                ct = col - j
-                if self.validatePair(rt, ct):
-                    moves.append((Move((row, col), (rt, ct), self.map)))
+        to_seek = []
+
+        while 
+        
         return moves
 
     def validatePair(self, r, c):
@@ -99,6 +87,15 @@ class GameState():
 
     def square_is_occupied(self, square):
         return self.map[square[1]][square[0]] != -1
+
+    def square_is_occupied_by_hostile(self, square, team):
+        unit_index = self.map[square[1]][square[0]]
+        if unit_index == -1:
+            return False
+        unit = self.unit_list[unit_index]
+        team = unit.team
+        return team == unit.team
+        
 
     def square_can_produce(self, square):        
         return square in self.production_tiles
@@ -141,7 +138,7 @@ class ArmyUnit:
         return self._unit_name
 
     def team(self):
-        return self._team # team should really be an enum
+        return self._team
 
 class FootSoldier(ArmyUnit):
     def __init__(self, team):
@@ -164,3 +161,12 @@ class Phase(Enum):
     SELECTING_TARGET = 4
     ANIMATING_INSTRUCTION = 5
     TURN_TRANSITION = 6
+
+class Team(Enum):
+    BLUE = 0
+    RED = 1
+
+    @staticmethod
+    def to_string(color):
+        names = ["b", "r"]
+        return names[color.value]
