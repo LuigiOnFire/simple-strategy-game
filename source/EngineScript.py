@@ -60,7 +60,7 @@ class GameState():
         moves = []
         piece = self.selected_unit
         turn = piece._team
-        if (turn == "r" and not self.blueToMove) or (turn == "b" and self.blueToMove):                                        
+        if (turn == Team.RED and not self.blueToMove) or (turn == Team.BLUE and self.blueToMove):                                        
             moves = self.get_valid_moves(piece.move_range)
         return moves
                         
@@ -72,8 +72,26 @@ class GameState():
         row = self.selected_square[1]
         moves = []
         to_seek = []
+        visited = set()
 
-        while 
+        to_seek.append(((row, col), move_range))
+        while to_seek:            
+            q = to_seek.pop()
+            sq = q[0]
+            range = q[1]
+
+            adj_list = (
+                (sq[0] + 1, sq[1]), 
+                (sq[0] - 1, sq[1]), 
+                (sq[0], sq[1] + 1), 
+                (sq[0], sq[1] - 1)
+            )
+            for adj in adj_list:
+                if self.is_on_map(adj) and self not in visited and range - 1 >= 0:
+                    to_seek.append((adj, range - 1))
+                    visited.add((adj))
+        for v in visited:
+            moves.append(Move((row, col), (v), self.map))
         
         return moves
 
@@ -99,6 +117,18 @@ class GameState():
 
     def square_can_produce(self, square):        
         return square in self.production_tiles
+        
+    def is_on_map(self, sq):
+        width = len(self.map[0])
+        height = len(self.map)
+
+        if not (0 <= sq[0] < width):
+            return False
+
+        if not (0 <= sq[1] < height):
+            return False
+
+        return True
         
                         
     # for each 1 to move range

@@ -143,8 +143,9 @@ def display_menu(screen, gs):
     X_SCREEN_PADDING = WIDTH // 8
     Y_SCREEN_PADDING = HEIGHT // 8
     BORDER_PADDING = 1 * SCALE
-    BUTTON_HEIGHT = 12 * SCALE
+    BUTTON_HEIGHT = 6 * SCALE
     border_width = MENU_WIDTH + 2 * BORDER_PADDING    
+    icon_width = 4 * SCALE
 
     border_color = p.Color('gray25')
     body_color = p.Color('gray50')
@@ -188,9 +189,15 @@ def display_menu(screen, gs):
     screen.blit(body_surface, body_position)
 
 
-    # for each active button
-        # display the icon and the text
+    for i in (0, len(gs.menu.buttons) - 1):
+        screen.blit(gs.menu.buttons[i].icon, (body_top_left_x + BORDER_PADDING, body_top_left_y + BORDER_PADDING + (i * BUTTON_HEIGHT)))
         # color in rgb is (255, 255, 127)
+        font = p.font.Font('freesansbold.ttf', 12)
+        font_color = p.Color(255, 255, 127)
+        text = font.render('Abcdefg', True, font_color, body_color)
+        textRect = text.get_rect()
+        screen.blit(text, (body_top_left_x + BORDER_PADDING + icon_width, body_top_left_y + BORDER_PADDING + (i * BUTTON_HEIGHT)))
+
     pass
 
 def display_units(screen, gs):
@@ -228,10 +235,10 @@ def prep_unit_move(ref_square, gs):
     for adj_square in adj_squares:        
         # if it's in range AND if it's occupied
         if gs.square_is_occupied(adj_square):
-            gs.menu.buttons.push(GameMenu.AttackButton())
+            gs.menu.buttons.append(EngineScript.GameMenu.AttackButton())
             break
-    gs.menu.buttons.push(GameMenu.WaitButton())
-    gs.menu.buttons.push(GameMenu.CancelButton())
+    gs.menu.buttons.append(EngineScript.GameMenu.WaitButton())
+    gs.menu.buttons.append(EngineScript.GameMenu.CancelButton())
 
 def animate_still(coords, this_unit, screen): 
     if this_unit.anim.square == None:
@@ -256,13 +263,14 @@ def animate_moving(coords, this_unit, screen, gs):
     r, c = (start_square[1] + dR*curr/dura, start_square[0] + dC*curr/dura)
 
     # show moving piece
-    this_team = this_unit.team.to_string()    
+    this_team = EngineScript.Team.to_string(this_unit._team)
 
-    screen.blit(IMAGES[this_unit.team(), this_unit.unit_name()], p.Rect(c*SQ_SIZE, r*SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE))
+    screen.blit(IMAGES[this_team, this_unit.unit_name()], p.Rect(c*SQ_SIZE, r*SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE))
 
     this_unit.anim.timer += 1
     if this_unit.anim.timer >= this_unit.anim.duration:
         this_unit.anim = Anim.StillAnim((end_square[1], end_square[0]))
+        gs.phase = EngineScript.Phase.AWAITING_MENU_INSTRUCTION
 
 
 def drawMenu(menu, screen):

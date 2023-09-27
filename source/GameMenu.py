@@ -1,3 +1,5 @@
+import pygame as p
+
 class GameMenu():
     def __init__(self):
         self.buttons = []
