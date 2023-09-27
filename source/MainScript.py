@@ -10,7 +10,7 @@ SQ_SIZE = 16*SCALE
 WALLSIZE = 8*SCALE
 MAP_WIDTH = MAP_X * SQ_SIZE
 MAP_HEIGHT = MAP_Y * SQ_SIZE + WALLSIZE * 2
-MENU_WIDTH = MAP_WIDTH // 4
+MENU_WIDTH = MAP_WIDTH / 2.5
 WIDTH = 128 * SCALE
 HEIGHT = 192 * SCALE
 MAX_FPS = 30
@@ -143,10 +143,11 @@ def display_menu(screen, gs):
     X_SCREEN_PADDING = WIDTH // 8
     Y_SCREEN_PADDING = HEIGHT // 8
     BORDER_PADDING = 1 * SCALE
-    BODY_PADDING = 1 * SCALE
     BUTTON_HEIGHT = 6 * SCALE
+    BUTTON_PADDING = 4 * SCALE
+    ELEMENT_SPACING = 2 * SCALE # spacing between the icon and the button
     border_width = MENU_WIDTH + 2 * BORDER_PADDING    
-    icon_width = 4 * SCALE
+    icon_width = BUTTON_HEIGHT
 
     border_color = p.Color('gray25')
     body_color = p.Color('gray50')
@@ -155,12 +156,13 @@ def display_menu(screen, gs):
     right_side = True
     top_side = True
     if gs.selected_square != None: # later this should probably be an exception
-        if gs.selected_square[1] > MAP_X // 2:
+        if gs.selected_square[0] >= MAP_X // 2:
             right_side = False
-        if gs.selected_square[0] < MAP_Y // 2:
-            left_side = False
+        if gs.selected_square[1] <= MAP_Y // 2:
+            top_side = False
     
-    menu_height = len(gs.menu.buttons) * BUTTON_HEIGHT    
+    button_count = (len(gs.menu.buttons))
+    menu_height = (button_count * BUTTON_HEIGHT) + (button_count * BUTTON_PADDING) 
     border_height = menu_height + 2 * BORDER_PADDING
 
     if right_side:
@@ -190,19 +192,21 @@ def display_menu(screen, gs):
     screen.blit(body_surface, body_position)
 
 
-    for i in (0, len(gs.menu.buttons) - 1):
+    for i in range(0, len(gs.menu.buttons)):
+        
         button = gs.menu.buttons[i]
-        icon_surface = p.Surface(
-            (body_top_left_x + BODY_PADDING, body_top_left_y + BODY_PADDING + (i * BUTTON_HEIGHT)), 
-            (BUTTON_HEIGHT - BODY_PADDING, BUTTON_HEIGHT - BODY_PADDING), 
-            button.icon
-        )
-        screen.blit(icon_surface)
-        font = p.font.Font('freesansbold.ttf', 12)
-        font_color = p.Color(255, 255, 127)
-        text = font.render(, True, font_color, body_color)
+        icon_image = button.icon
+        icon_size = (BUTTON_HEIGHT, BUTTON_HEIGHT)
+        icon_location = (body_top_left_x + BUTTON_PADDING, body_top_left_y + (i * BUTTON_HEIGHT) + (i + 1 / 2) * BUTTON_PADDING)
+        icon_image = p.transform.scale(icon_image, icon_size)
+
+        screen.blit(icon_image, icon_location)
+
+        font = p.font.Font('Fonts/PressStart2P-Regular.ttf', 24)
+        font_color = p.Color(255, 255, 127)        
+        text = font.render(button.text, True, font_color, body_color)
         textRect = text.get_rect()
-        screen.blit(text, (body_top_left_x + BODY_PADDING + icon_width, body_top_left_y + BODY_PADDING + (i * BUTTON_HEIGHT)))
+        screen.blit(text, (body_top_left_x + BUTTON_PADDING + icon_width + ELEMENT_SPACING, body_top_left_y + (i * BUTTON_HEIGHT) + (i + 1 / 2) * BUTTON_PADDING))
 
     pass
 
