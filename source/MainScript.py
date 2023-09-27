@@ -143,6 +143,7 @@ def display_menu(screen, gs):
     X_SCREEN_PADDING = WIDTH // 8
     Y_SCREEN_PADDING = HEIGHT // 8
     BORDER_PADDING = 1 * SCALE
+    BODY_PADDING = 1 * SCALE
     BUTTON_HEIGHT = 6 * SCALE
     border_width = MENU_WIDTH + 2 * BORDER_PADDING    
     icon_width = 4 * SCALE
@@ -190,13 +191,18 @@ def display_menu(screen, gs):
 
 
     for i in (0, len(gs.menu.buttons) - 1):
-        screen.blit(gs.menu.buttons[i].icon, (body_top_left_x + BORDER_PADDING, body_top_left_y + BORDER_PADDING + (i * BUTTON_HEIGHT)))
-        # color in rgb is (255, 255, 127)
+        button = gs.menu.buttons[i]
+        icon_surface = p.Surface(
+            (body_top_left_x + BODY_PADDING, body_top_left_y + BODY_PADDING + (i * BUTTON_HEIGHT)), 
+            (BUTTON_HEIGHT - BODY_PADDING, BUTTON_HEIGHT - BODY_PADDING), 
+            button.icon
+        )
+        screen.blit(icon_surface)
         font = p.font.Font('freesansbold.ttf', 12)
         font_color = p.Color(255, 255, 127)
-        text = font.render('Abcdefg', True, font_color, body_color)
+        text = font.render(, True, font_color, body_color)
         textRect = text.get_rect()
-        screen.blit(text, (body_top_left_x + BORDER_PADDING + icon_width, body_top_left_y + BORDER_PADDING + (i * BUTTON_HEIGHT)))
+        screen.blit(text, (body_top_left_x + BODY_PADDING + icon_width, body_top_left_y + BODY_PADDING + (i * BUTTON_HEIGHT)))
 
     pass
 
