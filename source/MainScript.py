@@ -86,7 +86,7 @@ def menu_event_handler(mouse_pos, gs):
     # fill in later
     pass
 
-def highlight_spaces(screen, gs):    
+def highlight_spaces(screen, gs):
         c, r = gs.selected_square
         s = p.Surface((SQ_SIZE - SCALE / 2, SQ_SIZE - SCALE / 2))
         s.set_alpha(100) # 255 is opaque
@@ -132,7 +132,7 @@ def draw_game_state(screen, gs, sqSelected):
         display_units(screen, gs)
     elif gs.phase == EngineScript.Phase.TURN_TRANSITION:
         display_map(screen)        
-        display_units(screen, gs)        
+        display_units(screen, gs)
         animate_turn_banner()
 
     
@@ -152,28 +152,31 @@ def display_menu(screen, gs):
     border_color = p.Color('gray25')
     body_color = p.Color('gray50')
 
-    # maybe move MENU_WIDTH here    
+    # maybe move MENU_WIDTH here
     right_side = True
     top_side = True
+    (dest_square_x, dest_square_y) = gs.dest_square
     if gs.selected_square != None: # later this should probably be an exception
-        if gs.selected_square[0] >= MAP_X // 2:
+        if dest_square_x >= MAP_X // 2:
             right_side = False
-        if gs.selected_square[1] <= MAP_Y // 2:
+        if dest_square_y <= MAP_Y // 2:
             top_side = False
     
     button_count = (len(gs.menu.buttons))
     menu_height = (button_count * BUTTON_HEIGHT) + (button_count * BUTTON_PADDING) 
     border_height = menu_height + 2 * BORDER_PADDING
+    (dest_coords_x, dest_coords_y) = get_square_coords(gs.dest_square)
 
     if right_side:
-        border_top_left_x = WIDTH - X_SCREEN_PADDING - border_width
+        border_top_left_x = dest_coords_x + SQ_SIZE 
     else:
-        border_top_left_x = X_SCREEN_PADDING
+        border_top_left_x = dest_coords_x - border_width
 
     if top_side:
-        border_top_left_y = Y_SCREEN_PADDING
+        border_top_left_y = dest_coords_y - border_height
     else: 
-        border_top_left_y = HEIGHT - Y_SCREEN_PADDING - border_height
+        border_top_left_y = dest_coords_y + SQ_SIZE
+
     border_position = (border_top_left_x, border_top_left_y)
 
     body_top_left_x = border_top_left_x + BORDER_PADDING
@@ -189,12 +192,30 @@ def display_menu(screen, gs):
     # display the body
     body_surface = p.Surface((MENU_WIDTH, menu_height))
     body_surface.fill(body_color)
+
+    mouse_pos = p.mouse.get_pos()
     screen.blit(body_surface, body_position)
 
 
     for i in range(0, len(gs.menu.buttons)):
         
         button = gs.menu.buttons[i]
+
+        button_x = body_top_left_x + BUTTON_PADDING
+        button_width = MENU_WIDTH - 2*BUTTON_PADDING
+                
+        button_y = body_top_left_y +  (i * BUTTON_HEIGHT) + (i + 1 / 2) * BUTTON_PADDING
+
+        button_color = None
+        if button_x <= mouse_pos[0] < button_x + button_width and button_y <= mouse_pos[1] <= button_y + BUTTON_HEIGHT:
+            button_color = border_color
+        else:
+            button_color = body_color        
+
+        button_surface = p.Surface((button_width, BUTTON_HEIGHT))
+        button_surface.fill(button_color)
+        screen.blit(button_surface, (button_x, button_y))
+
         icon_image = button.icon
         icon_size = (BUTTON_HEIGHT, BUTTON_HEIGHT)
         icon_location = (body_top_left_x + BUTTON_PADDING, body_top_left_y + (i * BUTTON_HEIGHT) + (i + 1 / 2) * BUTTON_PADDING)
@@ -203,8 +224,9 @@ def display_menu(screen, gs):
         screen.blit(icon_image, icon_location)
 
         font = p.font.Font('Fonts/PressStart2P-Regular.ttf', 24)
-        font_color = p.Color(255, 255, 127)        
-        text = font.render(button.text, True, font_color, body_color)
+        font_color = p.Color(255, 255, 127)
+        text_bg_color = None
+        text = font.render(button.text, True, font_color, text_bg_color)
         textRect = text.get_rect()
         screen.blit(text, (body_top_left_x + BUTTON_PADDING + icon_width + ELEMENT_SPACING, body_top_left_y + (i * BUTTON_HEIGHT) + (i + 1 / 2) * BUTTON_PADDING))
 
@@ -235,6 +257,7 @@ def prep_unit_move(ref_square, gs):
     start_square = gs.selected_square
     distance = math.sqrt((start_square[0]-ref_square[0])**2 + (start_square[1]-ref_square[1])**2)    
     duration = distance*frames_per_square
+    gs.dest_square = ref_square
     anim = Anim.MovingAnim(duration, start_square, ref_square)
     unit = gs.selected_unit
     unit.anim = anim
@@ -283,19 +306,6 @@ def animate_moving(coords, this_unit, screen, gs):
         gs.phase = EngineScript.Phase.AWAITING_MENU_INSTRUCTION
 
 
-def drawMenu(menu, screen):
-    menu_bg = p.Surface((MENU_WIDTH, MENU_HEIGHT))
-    menu_bg.fill(p.Color('black'))
-    screen.blit(0, MAP_HEIGHT, menu_bg)
-    button_width = SCALE
-    starting_x = SCALE * 2 # two scaled "pixels"
-    starting_y = MAP_HEIGHT + SCALE * 2
-    button_spacing_x = SQ_SIZE * 3
-    draw_x = SCALE*2
-    draw_y = starting_y
-    for button in menu.buttons:
-        button_s = p.Surface(())
-
 def square_can_produce(square, gs):
     if square in gs.production_tiles:
         return true
@@ -308,6 +318,9 @@ def get_the_row_and_col(pos):
     x = pos[0] // SQ_SIZE
     y = (pos[1] - WALLSIZE) // SQ_SIZE
     return (x, y)
+def get_square_coords(square):
+    (c, r) = square
+    return (c*SQ_SIZE, r*SQ_SIZE+WALLSIZE)
 
 if __name__ == "__main__":
     main()

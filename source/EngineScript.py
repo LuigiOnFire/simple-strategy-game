@@ -33,6 +33,7 @@ class GameState():
         self.phase = Phase.AWAITING_UNIT_SELECTION
         self.selected_unit = None
         self.selected_square = None
+        self.dest_square = None
         self.next_move = None
         self.menu = GameMenu.GameMenu()
 
