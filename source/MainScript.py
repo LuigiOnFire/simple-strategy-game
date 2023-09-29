@@ -143,11 +143,13 @@ def display_menu(screen, gs):
     X_SCREEN_PADDING = WIDTH // 8
     Y_SCREEN_PADDING = HEIGHT // 8
     BORDER_PADDING = 1 * SCALE
-    BUTTON_HEIGHT = 6 * SCALE
-    BUTTON_PADDING = 4 * SCALE
+    BUTTON_PADDING = 2 * SCALE
+    ELEMENT_HEIGHT = 6 * SCALE
     ELEMENT_SPACING = 2 * SCALE # spacing between the icon and the button
     border_width = MENU_WIDTH + 2 * BORDER_PADDING    
-    icon_width = BUTTON_HEIGHT
+    icon_width = ELEMENT_HEIGHT
+    BUTTON_HEIGHT = ELEMENT_HEIGHT + 2 * BUTTON_PADDING
+
 
     border_color = p.Color('gray25')
     body_color = p.Color('gray50')
@@ -163,7 +165,7 @@ def display_menu(screen, gs):
             top_side = False
     
     button_count = (len(gs.menu.buttons))
-    menu_height = (button_count * BUTTON_HEIGHT) + (button_count * BUTTON_PADDING) 
+    menu_height = (button_count * BUTTON_HEIGHT)
     border_height = menu_height + 2 * BORDER_PADDING
     (dest_coords_x, dest_coords_y) = get_square_coords(gs.dest_square)
 
@@ -201,24 +203,25 @@ def display_menu(screen, gs):
         
         button = gs.menu.buttons[i]
 
-        button_x = body_top_left_x + BUTTON_PADDING
-        button_width = MENU_WIDTH - 2*BUTTON_PADDING
+        button_x = body_top_left_x
+        button_width = MENU_WIDTH
                 
-        button_y = body_top_left_y +  (i * BUTTON_HEIGHT) + (i + 1 / 2) * BUTTON_PADDING
+        button_y = body_top_left_y +  (i * BUTTON_HEIGHT)
+        
 
         button_color = None
         if button_x <= mouse_pos[0] < button_x + button_width and button_y <= mouse_pos[1] <= button_y + BUTTON_HEIGHT:
-            button_color = border_color
+            button_color = p.Color("Gray38")
         else:
-            button_color = body_color        
+            button_color = body_color
 
         button_surface = p.Surface((button_width, BUTTON_HEIGHT))
         button_surface.fill(button_color)
         screen.blit(button_surface, (button_x, button_y))
 
         icon_image = button.icon
-        icon_size = (BUTTON_HEIGHT, BUTTON_HEIGHT)
-        icon_location = (body_top_left_x + BUTTON_PADDING, body_top_left_y + (i * BUTTON_HEIGHT) + (i + 1 / 2) * BUTTON_PADDING)
+        icon_size = (ELEMENT_HEIGHT, ELEMENT_HEIGHT)
+        icon_location = (body_top_left_x + BUTTON_PADDING, button_y + BUTTON_PADDING)
         icon_image = p.transform.scale(icon_image, icon_size)
 
         screen.blit(icon_image, icon_location)
@@ -228,7 +231,7 @@ def display_menu(screen, gs):
         text_bg_color = None
         text = font.render(button.text, True, font_color, text_bg_color)
         textRect = text.get_rect()
-        screen.blit(text, (body_top_left_x + BUTTON_PADDING + icon_width + ELEMENT_SPACING, body_top_left_y + (i * BUTTON_HEIGHT) + (i + 1 / 2) * BUTTON_PADDING))
+        screen.blit(text, (body_top_left_x + BUTTON_PADDING + icon_width + ELEMENT_SPACING, button_y + BUTTON_PADDING))
 
     pass
 
