@@ -57,10 +57,10 @@ def main():
                 running = False
             elif e.type == p.MOUSEBUTTONDOWN:
                 target = p.mouse.get_pos()
-                if is_in_map(target):
-                    map_event_handler(target, gs)
-                elif is_in_menu(target):
+                if mouse_in_menu(target, gs.menu):
                     menu_event_handler(target, gs.map, gs.menu)
+                else:
+                    map_event_handler(target, gs)                
             elif e.type == p.KEYDOWN:  # later move this to menu
                 if e.key == p.K_z:
                     gs.undoMove()
@@ -83,8 +83,10 @@ def map_event_handler(mouse_pos, gs):
         prep_unit_move(selected_square, gs)
 
 def menu_event_handler(mouse_pos, gs):
-    # fill in later
-    pass
+    for button in gs.menu.buttons:
+        if mouse_in_button(mouse_pos, button):
+           if isinstance(button, EngineScript.GameMenu.CancelButton):
+            gs.selected_unit.anim = Anim.StillAnim()
 
 def highlight_spaces(screen, gs):
         c, r = gs.selected_square
@@ -145,16 +147,15 @@ def display_menu(screen, gs):
     BORDER_PADDING = 1 * SCALE
     BUTTON_PADDING = 2 * SCALE
     ELEMENT_HEIGHT = 6 * SCALE
-    ELEMENT_SPACING = 2 * SCALE # spacing between the icon and the button
-    border_width = MENU_WIDTH + 2 * BORDER_PADDING    
+    ELEMENT_SPACING = 2 * SCALE # spacing between the icon and the button    
     icon_width = ELEMENT_HEIGHT
     BUTTON_HEIGHT = ELEMENT_HEIGHT + 2 * BUTTON_PADDING
-
 
     border_color = p.Color('gray25')
     body_color = p.Color('gray50')
 
     # maybe move MENU_WIDTH here
+    menu = gs.menu    
     right_side = True
     top_side = True
     (dest_square_x, dest_square_y) = gs.dest_square
@@ -163,31 +164,32 @@ def display_menu(screen, gs):
             right_side = False
         if dest_square_y <= MAP_Y // 2:
             top_side = False
-    
+       
     button_count = (len(gs.menu.buttons))
+    menu.width = MENU_WIDTH + 2 * BORDER_PADDING
     menu_height = (button_count * BUTTON_HEIGHT)
-    border_height = menu_height + 2 * BORDER_PADDING
+    menu.height = menu_height + 2 * BORDER_PADDING
     (dest_coords_x, dest_coords_y) = get_square_coords(gs.dest_square)
 
     if right_side:
-        border_top_left_x = dest_coords_x + SQ_SIZE 
+        menu.x = dest_coords_x + SQ_SIZE 
     else:
-        border_top_left_x = dest_coords_x - border_width
+        menu.x = dest_coords_x - menu.width
 
     if top_side:
-        border_top_left_y = dest_coords_y - border_height
+        menu.y = dest_coords_y - menu.height
     else: 
-        border_top_left_y = dest_coords_y + SQ_SIZE
+        menu.y = dest_coords_y + SQ_SIZE
 
-    border_position = (border_top_left_x, border_top_left_y)
+    border_position = (menu.x, menu.y)
 
-    body_top_left_x = border_top_left_x + BORDER_PADDING
-    body_top_left_y = border_top_left_y + BORDER_PADDING
+    body_top_left_x = menu.x + BORDER_PADDING
+    body_top_left_y = menu.y + BORDER_PADDING
     body_position = (body_top_left_x, body_top_left_y)
 
 
     # display the border
-    border_surface = p.Surface((border_width, border_height))
+    border_surface = p.Surface((menu.width, menu.height))
     border_surface.fill(border_color)
     screen.blit(border_surface, border_position)
 
@@ -203,25 +205,26 @@ def display_menu(screen, gs):
         
         button = gs.menu.buttons[i]
 
-        button_x = body_top_left_x
-        button_width = MENU_WIDTH
+        button.x = body_top_left_x
+        button.width = MENU_WIDTH
                 
-        button_y = body_top_left_y +  (i * BUTTON_HEIGHT)
+        button.y = body_top_left_y +  (i * BUTTON_HEIGHT)
+        button.height = BUTTON_HEIGHT
         
 
         button_color = None
-        if button_x <= mouse_pos[0] < button_x + button_width and button_y <= mouse_pos[1] <= button_y + BUTTON_HEIGHT:
+        if mouse_in_button(mouse_pos, button):
             button_color = p.Color("Gray38")
         else:
             button_color = body_color
 
-        button_surface = p.Surface((button_width, BUTTON_HEIGHT))
+        button_surface = p.Surface((button.width, button.height))
         button_surface.fill(button_color)
-        screen.blit(button_surface, (button_x, button_y))
+        screen.blit(button_surface, (button.x, button.y))
 
         icon_image = button.icon
         icon_size = (ELEMENT_HEIGHT, ELEMENT_HEIGHT)
-        icon_location = (body_top_left_x + BUTTON_PADDING, button_y + BUTTON_PADDING)
+        icon_location = (body_top_left_x + BUTTON_PADDING, button.y + BUTTON_PADDING)
         icon_image = p.transform.scale(icon_image, icon_size)
 
         screen.blit(icon_image, icon_location)
@@ -231,9 +234,7 @@ def display_menu(screen, gs):
         text_bg_color = None
         text = font.render(button.text, True, font_color, text_bg_color)
         textRect = text.get_rect()
-        screen.blit(text, (body_top_left_x + BUTTON_PADDING + icon_width + ELEMENT_SPACING, button_y + BUTTON_PADDING))
-
-    pass
+        screen.blit(text, (body_top_left_x + BUTTON_PADDING + icon_width + ELEMENT_SPACING, button.y + BUTTON_PADDING))
 
 def display_units(screen, gs):
     for r in range(MAP_Y):
@@ -314,16 +315,20 @@ def square_can_produce(square, gs):
         return true
     return false
 
-def is_in_map(pos):
-    return pos[1] < MAP_HEIGHT
-
 def get_the_row_and_col(pos):
     x = pos[0] // SQ_SIZE
     y = (pos[1] - WALLSIZE) // SQ_SIZE
     return (x, y)
+    
 def get_square_coords(square):
     (c, r) = square
     return (c*SQ_SIZE, r*SQ_SIZE+WALLSIZE)
+
+def mouse_in_button(mouse_pos, button):
+    button.x <= mouse_pos[0] < button.x + button.width and button.y <= mouse_pos[1] <= button.y + button.height
+
+def mouse_in_menu(mouse_pos, menu):
+    menu.x <= mouse_pos[0] < menu.x + menu.width and menu.y <= mouse_pos[1] <= menu.y + menu.height
 
 if __name__ == "__main__":
     main()
