@@ -58,7 +58,7 @@ def main():
             elif e.type == p.MOUSEBUTTONDOWN:
                 target = p.mouse.get_pos()
                 if mouse_in_menu(target, gs.menu):
-                    menu_event_handler(target, gs.map, gs.menu)
+                    menu_event_handler(target, gs)
                 else:
                     map_event_handler(target, gs)                
             elif e.type == p.KEYDOWN:  # later move this to menu
@@ -80,13 +80,16 @@ def map_event_handler(mouse_pos, gs):
     if phase == EngineScript.Phase.AWAITING_UNIT_SELECTION:
         select_space(selected_square, gs) # also need to support buying
     elif phase == EngineScript.Phase.UNIT_SELECTED:
-        prep_unit_move(selected_square, gs)
+        if move_is_valid(selected_square):
+            prep_unit_move(selected_square, gs)
 
 def menu_event_handler(mouse_pos, gs):
     for button in gs.menu.buttons:
         if mouse_in_button(mouse_pos, button):
            if isinstance(button, EngineScript.GameMenu.CancelButton):
             gs.selected_unit.anim = Anim.StillAnim()
+            gs.phase = EngineScript.Phase.AWAITING_UNIT_SELECTION
+            gs.menu = EngineScript.GameMenu.GameMenu()
 
 def highlight_spaces(screen, gs):
         c, r = gs.selected_square
@@ -325,10 +328,17 @@ def get_square_coords(square):
     return (c*SQ_SIZE, r*SQ_SIZE+WALLSIZE)
 
 def mouse_in_button(mouse_pos, button):
-    button.x <= mouse_pos[0] < button.x + button.width and button.y <= mouse_pos[1] <= button.y + button.height
+    return button.x <= mouse_pos[0] < button.x + button.width and button.y <= mouse_pos[1] <= button.y + button.height
 
 def mouse_in_menu(mouse_pos, menu):
-    menu.x <= mouse_pos[0] < menu.x + menu.width and menu.y <= mouse_pos[1] <= menu.y + menu.height
+    return menu.x <= mouse_pos[0] < menu.x + menu.width and menu.y <= mouse_pos[1] <= menu.y + menu.height
+
+def move_is_valid(selected_square):
+    # TODO: Redo validMoves as just a set in GameEngine
+    for move in valid_moves:
+        if selected_square == move.end_square:
+            return True
+    return False
 
 if __name__ == "__main__":
     main()

@@ -68,7 +68,8 @@ class GameState():
     def squareContainsUnit(self, row, col):
         return self.map[row][col] != -1
 
-    def get_valid_moves(self, move_range): # this is super scuffed and should be made into a proper bfs
+    def get_valid_moves(self, move_range):
+        # TODO: Redo validMoves as just a set in GameEngine
         col = self.selected_square[0]
         row = self.selected_square[1]
         moves = []
