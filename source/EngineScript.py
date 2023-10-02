@@ -36,6 +36,7 @@ class GameState():
         self.dest_square = None
         self.next_move = None
         self.menu = GameMenu.GameMenu()
+        self.valid_moves = []
 
     def setup_still_anims(self):
         for r in range(len(self.map)):
@@ -55,28 +56,20 @@ class GameState():
         if len(self.moveLog) != 0:
             move = self.moveLog.pop()
             self.map[move.startRow][move.startCol] = move.pieceMoved
-            self.map[move.endRow][move.endCol] = move.pieceCaptured
-
-    def get_all_moves(self):
-        moves = []
-        piece = self.selected_unit
-        turn = piece._team
-        if (turn == Team.RED and not self.blueToMove) or (turn == Team.BLUE and self.blueToMove):                                        
-            moves = self.get_valid_moves(piece.move_range)
-        return moves
+            self.map[move.endRow][move.endCol] = move.pieceCaptured    
                         
     def squareContainsUnit(self, row, col):
         return self.map[row][col] != -1
 
-    def get_valid_moves(self, move_range):
-        # TODO: Redo validMoves as just a set in GameEngine
+    def update_valid_moves(self, unit):
+        move_range = unit.move_range
         col = self.selected_square[0]
         row = self.selected_square[1]
-        moves = []
         to_seek = []
         visited = set()
 
-        to_seek.append(((row, col), move_range))
+        to_seek.append(((col, row), move_range))
+        visited.add((col, row))
         while to_seek:            
             q = to_seek.pop()
             sq = q[0]
@@ -88,14 +81,11 @@ class GameState():
                 (sq[0], sq[1] + 1), 
                 (sq[0], sq[1] - 1)
             )
-            for adj in adj_list:
+            for adj in adj_list: # need to add make sure that square is not occupied by hostile
                 if self.is_on_map(adj) and self not in visited and range - 1 >= 0:
                     to_seek.append((adj, range - 1))
                     visited.add((adj))
-        for v in visited:
-            moves.append(Move((row, col), (v), self.map))
-        
-        return moves
+        self.valid_moves = visited
 
     def validatePair(self, r, c):
         r_in = ( r >= 0 and r < len(self.map))
@@ -130,14 +120,7 @@ class GameState():
         if not (0 <= sq[1] < height):
             return False
 
-        return True
-        
-                        
-    # for each 1 to move range
-        # look at the pair (row + j, col + (move_range - j))
-            # make sure no part of that goes over max or min
-        # look at the pair (row - j, col + (move_range - j))
-            # 
+        return True    
 
 
 class Move():

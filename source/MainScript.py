@@ -80,7 +80,7 @@ def map_event_handler(mouse_pos, gs):
     if phase == EngineScript.Phase.AWAITING_UNIT_SELECTION:
         select_space(selected_square, gs) # also need to support buying
     elif phase == EngineScript.Phase.UNIT_SELECTED:
-        if move_is_valid(selected_square):
+        if selected_square in gs.valid_moves:
             prep_unit_move(selected_square, gs)
 
 def menu_event_handler(mouse_pos, gs):
@@ -96,12 +96,11 @@ def highlight_spaces(screen, gs):
         s = p.Surface((SQ_SIZE - SCALE / 2, SQ_SIZE - SCALE / 2))
         s.set_alpha(100) # 255 is opaque
         s.fill(p.Color('blue'))
-        screen.blit(s, (c*(SQ_SIZE), r*(SQ_SIZE) + WALLSIZE))
-        s.fill(p.Color('blue'))
-        validMoves = gs.get_all_moves()
-        for move in validMoves:
-            if move.startRow == r and move.startCol == c:
-                screen.blit(s, (move.endCol*SQ_SIZE, move.endRow*SQ_SIZE + WALLSIZE))
+        gs.update_valid_moves(gs.selected_unit)
+        for square in gs.valid_moves:
+            x = square[0]
+            y = square[1]
+            screen.blit(s, (x*SQ_SIZE, y*SQ_SIZE + WALLSIZE))
 
 def select_space(selected_square, gs):
     if gs.square_is_occupied(selected_square):
@@ -332,13 +331,6 @@ def mouse_in_button(mouse_pos, button):
 
 def mouse_in_menu(mouse_pos, menu):
     return menu.x <= mouse_pos[0] < menu.x + menu.width and menu.y <= mouse_pos[1] <= menu.y + menu.height
-
-def move_is_valid(selected_square):
-    # TODO: Redo validMoves as just a set in GameEngine
-    for move in valid_moves:
-        if selected_square == move.end_square:
-            return True
-    return False
 
 if __name__ == "__main__":
     main()
