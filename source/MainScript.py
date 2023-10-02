@@ -257,7 +257,7 @@ def display_units(screen, gs):
                     anim_taking_damage(unit, coords, this_unit, screen)
                 
 def prep_unit_move(ref_square, gs):
-    if gs.square_is_occupied(ref_square):
+    if gs.square_is_occupied(ref_square): # make this "occupied by other unit"
         return
     frames_per_square = 5 # change this as desired
     start_square = gs.selected_square
