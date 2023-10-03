@@ -67,6 +67,8 @@ class GameState():
         row = self.selected_square[1]
         to_seek = []
         visited = set()
+        valid_squares = [(col, row)]
+        team = unit.team
 
         to_seek.append(((col, row), move_range))
         visited.add((col, row))
@@ -83,9 +85,12 @@ class GameState():
             )
             for adj in adj_list: # need to add make sure that square is not occupied by hostile
                 if self.is_on_map(adj) and self not in visited and range - 1 >= 0:
-                    to_seek.append((adj, range - 1))
+                    if not self.square_is_occupied_by_hostile(adj, team):
+                        to_seek.append((adj, range - 1))
+                    if not self.square_is_occupied(adj):
+                        valid_squares.append(adj)
                     visited.add((adj))
-        self.valid_moves = visited
+        self.valid_moves = valid_squares
 
     def validatePair(self, r, c):
         r_in = ( r >= 0 and r < len(self.map))
@@ -105,6 +110,13 @@ class GameState():
         unit = self.unit_list[unit_index]
         team = unit.team
         return team == unit.team
+
+    def square_is_occupied_by_other(self, square, this_unit):
+        unit_index = self.map[square[1]][square[0]]
+        if unit_index == -1:
+            return False
+        other_unit = self.unit_list[unit_index]        
+        return not this_unit == other_unit
         
 
     def square_can_produce(self, square):        

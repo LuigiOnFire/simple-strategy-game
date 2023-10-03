@@ -257,17 +257,20 @@ def display_units(screen, gs):
                     anim_taking_damage(unit, coords, this_unit, screen)
                 
 def prep_unit_move(ref_square, gs):
-    if gs.square_is_occupied(ref_square): # make this "occupied by other unit"
-        return
+    # if gs.square_is_occupied(ref_square): # make this "occupied by other unit"
+    #     return
     frames_per_square = 5 # change this as desired
     start_square = gs.selected_square
     distance = math.sqrt((start_square[0]-ref_square[0])**2 + (start_square[1]-ref_square[1])**2)    
     duration = distance*frames_per_square
     gs.dest_square = ref_square
     anim = Anim.MovingAnim(duration, start_square, ref_square)
-    unit = gs.selected_unit
-    unit.anim = anim
-    gs.phase = EngineScript.Phase.ANIMATING_MOVE
+    unit = gs.selected_unit    
+    if not distance == 0:
+        unit.anim = anim
+        gs.phase = EngineScript.Phase.ANIMATING_MOVE
+    else: # if the user selected the same square twice, skip the move animation
+        gs.phase = EngineScript.Phase.AWAITING_MENU_INSTRUCTION
 
     # move to new method
     adj_squares = [(ref_square[0] + 1, ref_square[1]), (ref_square[0] - 1, ref_square[1]), (ref_square[0], ref_square[1] + 1), (ref_square[0], ref_square[1] - 1)]
@@ -290,15 +293,18 @@ def animate_still(coords, this_unit, screen):
 
 def animate_moving(coords, this_unit, screen, gs):
     anim = this_unit.anim
+    # if isinstance(anim, Anim.StillAnim): # if the user selected the same square
+    #     gs.phase = EngineScript.Phase.AWAITING_MENU_INSTRUCTION
+
     start_square = anim.start_square
     end_square = anim.end_square
 
-    # in our square variables, I believe first is column (x), then row (y)
-
-    dR = end_square[1] - start_square[1]
-    dC = end_square[0] - start_square[0]
+    # in our square variables, first is column (x), then row (y)
     dura = this_unit.anim.duration
     curr = this_unit.anim.timer
+    dR = end_square[1] - start_square[1]
+    dC = end_square[0] - start_square[0]
+    
     r, c = (start_square[1] + dR*curr/dura, start_square[0] + dC*curr/dura)
 
     # show moving piece
