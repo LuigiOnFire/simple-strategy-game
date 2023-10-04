@@ -32,6 +32,7 @@ class GameState():
         self.unit_list = [FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.RED), FootSoldier(Team.RED)]
         self.phase = Phase.AWAITING_UNIT_SELECTION
         self.selected_unit = None
+        self.selected_unit_index = None
         self.selected_square = None
         self.dest_square = None
         self.next_move = None
@@ -116,8 +117,7 @@ class GameState():
         if unit_index == -1:
             return False
         other_unit = self.unit_list[unit_index]        
-        return not this_unit == other_unit
-        
+        return not this_unit == other_unit        
 
     def square_can_produce(self, square):        
         return square in self.production_tiles
@@ -133,6 +133,13 @@ class GameState():
             return False
 
         return True    
+
+    def reset_select(self):
+        self.selected_square = None
+        self.selected_unit = None
+        self.selected_unit_index = None
+        self.dest_square = None
+
 
 
 class Move():
@@ -160,6 +167,7 @@ class ArmyUnit:
         self._team = "b"
         self._unit_name = kwargs["unit_name"]
         self.anim = kwargs["anim"]
+        self.is_active = True
 
     def unit_name(self):
         return self._unit_name

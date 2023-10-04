@@ -86,10 +86,23 @@ def map_event_handler(mouse_pos, gs):
 def menu_event_handler(mouse_pos, gs):
     for button in gs.menu.buttons:
         if mouse_in_button(mouse_pos, button):
-           if isinstance(button, EngineScript.GameMenu.CancelButton):
-            gs.selected_unit.anim = Anim.StillAnim()
-            gs.phase = EngineScript.Phase.AWAITING_UNIT_SELECTION
-            gs.menu = EngineScript.GameMenu.GameMenu()
+            
+            if isinstance(button, EngineScript.GameMenu.CancelButton):
+                gs.selected_unit.anim = Anim.StillAnim()
+                gs.phase = EngineScript.Phase.AWAITING_UNIT_SELECTION
+                gs.menu = EngineScript.GameMenu.GameMenu()
+
+            elif isinstance(button, EngineScript.GameMenu.WaitButton):
+                (sel_x, sel_y) = gs.selected_square
+                (ref_x, ref_y) = gs.dest_square                
+                gs.map[ref_y][ref_x] = gs.selected_unit_index
+                gs.map[sel_y][sel_x] = -1
+                gs.selected_unit.is_active = False
+                gs.phase = EngineScript.Phase.AWAITING_UNIT_SELECTION
+                gs.menu = EngineScript.GameMenu.GameMenu()
+                gs.reset_select()
+
+
 
 def highlight_spaces(screen, gs):
         c, r = gs.selected_square
@@ -106,6 +119,7 @@ def select_space(selected_square, gs):
     if gs.square_is_occupied(selected_square):
         unit_index = gs.map[selected_square[1]][selected_square[0]]
         gs.selected_unit = gs.unit_list[unit_index]
+        gs.selected_unit_index = unit_index
         gs.selected_square = selected_square
         gs.phase = EngineScript.Phase.UNIT_SELECTED
     # elif gs.square_can_produce(selected_square):
@@ -289,7 +303,10 @@ def animate_still(coords, this_unit, screen):
         (r, c) = this_unit.anim.square    
     this_type = this_unit.unit_name()
     this_team = EngineScript.Team.to_string(this_unit.team())
-    screen.blit(IMAGES[this_team, this_type], p.Rect(c*SQ_SIZE, r*SQ_SIZE+WALLSIZE, SQ_SIZE, SQ_SIZE))
+    unit_sprite = IMAGES[this_team, this_type]
+    if not this_unit.is_active:
+        unit_sprite = convert_sprite_to_greyscale(unit_sprite)
+    screen.blit(unit_sprite, p.Rect(c*SQ_SIZE, r*SQ_SIZE+WALLSIZE, SQ_SIZE, SQ_SIZE))
 
 def animate_moving(coords, this_unit, screen, gs):
     anim = this_unit.anim
@@ -337,6 +354,17 @@ def mouse_in_button(mouse_pos, button):
 
 def mouse_in_menu(mouse_pos, menu):
     return menu.x <= mouse_pos[0] < menu.x + menu.width and menu.y <= mouse_pos[1] <= menu.y + menu.height
+
+def convert_sprite_to_greyscale(image):
+    grey_image = p.Surface(image.get_size(), p.SRCALPHA)
+    for x in range(image.get_width()):
+        for y in range(image.get_height()):
+            r, g, b, a = image.get_at((x, y))
+            grey = int(0.34 * r + 0.48 * g + 0.18 * b)
+            grey_image.set_at((x, y), (grey, grey, grey, a))
+            if a != 255:
+                pass
+    return grey_image
 
 if __name__ == "__main__":
     main()
