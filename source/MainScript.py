@@ -1,7 +1,8 @@
 import pygame as p
+import math
 import EngineScript
 import Anim
-import math
+import Team
 
 SCALE = 4
 MAP_X = 8
@@ -103,7 +104,6 @@ def menu_event_handler(mouse_pos, gs):
                 gs.reset_select()
 
 
-
 def highlight_spaces(screen, gs):
         c, r = gs.selected_square
         s = p.Surface((SQ_SIZE - SCALE / 2, SQ_SIZE - SCALE / 2))
@@ -151,7 +151,7 @@ def draw_game_state(screen, gs, sqSelected):
     elif gs.phase == EngineScript.Phase.TURN_TRANSITION:
         display_map(screen)        
         display_units(screen, gs)
-        animate_turn_banner()
+        animate_turn_banner(screen, gs)
 
     
 def display_map(screen):
@@ -333,6 +333,38 @@ def animate_moving(coords, this_unit, screen, gs):
     if this_unit.anim.timer >= this_unit.anim.duration:
         this_unit.anim = Anim.StillAnim((end_square[1], end_square[0]))
         gs.phase = EngineScript.Phase.AWAITING_MENU_INSTRUCTION
+
+def animate_turn_banner(screen, gs):
+    font_size = 32
+    time = gs.banner_anim.timer
+    dura = gs.banner_anim.duration
+    blue_to_move = gs.blueToMove
+
+    font = p.font.Font('Fonts/PressStart2P-Regular.ttf', 32)
+
+    if blue_to_move:
+        font_color = p.Color(0, 0, 172)
+        text_bg_color = None
+        text = "Blue Turn"
+    
+    else:
+        font_color = p.Color(172, 0, 0)
+        text_bg_color = None
+        text = "Red Turn"
+    text = font.render(text, True, font_color, text_bg_color)
+    textRect = text.get_rect()    
+
+    x_mid = (MAP_WIDTH - text.get_width()) / 2
+    y = (MAP_HEIGHT - text.get_height()) / 2
+
+
+    if time < dura / 3:
+        x = MAP_WIDTH - (MAP_WIDTH - x_mid) * 3 * time / dura # this will sum to 
+        screen.blit(text, (x, y))
+
+    elif time < 2 * dura / 3:
+        pass
+    gs.banner_anim.timer += 1
 
 
 def square_can_produce(square, gs):

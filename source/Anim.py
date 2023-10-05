@@ -1,10 +1,10 @@
+import Team
 CONST_ATTACK_DURATION = 10
 
 class StillAnim():
    def __init__(self, square=None):
         self.square = square
     
-
 class MovingAnim:
     def __init__(self, duration, start_square, end_square):
         self.timer = 0
@@ -12,7 +12,6 @@ class MovingAnim:
         self.start_square = start_square
         self.end_square = end_square
         
-
 class AttackAnim:
     def __init__(self, square):
         self.timer = 0
@@ -30,3 +29,9 @@ class TakingDamageAnim:
         self.timer = 0
         self.duration = CONST_ATTACK_DURATION # this will be a constant
         self.square = square
+
+class TurnBannerAnim:
+    def __init__(self, team):        
+        self.timer = 0
+        self.duration = 120
+        self.team = team

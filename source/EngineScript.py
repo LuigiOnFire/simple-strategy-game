@@ -1,6 +1,7 @@
 from enum import Enum
 import Anim
 import GameMenu
+from Team import Team
 
 class GameState():
     def __init__(self):
@@ -30,7 +31,7 @@ class GameState():
         self.blueToMove = True
         self.moveLog = []
         self.unit_list = [FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.RED), FootSoldier(Team.RED)]
-        self.phase = Phase.AWAITING_UNIT_SELECTION
+        self.phase = Phase.TURN_TRANSITION
         self.selected_unit = None
         self.selected_unit_index = None
         self.selected_square = None
@@ -38,6 +39,7 @@ class GameState():
         self.next_move = None
         self.menu = GameMenu.GameMenu()
         self.valid_moves = []
+        self.banner_anim = Anim.TurnBannerAnim(Team.BLUE)
 
     def setup_still_anims(self):
         for r in range(len(self.map)):
@@ -196,12 +198,3 @@ class Phase(Enum):
     SELECTING_TARGET = 4
     ANIMATING_INSTRUCTION = 5
     TURN_TRANSITION = 6
-
-class Team(Enum):
-    BLUE = 0
-    RED = 1
-
-    @staticmethod
-    def to_string(color):
-        names = ["b", "r"]
-        return names[color.value]
