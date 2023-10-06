@@ -142,6 +142,8 @@ class GameState():
         self.selected_unit_index = None
         self.dest_square = None
 
+    def transition_to_awaiting_unit_selection(self):
+        self.phase = Phase.AWAITING_UNIT_SELECTION
 
 
 class Move():

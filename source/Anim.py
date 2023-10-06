@@ -33,5 +33,5 @@ class TakingDamageAnim:
 class TurnBannerAnim:
     def __init__(self, team):        
         self.timer = 0
-        self.duration = 120
+        self.duration = 60
         self.team = team

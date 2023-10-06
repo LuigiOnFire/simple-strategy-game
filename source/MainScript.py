@@ -348,23 +348,35 @@ def animate_turn_banner(screen, gs):
         text = "Blue Turn"
     
     else:
-        font_color = p.Color(172, 0, 0)
+        font_color = p.Color(255, 0, 0)
         text_bg_color = None
         text = "Red Turn"
     text = font.render(text, True, font_color, text_bg_color)
     textRect = text.get_rect()    
 
-    x_mid = (MAP_WIDTH - text.get_width()) / 2
-    y = (MAP_HEIGHT - text.get_height()) / 2
+    text_width = text.get_width()
+    text_height = text.get_height()
+
+    x_mid = (MAP_WIDTH - text_width) / 2
+    y = (MAP_HEIGHT - text_height) / 2
 
 
     if time < dura / 3:
-        x = MAP_WIDTH - (MAP_WIDTH - x_mid) * 3 * time / dura # this will sum to 
+        x = MAP_WIDTH - (MAP_WIDTH - x_mid) * 3 * time / dura 
         screen.blit(text, (x, y))
 
     elif time < 2 * dura / 3:
-        pass
+        x = x_mid
+        screen.blit(text, (x, y))
+
+    elif time < dura:
+        x = x_mid - (x_mid + text_width) * (3 * time - 2 * dura) / (dura) # this will sum to 
+        screen.blit(text, (x, y))
+
     gs.banner_anim.timer += 1
+
+    if time >= dura:
+        gs.transition_to_awaiting_unit_selection()
 
 
 def square_can_produce(square, gs):
