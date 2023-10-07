@@ -28,7 +28,7 @@ class GameState():
         ]
         self.production_tiles = [(0, 0), (0, 1),(0, 2) ,(0, 3), (0, 4), (0, 5), (0, 6), (0, 7), 
                                 (1, 0), (1, 1),(1, 2) ,(1, 3), (1, 4), (1, 5), (1, 6), (1, 7)]
-        self.blueToMove = True
+        self.blue_to_move = True
         self.moveLog = []
         self.unit_list = [FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.RED), FootSoldier(Team.RED)]
         self.phase = Phase.TURN_TRANSITION
@@ -53,7 +53,6 @@ class GameState():
         self.map[move.startRow][move.startCol] = -1
         self.map[move.endRow][move.endCol] = move.pieceMoved
         self.moveLog.append(move) #log the move for later reference
-        self.blueToMove = not self.blueToMove    
     
     def undoMove(self):
         if len(self.moveLog) != 0:
@@ -144,6 +143,12 @@ class GameState():
 
     def transition_to_awaiting_unit_selection(self):
         self.phase = Phase.AWAITING_UNIT_SELECTION
+    
+    def transition_to_turn_transition(self):
+        team = Team.BLUE if self.blue_to_move else Team.RED
+        self.blue_to_move = not self.blue_to_move
+        self.phase = Phase.TURN_TRANSITION
+        self.banner_anim = Anim.TurnBannerAnim(team)
 
 
 class Move():

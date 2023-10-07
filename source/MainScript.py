@@ -103,6 +103,8 @@ def menu_event_handler(mouse_pos, gs):
                 gs.menu = EngineScript.GameMenu.GameMenu()
                 gs.reset_select()
 
+            check_end_turn(gs) # regardless of what button was pushed it's goot to check
+                
 
 def highlight_spaces(screen, gs):
         c, r = gs.selected_square
@@ -147,7 +149,7 @@ def draw_game_state(screen, gs, sqSelected):
         highlight_spaces(screen, gs)
     elif gs.phase == EngineScript.Phase.ANIMATING_INSTRUCTION:
         display_map(screen)        
-        display_units(screen, gs)
+        display_units(screen, gs)        
     elif gs.phase == EngineScript.Phase.TURN_TRANSITION:
         display_map(screen)        
         display_units(screen, gs)
@@ -338,7 +340,7 @@ def animate_turn_banner(screen, gs):
     font_size = 32
     time = gs.banner_anim.timer
     dura = gs.banner_anim.duration
-    blue_to_move = gs.blueToMove
+    blue_to_move = gs.blue_to_move
 
     font = p.font.Font('Fonts/PressStart2P-Regular.ttf', 32)
 
@@ -409,6 +411,17 @@ def convert_sprite_to_greyscale(image):
             if a != 255:
                 pass
     return grey_image
+
+def check_end_turn(gs):
+    advance_state = True
+    team = EngineScript.Team.BLUE if gs.blue_to_move else EngineScript.Team.RED
+    for unit in gs.unit_list:
+        if unit.team() == team and unit.is_active == True:
+            advance_state = False
+    if advance_state == True:        
+        gs.transition_to_turn_transition()
+
+
 
 if __name__ == "__main__":
     main()
