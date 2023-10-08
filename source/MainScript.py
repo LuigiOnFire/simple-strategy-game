@@ -11,7 +11,7 @@ SQ_SIZE = 16*SCALE
 WALLSIZE = 8*SCALE
 MAP_WIDTH = MAP_X * SQ_SIZE
 MAP_HEIGHT = MAP_Y * SQ_SIZE + WALLSIZE * 2
-MENU_WIDTH = MAP_WIDTH / 2.5
+MENU_WIDTH = MAP_WIDTH / 2.2
 WIDTH = 128 * SCALE
 HEIGHT = 192 * SCALE
 MAX_FPS = 30
@@ -117,21 +117,43 @@ def highlight_spaces(screen, gs):
             y = square[1]
             screen.blit(s, (x*SQ_SIZE, y*SQ_SIZE + WALLSIZE))
 
-def select_space(selected_square, gs):
+def select_space(selected_square, gs):    
+    # if the square is occupied by a ally unit and active
+        # make the unit menu
+    # else if the square is for production
+        # make the production menu
+    # else 
+        # make the quit menu
+
+
     if gs.square_is_occupied(selected_square):
         unit_index = gs.map[selected_square[1]][selected_square[0]]
-        gs.selected_unit = gs.unit_list[unit_index]
-        gs.selected_unit_index = unit_index
+        unit = gs.unit_list[unit_index]
+        if unit.is_active:
+            gs.selected_unit = gs.unit_list[unit_index]
+            gs.selected_unit_index = unit_index
+            gs.selected_square = selected_square
+            gs.phase = EngineScript.Phase.UNIT_SELECTED
+        else:
+            gs.selected_square = selected_square
+            prep_end_menu(gs)
+
+    elif gs.square_can_produce(selected_square):
         gs.selected_square = selected_square
-        gs.phase = EngineScript.Phase.UNIT_SELECTED
-    # elif gs.square_can_produce(selected_square):
-    #     gs.selected_square = selected_square
-    #     gs.phase = EngineScript.Phase.UNIT_SELECTED
+        gs.phase = EngineScript.Phase.AWAITING_MENU_INSTRUCTION
+
+    else:
+        gs.selected_square = selected_square
+        prep_end_menu(gs)
+
+
+
 
 def draw_game_state(screen, gs, sqSelected):
     if gs.phase == EngineScript.Phase.AWAITING_UNIT_SELECTION:
         display_map(screen)
         display_units(screen, gs)
+
     elif gs.phase == EngineScript.Phase.UNIT_SELECTED:
         display_map(screen)        
         highlight_spaces(screen, gs)
@@ -275,7 +297,7 @@ def display_units(screen, gs):
 def prep_unit_move(ref_square, gs):
     # if gs.square_is_occupied(ref_square): # make this "occupied by other unit"
     #     return
-    frames_per_square = 5 # change this as desired
+    frames_per_square = 5 # change this as desired TODO make this static variable in Anim
     start_square = gs.selected_square
     distance = math.sqrt((start_square[0]-ref_square[0])**2 + (start_square[1]-ref_square[1])**2)    
     duration = distance*frames_per_square
@@ -421,7 +443,10 @@ def check_end_turn(gs):
     if advance_state == True:        
         gs.transition_to_turn_transition()
 
-
+def prep_end_menu(gs):
+    gs.phase = EngineScript.Phase.AWAITING_MENU_INSTRUCTION
+    gs.menu = EngineScript.GameMenu.GameMenu()
+    gs.menu.buttons.append(EngineScript.GameMenu.EndTurnButton())
 
 if __name__ == "__main__":
     main()

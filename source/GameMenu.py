@@ -38,3 +38,9 @@ class CancelButton(Button):
         self.icon = p.image.load("Sprites/ButtonIcons/CancelButtonIcon.png")
         self.text = "Cancel"
         self.priority = 2
+
+class EndTurnButton(Button):
+    def __init__(self):
+        self.icon = p.image.load("Sprites/ButtonIcons/EndTurnButtonIcon.png")
+        self.text = "End Turn"
+        self.priority = 15
