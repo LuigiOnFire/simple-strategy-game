@@ -1,8 +1,9 @@
-import Team
+"""Contains animations for units and other game objects"""
 CONST_ATTACK_DURATION = 10
 
 class StillAnim():
-   def __init__(self, square=None):
+    """Animation for a still unit"""
+    def __init__(self, square=None):
         self.square = square
     
 class MovingAnim:

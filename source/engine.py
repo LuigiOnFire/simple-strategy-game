@@ -1,7 +1,7 @@
 from enum import Enum
-import Anim
-import GameMenu
-from Team import Team
+import anim
+import game_menu
+from team import Team
 
 class GameState():
     def __init__(self):
@@ -34,12 +34,12 @@ class GameState():
         self.phase = Phase.TURN_TRANSITION
         self.selected_unit = None
         self.selected_unit_index = None
-        self.selected_square = None
-        self.dest_square = None
+        self.selected_square = []
+        self.dest_square = []
         self.next_move = None
-        self.menu = GameMenu.GameMenu()
+        self.menu = game_menu.GameMenu()
         self.valid_moves = []
-        self.banner_anim = Anim.TurnBannerAnim(Team.BLUE)
+        self.banner_anim = anim.TurnBannerAnim(Team.BLUE)
 
     def setup_still_anims(self):
         for r in range(len(self.map)):
@@ -47,7 +47,7 @@ class GameState():
                 index = self.map[r][c]
                 if index > -1:
                     this_unit = self.unit_list[index]
-                    this_unit.anim = Anim.StillAnim((r, c))
+                    this_unit.anim = anim.StillAnim((r, c))
 
     def makeMove(self, move):
         self.map[move.startRow][move.startCol] = -1
@@ -77,7 +77,7 @@ class GameState():
         while to_seek:            
             q = to_seek.pop()
             sq = q[0]
-            range = q[1]
+            check_range = q[1]
 
             adj_list = (
                 (sq[0] + 1, sq[1]), 
@@ -86,9 +86,9 @@ class GameState():
                 (sq[0], sq[1] - 1)
             )
             for adj in adj_list: # need to add make sure that square is not occupied by hostile
-                if self.is_on_map(adj) and self not in visited and range - 1 >= 0:
+                if self.is_on_map(adj) and self not in visited and check_range - 1 >= 0:
                     if not self.square_is_occupied_by_hostile(adj, team):
-                        to_seek.append((adj, range - 1))
+                        to_seek.append((adj, check_range - 1))
                     if not self.square_is_occupied(adj):
                         valid_squares.append(adj)
                     visited.add((adj))
@@ -99,11 +99,13 @@ class GameState():
         c_in = ( c >= 0 and c < len(self.map[0]))
         if not r_in or not c_in:
             return False
-        no_unit = (self.map[r][c] < 0)
+        no_unit = self.map[r][c] < 0
         return no_unit
+
 
     def square_is_occupied(self, square):
         return self.map[square[1]][square[0]] != -1
+
 
     def square_is_occupied_by_hostile(self, square, team):
         unit_index = self.map[square[1]][square[0]]
@@ -113,27 +115,31 @@ class GameState():
         team = unit.team
         return team == unit.team
 
+
     def square_is_occupied_by_other(self, square, this_unit):
         unit_index = self.map[square[1]][square[0]]
         if unit_index == -1:
             return False
-        other_unit = self.unit_list[unit_index]        
-        return not this_unit == other_unit        
+        other_unit = self.unit_list[unit_index]
+        return not this_unit == other_unit
 
-    def square_can_produce(self, square):        
+
+    def square_can_produce(self, square):
         return square in self.production_tiles
-        
+
+
     def is_on_map(self, sq):
         width = len(self.map[0])
         height = len(self.map)
 
-        if not (0 <= sq[0] < width):
+        if not 0 <= sq[0] < width:
             return False
 
-        if not (0 <= sq[1] < height):
+        if not 0 <= sq[1] < height:
             return False
 
-        return True    
+        return True
+
 
     def reset_select(self):
         self.selected_square = None
@@ -141,14 +147,29 @@ class GameState():
         self.selected_unit_index = None
         self.dest_square = None
 
+
     def transition_to_awaiting_unit_selection(self):
         self.phase = Phase.AWAITING_UNIT_SELECTION
-    
+
+
     def transition_to_turn_transition(self):
         team = Team.BLUE if self.blue_to_move else Team.RED
         self.blue_to_move = not self.blue_to_move
+        self.refresh_all_units()
         self.phase = Phase.TURN_TRANSITION
-        self.banner_anim = Anim.TurnBannerAnim(team)
+        self.banner_anim = anim.TurnBannerAnim(team)        
+
+
+    def prep_end_menu(self): # Move to engine TODO
+        self.phase = Phase.AWAITING_MENU_INSTRUCTION
+        self.menu = game_menu.GameMenu()
+        self.menu.buttons.append(game_menu.CancelButton())
+        self.menu.buttons.append(game_menu.EndTurnButton())
+
+
+    def refresh_all_units(self):
+        for unit in self.unit_list:
+            unit.is_active = True
 
 
 class Move():
@@ -159,13 +180,18 @@ class Move():
         self.endCol = endSq[1]
         self.pieceMoved = map[self.startRow][self.startCol]
         self.pieceCaptured = map[self.endRow][self.endCol]
-        self.moveID = self.startRow * pow(11, 3) + self.startCol * pow(11, 2) + self.endRow * 11 + self.endCol * 1
+        self.moveID = (
+            self.startRow * pow(11, 3) +
+            self.startCol * pow(11, 2) +
+            self.endRow * 11 +
+            self.endCol * 1
+        )
 
     def __eq__(self, other):
         if isinstance(other, Move):
             return self.moveID == other.moveID
         return False
-    
+
 
 class ArmyUnit:
     def __init__(self, **kwargs):
@@ -192,7 +218,7 @@ class FootSoldier(ArmyUnit):
             "hit_points": 1,
             "max_hit_points": 1,
             "unit_name": "footsoldier",
-            "anim": Anim.StillAnim((0, 0)),
+            "anim": anim.StillAnim((0, 0)),
         }
         super().__init__(**kwargs)
         self._team = team        
