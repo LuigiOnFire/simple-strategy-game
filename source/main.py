@@ -109,6 +109,9 @@ def menu_event_handler(mouse_pos, gs):
                 gs.transition_to_turn_transition()
                 gs.menu = engine.game_menu.GameMenu()
 
+            elif isinstance(button, engine.game_menu.AttackButton):
+                gs.transition_to_selecting_target()
+
             # regardless of what button was pushed it's good to check
             check_end_turn(gs)
 
@@ -124,6 +127,16 @@ def highlight_spaces(screen, gs):
         y = square[1]
         screen.blit(s, (x*SQ_SIZE, y*SQ_SIZE + WALLSIZE))
 
+def highlight_enemies(screen, gs):
+    """Highlights squares that contain enemies"""
+    s = p.Surface((SQ_SIZE - SCALE / 2, SQ_SIZE - SCALE /2))
+    s.set_alpha(100)
+    s.fill(p.Color('red'))
+    gs.find_in_range_hostiles()
+    for square in gs.found_hostiles:
+        x = square[0]
+        y = square[1]
+        screen.blit(s, (x*SQ_SIZE, y*SQ_SIZE + WALLSIZE))
 
 def select_space(selected_square, gs):
     """Gets a selected space once it's been clicked on"""
@@ -173,8 +186,8 @@ def draw_game_state(screen, gs):
 
     elif gs.phase == engine.Phase.SELECTING_TARGET:
         display_map(screen)
+        highlight_enemies(screen, gs)
         display_units(screen, gs)
-        highlight_spaces(screen, gs)
 
     elif gs.phase == engine.Phase.ANIMATING_INSTRUCTION:
         display_map(screen)

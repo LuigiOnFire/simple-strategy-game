@@ -14,7 +14,7 @@ class GameState():
         # *l - spear/lance
         # *b - bow
         self.map = [
-            [-1, -1, -1, 0, 1, -1, -1, -1],
+            [-1, -1, -1, 0, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
@@ -23,8 +23,8 @@ class GameState():
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, 2, 3, -1, -1, -1],
+            [-1, -1, -1, 2, 1, -1, -1, -1],
+            [-1, -1, -1, -1, 3, -1, -1, -1],
         ]
         self.production_tiles = [(0, 0), (0, 1),(0, 2) ,(0, 3), (0, 4), (0, 5), (0, 6), (0, 7), 
                                 (1, 0), (1, 1),(1, 2) ,(1, 3), (1, 4), (1, 5), (1, 6), (1, 7)]
@@ -39,6 +39,7 @@ class GameState():
         self.next_move = None
         self.menu = game_menu.GameMenu()
         self.valid_moves = []
+        self.found_hostiles = []
         self.banner_anim = anim.TurnBannerAnim(Team.BLUE)
 
     def setup_still_anims(self):
@@ -94,6 +95,39 @@ class GameState():
                     visited.add((adj))
         self.valid_moves = valid_squares
 
+    def find_in_range_hostiles(self):   # currently does not support any minimum range
+                                        # would need a substantial refactoring
+        unit = self.selected_unit
+        attack_range = unit.attack_range
+        col = self.dest_square[0]
+        row = self.dest_square[1]
+        to_seek = []
+        visited = set()
+        self.found_hostiles = []
+        team = unit.team
+
+        to_seek.append(((col, row), attack_range))
+        visited.add((col, row))
+        while to_seek:
+            q = to_seek.pop()
+            sq = q[0]
+            check_range = q[1]
+
+            adj_list = (
+                (sq[0] + 1, sq[1]), 
+                (sq[0] - 1, sq[1]), 
+                (sq[0], sq[1] + 1), 
+                (sq[0], sq[1] - 1)
+            )
+
+            for adj in adj_list:
+                if self.is_on_map(adj) and self not in visited and check_range - 1 >= 0:
+                    to_seek.append((adj, check_range - 1))
+                    if self.square_is_occupied_by_hostile(adj, team):
+                        self.found_hostiles.append(adj)
+                    visited.add((adj))
+
+
     def validatePair(self, r, c):
         r_in = ( r >= 0 and r < len(self.map))
         c_in = ( c >= 0 and c < len(self.map[0]))
@@ -104,6 +138,7 @@ class GameState():
 
 
     def square_is_occupied(self, square):
+        # needs IF list is in range (where is this coming from?)
         return self.map[square[1]][square[0]] != -1
 
 
@@ -157,7 +192,13 @@ class GameState():
         self.blue_to_move = not self.blue_to_move
         self.refresh_all_units()
         self.phase = Phase.TURN_TRANSITION
-        self.banner_anim = anim.TurnBannerAnim(team)        
+        self.banner_anim = anim.TurnBannerAnim(team)
+
+
+    def transition_to_selecting_target(self):
+        self.phase = Phase.SELECTING_TARGET
+        self.find_in_range_hostiles()
+
 
 
     def prep_end_menu(self): # Move to engine TODO
