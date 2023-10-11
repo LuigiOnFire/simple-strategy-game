@@ -130,7 +130,7 @@ def highlight_spaces(screen, gs):
 def highlight_enemies(screen, gs):
     """Highlights squares that contain enemies"""
     s = p.Surface((SQ_SIZE - SCALE / 2, SQ_SIZE - SCALE /2))
-    s.set_alpha(100)
+    s.set_alpha(128) # 255 is opaque
     s.fill(p.Color('red'))
     gs.find_in_range_hostiles()
     for square in gs.found_hostiles:
@@ -336,10 +336,11 @@ def prep_unit_move(ref_square, gs):
     adj_squares = [(ref_square[0] + 1, ref_square[1]), (ref_square[0] - 1, ref_square[1]),
                    (ref_square[0], ref_square[1] + 1), (ref_square[0], ref_square[1] - 1)]
     for adj_square in adj_squares:
+        if gs.is_on_map(adj_square):
         # if it's in range AND if it's occupied
-        if gs.square_is_occupied(adj_square):
-            gs.menu.buttons.append(engine.game_menu.AttackButton())
-            break
+            if gs.square_is_occupied(adj_square):
+                gs.menu.buttons.append(engine.game_menu.AttackButton())
+                break
 
     gs.menu.buttons.append(engine.game_menu.WaitButton())
     gs.menu.buttons.append(engine.game_menu.CancelButton())
