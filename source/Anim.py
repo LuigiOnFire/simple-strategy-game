@@ -12,18 +12,13 @@ class MovingAnim:
         self.duration = duration
         self.start_square = start_square
         self.end_square = end_square
-        
-class AttackAnim:
-    def __init__(self, square):
-        self.timer = 0
-        self.duration = CONST_ATTACK_DURATION # this will be a constant
-        self.square = square
 
-class DamageAnim:
-    def __init__(self, square):
+class AttackAnim:
+    def __init__(self, start_square, ref_square):
         self.timer = 0
         self.duration = CONST_ATTACK_DURATION # this will be a constant
-        self.square = square
+        self.start_square = start_square
+        self.ref_square = ref_square
 
 class TakingDamageAnim:
     def __init__(self, square):

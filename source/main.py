@@ -82,6 +82,10 @@ def map_event_handler(mouse_pos, gs):
     elif phase == engine.Phase.UNIT_SELECTED:
         if selected_square in gs.valid_moves:
             prep_unit_move(selected_square, gs)
+    
+    elif phase == engine.Phase.SELECTING_TARGET:
+        if selected_square == gs.found_hostiles:
+            prep_unit_attack(selected_square, gs):
 
 
 def menu_event_handler(mouse_pos, gs):
@@ -344,6 +348,16 @@ def prep_unit_move(ref_square, gs):
 
     gs.menu.buttons.append(engine.game_menu.WaitButton())
     gs.menu.buttons.append(engine.game_menu.CancelButton())
+
+def prep_unit_attack(ref_square, gs):
+    selected_square = gs.selected_square
+    selected_unit = gs.selected_unit
+    col = ref_square[0]
+    row = ref_square[1]    
+    target_unit_index = gs.map[row][col]
+    target_unit = gs.unit_list[target_unit_index]
+    selected_unit.anim = anim.AttackAnim(selected_square, ref_square)
+    target_unit.anim = anim.TakingDamageAnim(ref_square)
 
 
 def animate_still(coords, this_unit, screen):
