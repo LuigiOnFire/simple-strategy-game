@@ -312,8 +312,8 @@ def display_units(screen, gs):
                     animate_still(coords, this_unit,  screen)
                 if isinstance(this_anim, anim.MovingAnim):
                     animate_moving(this_unit, screen, gs)
-                # if isinstance(this_anim, anim.AttackAnim):
-                    # animate_attacking(index, coords, this_unit, screen)
+                if isinstance(this_anim, anim.AttackAnim):
+                    animate_attacking(index, coords, this_unit, screen)
                 # if isinstance(this_anim, Anim.TakingDamageAnim):
                     # anim_taking_damage(unit, coords, this_unit, screen)
 
@@ -356,7 +356,7 @@ def prep_unit_attack(ref_square, gs):
     row = ref_square[1]    
     target_unit_index = gs.map[row][col]
     target_unit = gs.unit_list[target_unit_index]
-    selected_unit.anim = anim.AttackAnim(selected_square, ref_square)
+    selected_unit.anim = anim.AttackAnim(selected_square, ref_square, SQ_SIZE)
     target_unit.anim = anim.TakingDamageAnim(ref_square)
 
 
@@ -402,6 +402,16 @@ def animate_moving(this_unit, screen, gs):
         this_unit.anim = anim.StillAnim((end_square[1], end_square[0]))
         gs.phase = engine.Phase.AWAITING_MENU_INSTRUCTION
 
+def animate_attacking(this_unit, screen, gs):        
+    this_anim = this_unit.anim
+    this_team = engine.Team.to_string(this_unit.team())
+    this_sprite = IMAGES[this_team, this_unit.unit_name()]
+    (c, r) = select_space    
+    (dx, dy) = this_anim.get_current_offset()    
+
+    screen.blit(p.Rect(this_sprite, c*SQ_SIZE + dx, r*SQ_SIZE + WALLSIZE + dy, SQ_SIZE, SQ_SIZE))
+
+    this_anim.increment_timer()
 
 def animate_turn_banner(screen, gs):
     time = gs.banner_anim.timer

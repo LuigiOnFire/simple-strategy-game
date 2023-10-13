@@ -14,11 +14,21 @@ class MovingAnim:
         self.end_square = end_square
 
 class AttackAnim:
-    def __init__(self, start_square, ref_square):
+    def __init__(self, start_square, ref_square, SQ_SIZE):
         self.timer = 0
         self.duration = CONST_ATTACK_DURATION # this will be a constant
         self.start_square = start_square
         self.ref_square = ref_square
+        self.dist = SQ_SIZE / 4
+    
+    def get_current_offset(self):
+        half_time = CONST_ATTACK_DURATION / 2
+
+        if self.timer < half_time:
+            
+
+        else:
+
 
 class TakingDamageAnim:
     def __init__(self, square):
