@@ -82,10 +82,10 @@ def map_event_handler(mouse_pos, gs):
     elif phase == engine.Phase.UNIT_SELECTED:
         if selected_square in gs.valid_moves:
             prep_unit_move(selected_square, gs)
-    
+
     elif phase == engine.Phase.SELECTING_TARGET:
-        if selected_square == gs.found_hostiles:
-            prep_unit_attack(selected_square, gs):
+        if selected_square in gs.found_hostiles:
+            prep_unit_attack(selected_square, gs)
 
 
 def menu_event_handler(mouse_pos, gs):
@@ -313,7 +313,7 @@ def display_units(screen, gs):
                 if isinstance(this_anim, anim.MovingAnim):
                     animate_moving(this_unit, screen, gs)
                 if isinstance(this_anim, anim.AttackAnim):
-                    animate_attacking(index, coords, this_unit, screen)
+                    animate_attacking(this_unit, screen, gs)
                 # if isinstance(this_anim, Anim.TakingDamageAnim):
                     # anim_taking_damage(unit, coords, this_unit, screen)
 
@@ -353,11 +353,12 @@ def prep_unit_attack(ref_square, gs):
     selected_square = gs.selected_square
     selected_unit = gs.selected_unit
     col = ref_square[0]
-    row = ref_square[1]    
+    row = ref_square[1]
     target_unit_index = gs.map[row][col]
     target_unit = gs.unit_list[target_unit_index]
     selected_unit.anim = anim.AttackAnim(selected_square, ref_square, SQ_SIZE)
     target_unit.anim = anim.TakingDamageAnim(ref_square)
+    gs.transition_to_animating_instruction()
 
 
 def animate_still(coords, this_unit, screen):
@@ -402,16 +403,20 @@ def animate_moving(this_unit, screen, gs):
         this_unit.anim = anim.StillAnim((end_square[1], end_square[0]))
         gs.phase = engine.Phase.AWAITING_MENU_INSTRUCTION
 
-def animate_attacking(this_unit, screen, gs):        
+def animate_attacking(this_unit, screen, gs):
     this_anim = this_unit.anim
     this_team = engine.Team.to_string(this_unit.team())
     this_sprite = IMAGES[this_team, this_unit.unit_name()]
-    (c, r) = select_space    
-    (dx, dy) = this_anim.get_current_offset()    
+    (c, r) = gs.selected_square
+    (dx, dy) = this_anim.get_current_offset()
 
-    screen.blit(p.Rect(this_sprite, c*SQ_SIZE + dx, r*SQ_SIZE + WALLSIZE + dy, SQ_SIZE, SQ_SIZE))
+    screen.blit(this_sprite, p.Rect(c*SQ_SIZE + dx, r*SQ_SIZE + WALLSIZE + dy, SQ_SIZE, SQ_SIZE))
 
     this_anim.increment_timer()
+    if this_unit.anim.timer >= this_unit.anim.duration:
+        this_unit.anim = anim.StillAnim((c, r))
+        gs.phase = engine.Phase.AWAITING_MENU_INSTRUCTION
+
 
 def animate_turn_banner(screen, gs):
     time = gs.banner_anim.timer

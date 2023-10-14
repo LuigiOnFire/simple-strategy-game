@@ -20,15 +20,47 @@ class AttackAnim:
         self.start_square = start_square
         self.ref_square = ref_square
         self.dist = SQ_SIZE / 4
-    
+
+        x_dir = self.get_direction("x", start_square, ref_square)
+        y_dir = self.get_direction("y", start_square, ref_square)
+
+        self.x_base = x_dir * self.dist
+        self.y_base = y_dir * self.dist
+
+
     def get_current_offset(self):
+        """Gets the offset from the unit's current square at which it is to be animated"""
         half_time = CONST_ATTACK_DURATION / 2
 
-        if self.timer < half_time:
-            
+        if self.timer <= half_time:
+            time_scale = self.timer / half_time
 
         else:
+            time_scale = 1 - (self.timer - half_time / half_time) # Error in the arithmetic here
 
+        x_offset = self.x_base * time_scale
+        y_offset = self.y_base * time_scale
+
+        return (x_offset, y_offset)
+
+    def increment_timer(self):
+        """Increments the timer by one tick"""
+        self.timer += 1
+
+    @staticmethod
+    def get_direction(dimension, start_square, ref_square):
+        """Indicates which direction we should animate the unit in"""
+        if dimension == "x":
+            ind = 0
+        else:
+            ind = 1        
+        if start_square[ind] < ref_square[ind]:
+            return 1
+        if start_square[ind] == ref_square[ind]:
+            return 0
+        if start_square[ind] > ref_square[ind]:
+            return -1
+        
 
 class TakingDamageAnim:
     def __init__(self, square):

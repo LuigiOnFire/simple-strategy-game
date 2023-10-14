@@ -59,7 +59,7 @@ class GameState():
         if len(self.moveLog) != 0:
             move = self.moveLog.pop()
             self.map[move.startRow][move.startCol] = move.pieceMoved
-            self.map[move.endRow][move.endCol] = move.pieceCaptured    
+            self.map[move.endRow][move.endCol] = move.pieceCaptured
                         
     def squareContainsUnit(self, row, col):
         return self.map[row][col] != -1
@@ -199,6 +199,8 @@ class GameState():
         self.phase = Phase.SELECTING_TARGET
         self.find_in_range_hostiles()
 
+    def transition_to_animating_instruction(self):
+        self.phase = Phase.ANIMATING_INSTRUCTION
 
 
     def prep_end_menu(self): # Move to engine TODO
