@@ -36,7 +36,7 @@ class AttackAnim:
             time_scale = self.timer / half_time
 
         else:
-            time_scale = 1 - (self.timer - half_time / half_time) # Error in the arithmetic here
+            time_scale = 1 - (self.timer - half_time) / half_time # Error in the arithmetic here
 
         x_offset = self.x_base * time_scale
         y_offset = self.y_base * time_scale
@@ -60,7 +60,7 @@ class AttackAnim:
             return 0
         if start_square[ind] > ref_square[ind]:
             return -1
-        
+
 
 class TakingDamageAnim:
     def __init__(self, square):
@@ -68,8 +68,19 @@ class TakingDamageAnim:
         self.duration = CONST_ATTACK_DURATION # this will be a constant
         self.square = square
 
+    def get_alpha_offset(self):
+        half_time = self.duration / 2
+        diff = abs(self.timer - half_time)
+        scale = 1 - diff / half_time
+
+        return scale * 255
+
+    def increment_timer(self):
+        """Increments the timer by one tick"""
+        self.timer += 1
+
 class TurnBannerAnim:
-    def __init__(self, team):        
+    def __init__(self, team):
         self.timer = 0
         self.duration = 60
         self.team = team

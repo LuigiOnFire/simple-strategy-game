@@ -264,7 +264,6 @@ def display_menu(screen, gs):
     screen.blit(body_surface, body_position)
 
     for i in range(0, len(gs.menu.buttons)):
-
         button = gs.menu.buttons[i]
 
         button.x = body_top_left_x
@@ -314,8 +313,8 @@ def display_units(screen, gs):
                     animate_moving(this_unit, screen, gs)
                 if isinstance(this_anim, anim.AttackAnim):
                     animate_attacking(this_unit, screen, gs)
-                # if isinstance(this_anim, Anim.TakingDamageAnim):
-                    # anim_taking_damage(unit, coords, this_unit, screen)
+                if isinstance(this_anim, anim.TakingDamageAnim):
+                    animate_taking_damage(this_unit, screen, gs)
 
 
 def prep_unit_move(ref_square, gs):
@@ -352,6 +351,7 @@ def prep_unit_move(ref_square, gs):
 def prep_unit_attack(ref_square, gs):
     selected_square = gs.selected_square
     selected_unit = gs.selected_unit
+    gs.target_square = ref_square
     col = ref_square[0]
     row = ref_square[1]
     target_unit_index = gs.map[row][col]
@@ -403,6 +403,7 @@ def animate_moving(this_unit, screen, gs):
         this_unit.anim = anim.StillAnim((end_square[1], end_square[0]))
         gs.phase = engine.Phase.AWAITING_MENU_INSTRUCTION
 
+
 def animate_attacking(this_unit, screen, gs):
     this_anim = this_unit.anim
     this_team = engine.Team.to_string(this_unit.team())
@@ -415,7 +416,25 @@ def animate_attacking(this_unit, screen, gs):
     this_anim.increment_timer()
     if this_unit.anim.timer >= this_unit.anim.duration:
         this_unit.anim = anim.StillAnim((c, r))
-        gs.phase = engine.Phase.AWAITING_MENU_INSTRUCTION
+        this_unit.active = False
+        gs.phase = engine.Phase.AWAITING_UNIT_SELECTION
+
+
+def animate_taking_damage(this_unit, screen, gs):
+    this_anim = this_unit.anim
+    this_team = engine.Team.to_string(this_unit.team())
+    this_sprite = IMAGES[this_team, this_unit.unit_name()]
+    (c, r) = gs.target_square
+    alpha_offset = this_anim.get_alpha_offset()
+
+    shade_color = (255, 255, 255)
+
+    this_sprite.fill(shade_color + (alpha_offset,), None, p.BLEND_RGBA_MULT)
+    screen.blit(this_sprite, p.Rect(c*SQ_SIZE, r*SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE))
+
+    this_anim.increment_timer()
+    if this_unit.anim.timer >= this_unit.anim.duration:
+        this_unit.anim = anim.StillAnim((c, r))
 
 
 def animate_turn_banner(screen, gs):

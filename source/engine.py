@@ -36,6 +36,7 @@ class GameState():
         self.selected_unit_index = None
         self.selected_square = []
         self.dest_square = []
+        self.target_square = []
         self.next_move = None
         self.menu = game_menu.GameMenu()
         self.valid_moves = []
@@ -199,8 +200,10 @@ class GameState():
         self.phase = Phase.SELECTING_TARGET
         self.find_in_range_hostiles()
 
+
     def transition_to_animating_instruction(self):
         self.phase = Phase.ANIMATING_INSTRUCTION
+        self.menu = game_menu.GameMenu()
 
 
     def prep_end_menu(self): # Move to engine TODO
