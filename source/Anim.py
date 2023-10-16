@@ -71,7 +71,7 @@ class TakingDamageAnim:
     def get_alpha_offset(self):
         half_time = self.duration / 2
         diff = abs(self.timer - half_time)
-        scale = diff / half_time
+        scale = 1- diff / half_time
 
         return scale * 255
 
