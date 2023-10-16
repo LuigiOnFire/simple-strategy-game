@@ -372,8 +372,7 @@ def animate_still(coords, this_unit, screen):
     if not this_unit.is_active:
         unit_sprite = convert_sprite_to_greyscale(unit_sprite)
 
-    screen.blit(unit_sprite, p.Rect(
-        c*SQ_SIZE, r*SQ_SIZE+WALLSIZE, SQ_SIZE, SQ_SIZE))
+    screen.blit(unit_sprite, p.Rect(c*SQ_SIZE, r*SQ_SIZE+WALLSIZE, SQ_SIZE, SQ_SIZE))
 
 
 def animate_moving(this_unit, screen, gs):
@@ -423,13 +422,15 @@ def animate_attacking(this_unit, screen, gs):
 def animate_taking_damage(this_unit, screen, gs):
     this_anim = this_unit.anim
     this_team = engine.Team.to_string(this_unit.team())
-    this_sprite = IMAGES[this_team, this_unit.unit_name()]
+    this_sprite = IMAGES[this_team, this_unit.unit_name()].copy()
     (c, r) = gs.target_square
     alpha_offset = this_anim.get_alpha_offset()
 
     shade_color = (255, 255, 255)
 
-    this_sprite.fill(shade_color + (alpha_offset,), None, p.BLEND_RGBA_MULT)
+    sprite_color = shade_color + (alpha_offset,)
+
+    this_sprite.fill(sprite_color, None, p.BLEND_RGBA_MAX)
     screen.blit(this_sprite, p.Rect(c*SQ_SIZE, r*SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE))
 
     this_anim.increment_timer()
