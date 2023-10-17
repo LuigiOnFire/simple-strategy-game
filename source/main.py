@@ -315,6 +315,8 @@ def display_units(screen, gs):
                     animate_attacking(this_unit, screen, gs)
                 if isinstance(this_anim, anim.TakingDamageAnim):
                     animate_taking_damage(this_unit, screen, gs)
+                if isinstance(this_anim, anim.DeathAnim):
+                    animate_dying(this_unit, screen, gs)
 
 
 def prep_unit_move(ref_square, gs):
@@ -416,7 +418,6 @@ def animate_attacking(this_unit, screen, gs):
     if this_unit.anim.timer >= this_unit.anim.duration:
         this_unit.anim = anim.StillAnim()
         this_unit.active = False
-        gs.phase = engine.Phase.AWAITING_UNIT_SELECTION
 
 
 def animate_taking_damage(this_unit, screen, gs):
@@ -424,18 +425,47 @@ def animate_taking_damage(this_unit, screen, gs):
     this_team = engine.Team.to_string(this_unit.team())
     this_sprite = IMAGES[this_team, this_unit.unit_name()].copy()
     (c, r) = gs.target_square
-    alpha_offset = this_anim.get_alpha_offset()
+    color_offset = this_anim.get_alpha_offset()
 
-    shade_color = (alpha_offset, alpha_offset, alpha_offset)
+    shade_color = (color_offset, color_offset, color_offset)
 
-    sprite_color = shade_color + (alpha_offset,)
+    sprite_color = shade_color + (color_offset,) # check this later, color offset should not be needed here? TODO
 
     this_sprite.fill(sprite_color, None, p.BLEND_RGB_ADD)
-    screen.blit(this_sprite, p.Rect(c*SQ_SIZE, r*SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE))
+    screen.blit(this_sprite, p.Rect(c * SQ_SIZE, r * SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE))
 
     this_anim.increment_timer()
     if this_unit.anim.timer >= this_unit.anim.duration:
-        this_unit.anim = anim.StillAnim()
+        this_unit.hit_points -= 1
+        if this_unit.hit_points <= 0:
+            this_unit.anim = anim.DeathAnim()
+
+        else:
+            this_unit.anim = anim.StillAnim()
+            gs.phase = engine.Phase.AWAITING_UNIT_SELECTION
+
+
+def animate_dying(this_unit, screen, gs):
+    this_anim = this_unit.anim
+    this_team = engine.Team.to_string(this_unit.team())
+    this_sprite = IMAGES[this_team, this_unit.unit_name()].copy()
+    (c, r) = gs.target_square
+    alpha_offset = this_anim.get_alpha_offset()
+
+    shade_color = (255, 255, 255)
+
+    sprite_color = shade_color + (alpha_offset,)
+
+    this_sprite.fill(sprite_color, None, p.BLEND_RGBA_MULT)
+    screen.blit(this_sprite, p.Rect(c*SQ_SIZE, r* SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE))
+
+    this_anim.increment_timer()
+    if this_unit.anim.timer >= this_unit.anim.duration:
+        gs.map[r][c] = -1
+        gs.phase = engine.Phase.AWAITING_UNIT_SELECTION
+
+
+
 
 
 def animate_turn_banner(screen, gs):

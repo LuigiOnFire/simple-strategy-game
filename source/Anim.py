@@ -79,6 +79,20 @@ class TakingDamageAnim:
         """Increments the timer by one tick"""
         self.timer += 1
 
+class DeathAnim:
+    def __init__(self):
+        self.timer = 0
+        self.duration = 20 # this will be a constant
+
+    def get_alpha_offset(self):                
+        scale = 1 - self.timer / self.duration
+
+        return scale * 255
+
+    def increment_timer(self):
+        """Increments the timer by one tick"""
+        self.timer += 1
+
 class TurnBannerAnim:
     def __init__(self, team):
         self.timer = 0

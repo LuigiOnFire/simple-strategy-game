@@ -243,7 +243,7 @@ class ArmyUnit:
     def __init__(self, **kwargs):
         self.attack_range = kwargs["attack_range"]
         self.move_range = kwargs["move_range"]
-        self._hit_points = kwargs["hit_points"]
+        self.hit_points = kwargs["hit_points"]
         self._max_hit_points = kwargs["max_hit_points"]
         self._team = "b"
         self._unit_name = kwargs["unit_name"]
