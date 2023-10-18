@@ -417,7 +417,7 @@ def animate_attacking(this_unit, screen, gs):
     this_anim.increment_timer()
     if this_unit.anim.timer >= this_unit.anim.duration:
         this_unit.anim = anim.StillAnim()
-        this_unit.active = False
+        this_unit.is_active = False
 
 
 def animate_taking_damage(this_unit, screen, gs):
@@ -429,7 +429,8 @@ def animate_taking_damage(this_unit, screen, gs):
 
     shade_color = (color_offset, color_offset, color_offset)
 
-    sprite_color = shade_color + (color_offset,) # check this later, color offset should not be needed here? TODO
+    sprite_color = shade_color + (color_offset,) 
+    # check this later, color offset should not be needed here? TODO
 
     this_sprite.fill(sprite_color, None, p.BLEND_RGB_ADD)
     screen.blit(this_sprite, p.Rect(c * SQ_SIZE, r * SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE))

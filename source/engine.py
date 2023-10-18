@@ -14,7 +14,6 @@ class GameState():
         # *l - spear/lance
         # *b - bow
         self.map = [
-            [-1, -1, -1, 0, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
@@ -22,11 +21,12 @@ class GameState():
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, 2, 1, -1, -1, -1],
+            [-1, -1, -1, -0, -1, -1, -1, -1],
+            [-1, -1, -1, 1, -1, -1, -1, -1],
+            [-1, -1, -1, 2, -1, -1, -1, -1],
             [-1, -1, -1, -1, 3, -1, -1, -1],
         ]
-        self.production_tiles = [(0, 0), (0, 1),(0, 2) ,(0, 3), (0, 4), (0, 5), (0, 6), (0, 7), 
+        self.production_tiles = [(0, 0), (0, 1),(0, 2) ,(0, 3), (0, 4), (0, 5), (0, 6), (0, 7),
                                 (1, 0), (1, 1),(1, 2) ,(1, 3), (1, 4), (1, 5), (1, 6), (1, 7)]
         self.blue_to_move = True
         self.moveLog = []
@@ -72,7 +72,7 @@ class GameState():
         to_seek = []
         visited = set()
         valid_squares = [(col, row)]
-        team = unit.team
+        team = unit.team()
 
         to_seek.append(((col, row), move_range))
         visited.add((col, row))
@@ -105,7 +105,7 @@ class GameState():
         to_seek = []
         visited = set()
         self.found_hostiles = []
-        team = unit.team
+        team = unit.team()
 
         to_seek.append(((col, row), attack_range))
         visited.add((col, row))
@@ -143,13 +143,13 @@ class GameState():
         return self.map[square[1]][square[0]] != -1
 
 
-    def square_is_occupied_by_hostile(self, square, team):
+    def square_is_occupied_by_hostile(self, square, active_team):
         unit_index = self.map[square[1]][square[0]]
         if unit_index == -1:
             return False
         unit = self.unit_list[unit_index]
-        team = unit.team
-        return team == unit.team
+        # active_team = Team.BLUE if self.blue_to_move == true else Team.RED
+        return active_team != unit.team()
 
 
     def square_is_occupied_by_other(self, square, this_unit):
