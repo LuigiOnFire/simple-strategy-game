@@ -217,6 +217,9 @@ class GameState():
         for unit in self.unit_list:
             unit.is_active = True
 
+    def unit_has_active_team(self, unit):
+        active_team = Team.BLUE if self.blue_to_move else Team.RED
+        return unit.team() == active_team
 
 class Move():
     def __init__(self, startSq, endSq, map):

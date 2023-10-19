@@ -85,6 +85,11 @@ def map_event_handler(mouse_pos, gs):
 
     elif phase == engine.Phase.SELECTING_TARGET:
         if selected_square in gs.found_hostiles:
+            (sel_x, sel_y) = gs.selected_square
+            (ref_x, ref_y) = gs.dest_square
+            gs.map[ref_y][ref_x] = gs.selected_unit_index
+            gs.map[sel_y][sel_x] = -1
+            
             prep_unit_attack(selected_square, gs)
 
 
@@ -114,6 +119,7 @@ def menu_event_handler(mouse_pos, gs):
                 gs.menu = engine.game_menu.GameMenu()
 
             elif isinstance(button, engine.game_menu.AttackButton):
+                # first, confirm the move
                 gs.transition_to_selecting_target()
 
             # regardless of what button was pushed it's good to check
@@ -148,7 +154,7 @@ def select_space(selected_square, gs):
         unit_index = gs.map[selected_square[1]][selected_square[0]]
         unit = gs.unit_list[unit_index]
 
-        if unit.is_active:
+        if unit.is_active and gs.unit_has_active_team(unit):
             gs.selected_unit = gs.unit_list[unit_index]
             gs.selected_unit_index = unit_index
             gs.selected_square = selected_square
@@ -351,7 +357,7 @@ def prep_unit_move(ref_square, gs):
     gs.menu.buttons.append(engine.game_menu.CancelButton())
 
 def prep_unit_attack(ref_square, gs):
-    selected_square = gs.selected_square
+    selected_square = gs.dest_square
     selected_unit = gs.selected_unit
     gs.target_square = ref_square
     col = ref_square[0]
