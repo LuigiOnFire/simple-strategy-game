@@ -118,8 +118,7 @@ def menu_event_handler(mouse_pos, gs):
                 gs.transition_to_turn_transition()
                 gs.menu = engine.game_menu.GameMenu()
 
-            elif isinstance(button, engine.game_menu.AttackButton):
-                # first, confirm the move
+            elif isinstance(button, engine.game_menu.AttackButton):                
                 gs.transition_to_selecting_target()
 
             # regardless of what button was pushed it's good to check
@@ -358,14 +357,21 @@ def prep_unit_move(ref_square, gs):
     gs.menu.buttons.append(engine.game_menu.CancelButton())
 
 def prep_unit_attack(ref_square, gs):
-    selected_square = gs.dest_square
+    dest_square = gs.dest_square
     selected_unit = gs.selected_unit
     gs.target_square = ref_square
     col = ref_square[0]
     row = ref_square[1]
     target_unit_index = gs.map[row][col]
     target_unit = gs.unit_list[target_unit_index]
-    selected_unit.anim = anim.AttackAnim(selected_square, ref_square, SQ_SIZE)
+
+    # confirm the move here
+    (sel_x, sel_y) = gs.selected_square
+    (dest_x, dest_y) = dest_square
+    gs.map[sel_y][sel_x] = -1
+    gs.map[dest_y][dest_x] = gs.selected_unit_index
+
+    selected_unit.anim = anim.AttackAnim(dest_square, ref_square, SQ_SIZE)
     target_unit.anim = anim.TakingDamageAnim(ref_square)
     gs.transition_to_animating_instruction()
 
@@ -416,7 +422,7 @@ def animate_attacking(this_unit, screen, gs):
     this_anim = this_unit.anim
     this_team = engine.Team.to_string(this_unit.team())
     this_sprite = IMAGES[this_team, this_unit.unit_name()]
-    (c, r) = gs.selected_square
+    (c, r) = gs.dest_square
     (dx, dy) = this_anim.get_current_offset()
 
     screen.blit(this_sprite, p.Rect(c*SQ_SIZE + dx, r*SQ_SIZE + WALLSIZE + dy, SQ_SIZE, SQ_SIZE))
