@@ -106,9 +106,9 @@ def menu_event_handler(mouse_pos, gs):
 
             elif isinstance(button, engine.game_menu.WaitButton):
                 (sel_x, sel_y) = gs.selected_square
-                (ref_x, ref_y) = gs.dest_square
-                gs.map[ref_y][ref_x] = gs.selected_unit_index
+                (ref_x, ref_y) = gs.dest_square                
                 gs.map[sel_y][sel_x] = -1
+                gs.map[ref_y][ref_x] = gs.selected_unit_index
                 gs.selected_unit.is_active = False
                 gs.phase = engine.Phase.AWAITING_UNIT_SELECTION
                 gs.menu = engine.game_menu.GameMenu()
@@ -336,6 +336,7 @@ def prep_unit_move(ref_square, gs):
     gs.dest_square = ref_square
     this_anim = anim.MovingAnim(duration, start_square, ref_square)
     unit = gs.selected_unit
+    team = unit.team()
     if not distance == 0:
         unit.anim = this_anim
         gs.phase = engine.Phase.ANIMATING_MOVE
@@ -349,7 +350,7 @@ def prep_unit_move(ref_square, gs):
     for adj_square in adj_squares:
         if gs.is_on_map(adj_square):
         # if it's in range AND if it's occupied
-            if gs.square_is_occupied(adj_square):
+            if gs.square_is_occupied_by_hostile(adj_square, team):
                 gs.menu.buttons.append(engine.game_menu.AttackButton())
                 break
 
@@ -470,8 +471,6 @@ def animate_dying(this_unit, screen, gs):
     if this_unit.anim.timer >= this_unit.anim.duration:
         gs.map[r][c] = -1
         gs.phase = engine.Phase.AWAITING_UNIT_SELECTION
-
-
 
 
 
