@@ -52,7 +52,6 @@ def main():
                 target = p.mouse.get_pos()
                 if mouse_in_menu(target, gs.menu):
                     menu_event_handler(target, gs)
-
                 else:
                     map_event_handler(target, gs)
 
@@ -89,8 +88,11 @@ def map_event_handler(mouse_pos, gs):
             (ref_x, ref_y) = gs.dest_square
             gs.map[ref_y][ref_x] = gs.selected_unit_index
             gs.map[sel_y][sel_x] = -1
-            
+
             prep_unit_attack(selected_square, gs)
+
+        else:
+            gs.transition_from_selecting_target_to_awaiting_menu_instruction()
 
 
 def menu_event_handler(mouse_pos, gs):

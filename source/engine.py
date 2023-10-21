@@ -18,19 +18,20 @@ class GameState():
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
+            [-1, -1,  0,  1,  2,  3, -1, -1],
+            [-1, -1, -1, -1, -1, -1, -1, -1],
+            [-1, -1,  4,  5,  6,  7, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -0, -1, -1, -1, -1],
-            [-1, -1, -1, 1, -1, -1, -1, -1],
-            [-1, -1, -1, 2, -1, -1, -1, -1],
-            [-1, -1, -1, -1, 3, -1, -1, -1],
+            [-1, -1, -1, -1, -1, -1, -1, -1],
         ]
         self.production_tiles = [(0, 0), (0, 1),(0, 2) ,(0, 3), (0, 4), (0, 5), (0, 6), (0, 7),
                                 (1, 0), (1, 1),(1, 2) ,(1, 3), (1, 4), (1, 5), (1, 6), (1, 7)]
         self.blue_to_move = True
         self.moveLog = []
-        self.unit_list = [FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.RED), FootSoldier(Team.RED)]
+        self.unit_list = [FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.BLUE),
+                          FootSoldier(Team.RED), FootSoldier(Team.RED), FootSoldier(Team.RED), FootSoldier(Team.RED)]
         self.phase = Phase.TURN_TRANSITION
         self.selected_unit = None
         self.selected_unit_index = None
@@ -203,8 +204,9 @@ class GameState():
 
     def transition_to_animating_instruction(self):
         self.phase = Phase.ANIMATING_INSTRUCTION
-        self.menu = game_menu.GameMenu()
-
+       
+    def transition_from_selecting_target_to_awaiting_menu_instruction(self):
+        self.phase = Phase.AWAITING_MENU_INSTRUCTION
 
     def prep_end_menu(self): # Move to engine TODO
         self.phase = Phase.AWAITING_MENU_INSTRUCTION
