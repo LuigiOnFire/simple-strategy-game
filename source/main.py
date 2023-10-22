@@ -526,12 +526,6 @@ def animate_turn_banner(screen, gs):
         gs.transition_to_awaiting_unit_selection()
 
 
-def square_can_produce(square, gs):
-    if square in gs.production_tiles:
-        return True
-    return False
-
-
 def get_the_row_and_col(pos):
     x = pos[0] // SQ_SIZE
     y = (pos[1] - WALLSIZE) // SQ_SIZE

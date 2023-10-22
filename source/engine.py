@@ -26,8 +26,10 @@ class GameState():
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
         ]
-        self.production_tiles = [(0, 0), (0, 1),(0, 2) ,(0, 3), (0, 4), (0, 5), (0, 6), (0, 7),
-                                (1, 0), (1, 1),(1, 2) ,(1, 3), (1, 4), (1, 5), (1, 6), (1, 7)]
+        self.production_tiles = {
+                               Team.BLUE: [(0, 0), (1, 0),(2, 0) ,(3, 0), (4, 0), (5, 0), (6, 0), (7, 0)],
+                               Team.RED: [(11, 0), (11, 0),(12, 0) ,(13, 0), (14, 0), (15, 0), (16, 0), (17, 0)]
+                                  }
         self.blue_to_move = True
         self.moveLog = []
         self.unit_list = [FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.BLUE),
@@ -162,8 +164,11 @@ class GameState():
 
 
     def square_can_produce(self, square):
-        return square in self.production_tiles
-    
+        active_team = self.get_active_team()
+        active_production_tiles = self.production_tiles[active_team]
+        return square in active_production_tiles
+
+
     def prep_buy_menu(self):
         self.menu = game_menu.GameMenu()
         self.menu.buttons.append(game_menu.BuyFootSoldierButton())
@@ -208,6 +213,7 @@ class GameState():
 
 
     def transition_to_animating_instruction(self):
+        self.menu = game_menu.GameMenu()
         self.phase = Phase.ANIMATING_INSTRUCTION
        
     def transition_from_selecting_target_to_awaiting_menu_instruction(self):
@@ -225,8 +231,11 @@ class GameState():
             unit.is_active = True
 
     def unit_has_active_team(self, unit):
-        active_team = Team.BLUE if self.blue_to_move else Team.RED
+        active_team = self.get_active_team()
         return unit.team() == active_team
+
+    def get_active_team(self):
+        return Team.BLUE if self.blue_to_move else Team.RED
 
 class Move():
     def __init__(self, startSq, endSq, map):
