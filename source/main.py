@@ -168,6 +168,7 @@ def select_space(selected_square, gs):
 
     elif gs.square_can_produce(selected_square):
         gs.selected_square = selected_square
+        gs.prep_buy_menu()
         gs.phase = engine.Phase.AWAITING_MENU_INSTRUCTION
 
     else:
@@ -236,9 +237,9 @@ def display_menu(screen, gs):
         if dest_square_y <= MAP_Y // 2:
             top_side = False
 
-    button_count = (len(gs.menu.buttons))
+    button_count = len(gs.menu.buttons)
     menu.width = MENU_WIDTH + 2 * BORDER_PADDING
-    menu_height = (button_count * BUTTON_HEIGHT)
+    menu_height = button_count * BUTTON_HEIGHT
     menu.height = menu_height + 2 * BORDER_PADDING
     (dest_coords_x, dest_coords_y) = get_square_coords(gs.dest_square)
 
@@ -543,11 +544,13 @@ def get_square_coords(square):
 
 
 def mouse_in_button(mouse_pos, button):
-    return button.x <= mouse_pos[0] < button.x + button.width and button.y <= mouse_pos[1] <= button.y + button.height
+    return button.x <= mouse_pos[0] < button.x + button.width \
+        and button.y <= mouse_pos[1] <= button.y + button.height
 
 
 def mouse_in_menu(mouse_pos, menu):
-    return menu.x <= mouse_pos[0] < menu.x + menu.width and menu.y <= mouse_pos[1] <= menu.y + menu.height
+    return menu.x <= mouse_pos[0] < menu.x + menu.width \
+        and menu.y <= mouse_pos[1] <= menu.y + menu.height
 
 
 def convert_sprite_to_greyscale(image):

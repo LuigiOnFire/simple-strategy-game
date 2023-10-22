@@ -39,6 +39,12 @@ class CancelButton(Button):
         self.text = "Cancel"
         self.priority = 2
 
+class BuyFootSoldierButton(Button):
+    def __init__(self):
+        self.icon = p.image.load("Sprites/ButtonIcons/AttackButtonIcon")
+        self.text = "Foot Soldier - 100"
+        self.priority = 3
+
 class EndTurnButton(Button):
     def __init__(self):
         self.icon = p.image.load("Sprites/ButtonIcons/EndTurnButtonIcon.png")

@@ -56,13 +56,13 @@ class GameState():
         self.map[move.startRow][move.startCol] = -1
         self.map[move.endRow][move.endCol] = move.pieceMoved
         self.moveLog.append(move) #log the move for later reference
-    
+
     def undoMove(self):
         if len(self.moveLog) != 0:
             move = self.moveLog.pop()
             self.map[move.startRow][move.startCol] = move.pieceMoved
             self.map[move.endRow][move.endCol] = move.pieceCaptured
-                        
+
     def squareContainsUnit(self, row, col):
         return self.map[row][col] != -1
 
@@ -163,6 +163,11 @@ class GameState():
 
     def square_can_produce(self, square):
         return square in self.production_tiles
+    
+    def prep_buy_menu(self):
+        self.menu = game_menu.GameMenu()
+        self.menu.buttons.append(game_menu.BuyFootSoldierButton())
+        self.menu.buttons.append(game_menu.CancelButton())
 
 
     def is_on_map(self, sq):
