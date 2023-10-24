@@ -194,7 +194,7 @@ def draw_game_state(screen, gs):
     elif gs.phase == engine.Phase.AWAITING_MENU_INSTRUCTION:
         display_map(screen)
         display_units(screen, gs)
-        display_menu(screen, gs)
+        display_action_menu(screen, gs)
 
     elif gs.phase == engine.Phase.SELECTING_TARGET:
         display_map(screen)
@@ -210,12 +210,17 @@ def draw_game_state(screen, gs):
         display_units(screen, gs)
         animate_turn_banner(screen, gs)
 
+    elif gs.phase == engine.Phase.AWAITNIG_UNIT_PURCHASE:
+        display_map(screen)
+        display_units(screen, gs)
+        display_buy_menu(screen, gs)
+
 
 def display_map(screen):
     screen.blit(BOARDART, p.Rect(0, 0, MAP_WIDTH, MAP_HEIGHT))
 
 
-def display_menu(screen, gs):
+def display_action_menu(screen, gs):
     BORDER_PADDING = 1 * SCALE
     BUTTON_PADDING = 2 * SCALE
     ELEMENT_HEIGHT = 6 * SCALE
@@ -230,7 +235,10 @@ def display_menu(screen, gs):
     menu = gs.menu
     right_side = True
     top_side = True
-    (dest_square_x, dest_square_y) = gs.dest_square
+    if gs.dest_square != []:
+        (dest_square_x, dest_square_y) = gs.dest_square    
+    else: # as in the case of the buy menu
+        (dest_square_x, dest_square_y) = gs.selected_square
     if gs.selected_square != None:  # later TODO this should probably be an exception
         if dest_square_x >= MAP_X // 2:
             right_side = False
@@ -304,6 +312,9 @@ def display_menu(screen, gs):
         text = font.render(button.text, True, font_color, text_bg_color)
         screen.blit(text, (body_top_left_x + BUTTON_PADDING +
                     icon_width + ELEMENT_SPACING, button.y + BUTTON_PADDING))
+
+
+def display_buy_menu(screen, gs):
 
 
 def display_units(screen, gs):
