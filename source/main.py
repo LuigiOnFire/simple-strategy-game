@@ -245,7 +245,7 @@ def display_action_menu(screen, gs):
         if dest_square_y <= MAP_Y // 2:
             top_side = False
 
-    button_count = len(gs.menu.buttons)
+    button_count = len(menu.buttons)
     menu.width = MENU_WIDTH + 2 * BORDER_PADDING
     menu_height = button_count * BUTTON_HEIGHT
     menu.height = menu_height + 2 * BORDER_PADDING
@@ -315,7 +315,33 @@ def display_action_menu(screen, gs):
 
 
 def display_buy_menu(screen, gs):
+    # make the border rect
+    BORDER_PADDING = 1 * SCALE
+    BUTTON_PADDING = 2 * SCALE
+    ELEMENT_HEIGHT = 6 * SCALE
+    ELEMENT_SPACING = 2 * SCALE  # spacing between the icon and the button
+    icon_width = ELEMENT_HEIGHT
+    BUTTON_HEIGHT = ELEMENT_HEIGHT + 2 * BUTTON_PADDING
 
+    border_color = p.Color('gray25')
+    body_color = p.Color('gray50')
+
+    menu = gs.buy_menu
+
+    button_count = len(menu.buttons)
+    menu.width = MENU_WIDTH + 2 * BORDER_PADDING
+    menu_height = button_count * BUTTON_HEIGHT
+    menu.height = menu_height + 2 * BORDER_PADDING
+
+    menu.x = dest_coords_x + SQ_SIZE
+
+    menu.y = dest_coords_y - menu.height
+    menu.y = dest_coords_y + SQ_SIZE
+
+
+    # make the inner rect
+
+    # render each button
 
 def display_units(screen, gs):
     for r in range(MAP_Y):

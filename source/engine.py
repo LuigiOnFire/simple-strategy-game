@@ -42,6 +42,7 @@ class GameState():
         self.target_square = []
         self.next_move = None
         self.menu = game_menu.GameMenu()
+        self.buy_menu = game_menu.GameMenu()
         self.valid_moves = []
         self.found_hostiles = []
         self.banner_anim = anim.TurnBannerAnim(Team.BLUE)
