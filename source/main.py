@@ -12,7 +12,6 @@ SQ_SIZE = 16*SCALE
 WALLSIZE = 8*SCALE
 MAP_WIDTH = MAP_X * SQ_SIZE
 MAP_HEIGHT = MAP_Y * SQ_SIZE + WALLSIZE * 2
-MENU_WIDTH = MAP_WIDTH / 2.2
 WIDTH = 128 * SCALE
 HEIGHT = 192 * SCALE
 MAX_FPS = 30
@@ -221,34 +220,37 @@ def display_map(screen):
 
 
 def display_action_menu(screen, gs):
-    BORDER_PADDING = 1 * SCALE
-    BUTTON_PADDING = 2 * SCALE
-    ELEMENT_HEIGHT = 6 * SCALE
-    ELEMENT_SPACING = 2 * SCALE  # spacing between the icon and the button
-    icon_width = ELEMENT_HEIGHT
-    BUTTON_HEIGHT = ELEMENT_HEIGHT + 2 * BUTTON_PADDING
+    menu_width = MAP_WIDTH / 2.2
+    border_padding = 1 * SCALE
+    button_padding = 2 * SCALE
+    element_height = 6 * SCALE
+    element_spacing = 2 * SCALE  # spacing between the icon and the button
+    icon_width = element_height
+    button_height = element_height + 2 * button_padding
 
-    border_color = p.Color('gray25')
     body_color = p.Color('gray50')
 
-    # maybe move MENU_WIDTH here
     menu = gs.menu
+
     right_side = True
     top_side = True
     if gs.dest_square != []:
-        (dest_square_x, dest_square_y) = gs.dest_square    
+        (dest_square_x, dest_square_y) = gs.dest_square
+
     else: # as in the case of the buy menu
         (dest_square_x, dest_square_y) = gs.selected_square
+
     if gs.selected_square != None:  # later TODO this should probably be an exception
         if dest_square_x >= MAP_X // 2:
             right_side = False
+
         if dest_square_y <= MAP_Y // 2:
             top_side = False
 
     button_count = len(menu.buttons)
-    menu.width = MENU_WIDTH + 2 * BORDER_PADDING
-    menu_height = button_count * BUTTON_HEIGHT
-    menu.height = menu_height + 2 * BORDER_PADDING
+    menu.width = menu_width + 2 * border_padding
+    menu_height = button_count * button_height
+    menu.height = menu_height + 2 * border_padding
     (dest_coords_x, dest_coords_y) = get_square_coords(gs.dest_square)
 
     if right_side:
@@ -263,8 +265,8 @@ def display_action_menu(screen, gs):
 
     border_position = (menu.x, menu.y)
 
-    body_top_left_x = menu.x + BORDER_PADDING
-    body_top_left_y = menu.y + BORDER_PADDING
+    body_top_left_x = menu.x + border_padding
+    body_top_left_y = menu.y + border_padding
     body_position = (body_top_left_x, body_top_left_y)
 
     # display the border
@@ -273,20 +275,20 @@ def display_action_menu(screen, gs):
     screen.blit(border_surface, border_position)
 
     # display the body
-    body_surface = p.Surface((MENU_WIDTH, menu_height))
+    body_surface = p.Surface((menu_width, menu_height))
     body_surface.fill(body_color)
 
     mouse_pos = p.mouse.get_pos()
     screen.blit(body_surface, body_position)
 
-    for i in range(0, len(gs.menu.buttons)):
+    for i,_ in enumerate(gs.menu.buttons):
         button = gs.menu.buttons[i]
 
         button.x = body_top_left_x
-        button.width = MENU_WIDTH
+        button.width = menu_width
 
-        button.y = body_top_left_y + (i * BUTTON_HEIGHT)
-        button.height = BUTTON_HEIGHT
+        button.y = body_top_left_y + (i * button_height)
+        button.height = button_height
 
         button_color = None
         if mouse_in_button(mouse_pos, button):
@@ -299,9 +301,9 @@ def display_action_menu(screen, gs):
         screen.blit(button_surface, (button.x, button.y))
 
         icon_image = button.icon
-        icon_size = (ELEMENT_HEIGHT, ELEMENT_HEIGHT)
-        icon_location = (body_top_left_x + BUTTON_PADDING,
-                         button.y + BUTTON_PADDING)
+        icon_size = (element_height, element_height)
+        icon_location = (body_top_left_x + button_padding,
+                         button.y + button_padding)
         icon_image = p.transform.scale(icon_image, icon_size)
 
         screen.blit(icon_image, icon_location)
@@ -310,9 +312,14 @@ def display_action_menu(screen, gs):
         font_color = p.Color(255, 255, 127)
         text_bg_color = None
         text = font.render(button.text, True, font_color, text_bg_color)
-        screen.blit(text, (body_top_left_x + BUTTON_PADDING +
-                    icon_width + ELEMENT_SPACING, button.y + BUTTON_PADDING))
+        screen.blit(text, (body_top_left_x + button_padding +
+                    icon_width + element_spacing, button.y + button_padding))
 
+def draw_menu_border(screen, menu, border_color):
+    border_surface = p.Surface((menu.width, menu.height))
+    border_color = p.Color('gray25')
+    border_surface.fill(border_color)
+    screen.blit(border_surface, (menu.x, menu,y))
 
 def display_buy_menu(screen, gs):
     # make the border rect
