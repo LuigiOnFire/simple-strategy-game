@@ -262,8 +262,11 @@ def display_action_menu(screen, gs):
         menu.y = dest_coords_y - menu.height
     else:
         menu.y = dest_coords_y + SQ_SIZE
-            
+
     mouse_pos = p.mouse.get_pos()
+
+    body_top_left_x = menu.x + border_padding
+    body_top_left_y = menu.y + border_padding
 
     for i,_ in enumerate(gs.menu.buttons):
         button = gs.menu.buttons[i]
@@ -274,30 +277,7 @@ def display_action_menu(screen, gs):
         button.y = body_top_left_y + (i * button_height)
         button.height = button_height
 
-        button_color = None
-        if mouse_in_button(mouse_pos, button):
-            button_color = p.Color("Gray38")
-        else:
-            button_color = body_color
-
-        button_surface = p.Surface((button.width, button.height))
-        button_surface.fill(button_color)
-        screen.blit(button_surface, (button.x, button.y))
-
-        icon_image = button.icon
-        icon_size = (element_height, element_height)
-        icon_location = (body_top_left_x + button_padding,
-                         button.y + button_padding)
-        icon_image = p.transform.scale(icon_image, icon_size)
-
-        screen.blit(icon_image, icon_location)
-
-        font = p.font.Font('Fonts/PressStart2P-Regular.ttf', 24)
-        font_color = p.Color(255, 255, 127)
-        text_bg_color = None
-        text = font.render(button.text, True, font_color, text_bg_color)
-        screen.blit(text, (body_top_left_x + button_padding +
-                    icon_width + element_spacing, button.y + button_padding))
+        draw_button(screen, button, mouse_pos, body_color)
 
 def draw_menu_border(screen, menu):
     border_surface = p.Surface((menu.width, menu.height))
@@ -305,11 +285,33 @@ def draw_menu_border(screen, menu):
     border_surface.fill(border_color)
     screen.blit(border_surface, (menu.x, menu.y))
 
-def draw_menu_body(screen, menu, border_padding):
+def draw_menu_body(screen, menu, border_padding, body_color):
     body_surface = p.Surface((menu.width, menu.height))
-    body_color = p.Color('gray75')
     body_surface.fill(body_color)
     screen.blit(menu.x + border_padding, menu.y + border_padding)
+
+def draw_button(screen, button, mouse_pos, body_color):
+    button_color = None
+    if mouse_in_button(mouse_pos, button):
+        button_color = p.Color("Gray38")
+    else:
+        button_color = body_color
+    button_surface = p.Surface((button.width, button.height))
+    button_surface.fill(button_color)
+    screen.blit(button_surface, (button.x, button.y))
+    icon_image = button.icon
+    icon_size = (element_height, element_height)
+    icon_location = (body_top_left_x + button_padding,
+                     button.y + button_padding)
+    icon_image = p.transform.scale(icon_image, icon_size)
+    screen.blit(icon_image, icon_location)
+    font = p.font.Font('Fonts/PressStart2P-Regular.ttf', 24)
+    font_color = p.Color(255, 255, 127)
+    text_bg_color = None
+    text = font.render(button.text, True, font_color, text_bg_color)
+    screen.blit(text, (body_top_left_x + button_padding +
+                icon_width + element_spacing, button.y + button_padding))
+
 
 def display_buy_menu(screen, gs):
     # make the border rect
