@@ -240,7 +240,7 @@ def display_action_menu(screen, gs):
     else: # as in the case of the buy menu
         (dest_square_x, dest_square_y) = gs.selected_square
 
-    if gs.selected_square != None:  # later TODO this should probably be an exception
+    if gs.selected_square is not None:  # later TODO this should probably be an exception
         if dest_square_x >= MAP_X // 2:
             right_side = False
 
@@ -262,24 +262,8 @@ def display_action_menu(screen, gs):
         menu.y = dest_coords_y - menu.height
     else:
         menu.y = dest_coords_y + SQ_SIZE
-
-    border_position = (menu.x, menu.y)
-
-    body_top_left_x = menu.x + border_padding
-    body_top_left_y = menu.y + border_padding
-    body_position = (body_top_left_x, body_top_left_y)
-
-    # display the border
-    border_surface = p.Surface((menu.width, menu.height))
-    border_surface.fill(border_color)
-    screen.blit(border_surface, border_position)
-
-    # display the body
-    body_surface = p.Surface((menu_width, menu_height))
-    body_surface.fill(body_color)
-
+            
     mouse_pos = p.mouse.get_pos()
-    screen.blit(body_surface, body_position)
 
     for i,_ in enumerate(gs.menu.buttons):
         button = gs.menu.buttons[i]
@@ -315,11 +299,17 @@ def display_action_menu(screen, gs):
         screen.blit(text, (body_top_left_x + button_padding +
                     icon_width + element_spacing, button.y + button_padding))
 
-def draw_menu_border(screen, menu, border_color):
+def draw_menu_border(screen, menu):
     border_surface = p.Surface((menu.width, menu.height))
     border_color = p.Color('gray25')
     border_surface.fill(border_color)
-    screen.blit(border_surface, (menu.x, menu,y))
+    screen.blit(border_surface, (menu.x, menu.y))
+
+def draw_menu_body(screen, menu, border_padding):
+    body_surface = p.Surface((menu.width, menu.height))
+    body_color = p.Color('gray75')
+    body_surface.fill(body_color)
+    screen.blit(menu.x + border_padding, menu.y + border_padding)
 
 def display_buy_menu(screen, gs):
     # make the border rect
