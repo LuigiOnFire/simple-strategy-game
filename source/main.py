@@ -8,8 +8,8 @@ import engine
 SCALE = 4
 MAP_X = 8
 MAP_Y = 11
-SQ_SIZE = 16*SCALE
-WALLSIZE = 8*SCALE
+SQ_SIZE = 16 * SCALE
+WALLSIZE = 8 * SCALE
 MAP_WIDTH = MAP_X * SQ_SIZE
 MAP_HEIGHT = MAP_Y * SQ_SIZE + WALLSIZE * 2
 WIDTH = 128 * SCALE
@@ -317,34 +317,46 @@ def draw_button(screen, button, mouse_pos, body_color, body_top_left_x, element_
                 icon_width + element_spacing, button.y + button_padding))
 
 
-#def display_buy_menu(screen, gs):
-#    # make the border rect
-#    BORDER_PADDING = 1 * SCALE
-#    BUTTON_PADDING = 2 * SCALE
-#    ELEMENT_HEIGHT = 6 * SCALE
-#    ELEMENT_SPACING = 2 * SCALE  # spacing between the icon and the button
-#    icon_width = ELEMENT_HEIGHT
-#    BUTTON_HEIGHT = ELEMENT_HEIGHT + 2 * BUTTON_PADDING
-#
-#    border_color = p.Color('gray25')
-#    body_color = p.Color('gray50')
-#
-#    menu = gs.buy_menu
-#
-#    button_count = len(menu.buttons)
-#    menu.width = MENU_WIDTH + 2 * BORDER_PADDING
-#    menu_height = button_count * BUTTON_HEIGHT
-#    menu.height = menu_height + 2 * BORDER_PADDING
-#
-#    menu.x = dest_coords_x + SQ_SIZE
-#
-#    menu.y = dest_coords_y - menu.height
-#    menu.y = dest_coords_y + SQ_SIZE
+def display_buy_menu(screen, gs):
+    border_padding = 1 * SCALE
+    button_padding = 2 * SCALE
+    element_height = 6 * SCALE
+    button_height = element_height + 2 * button_padding
 
+    body_color = p.Color('gray50')
 
-    # make the inner rect
+    menu = gs.menu
+    menu.width = MAP_WIDTH / 2.2
+    border_width = menu.width + 2 * border_padding
+
+    menu.height = MAP_HEIGHT / 2.2
+    border_height = menu.height + 2 * border_padding
+
+    menu.x = 1 / 4 * WIDTH
+    menu.y =  1 / 4 * HEIGHT
+
+    draw_menu_border(screen, menu, border_width, border_height)
+    draw_menu_body(screen, menu, border_padding, body_color)
+
+    mouse_pos = p.mouse.get_pos()
+
+    body_top_left_x = menu.x + border_padding
+    body_top_left_y = menu.y + border_padding
 
     # render each button
+
+    for i,_ in enumerate(gs.menu.buttons):
+        button = gs.menu.buttons[i]
+
+        button.x = body_top_left_x
+        button.width = menu.width
+
+        button.y = body_top_left_y + (i * button_height)
+        button.height = button_height
+
+        draw_button(screen, button, mouse_pos, body_color,
+                    body_top_left_x, element_height, button_padding)
+
 
 def display_units(screen, gs):
     for r in range(MAP_Y):
