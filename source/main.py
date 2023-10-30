@@ -107,7 +107,7 @@ def menu_event_handler(mouse_pos, gs):
 
             elif isinstance(button, engine.game_menu.WaitButton):
                 (sel_x, sel_y) = gs.selected_square
-                (ref_x, ref_y) = gs.dest_square                
+                (ref_x, ref_y) = gs.dest_square
                 gs.map[sel_y][sel_x] = -1
                 gs.map[ref_y][ref_x] = gs.selected_unit_index
                 gs.selected_unit.is_active = False
@@ -119,7 +119,7 @@ def menu_event_handler(mouse_pos, gs):
                 gs.transition_to_turn_transition()
                 gs.menu = engine.game_menu.GameMenu()
 
-            elif isinstance(button, engine.game_menu.AttackButton):                
+            elif isinstance(button, engine.game_menu.AttackButton):
                 gs.transition_to_selecting_target()
 
             # regardless of what button was pushed it's good to check
@@ -167,8 +167,7 @@ def select_space(selected_square, gs):
 
     elif gs.square_can_produce(selected_square):
         gs.selected_square = selected_square
-        gs.prep_buy_menu()
-        gs.phase = engine.Phase.AWAITING_MENU_INSTRUCTION
+        gs.transition_from_selecting_target_to_awaiting_unit_purchase()
 
     else:
         gs.selected_square = selected_square
@@ -236,7 +235,7 @@ def display_action_menu(screen, gs):
     if gs.dest_square != []:
         (dest_square_x, dest_square_y) = gs.dest_square
 
-    else: # as in the case of the buy menu
+    else:
         (dest_square_x, dest_square_y) = gs.selected_square
 
     if gs.selected_square is not None:  # later TODO this should probably be an exception
@@ -326,13 +325,13 @@ def display_buy_menu(screen, gs):
     body_color = p.Color('gray50')
 
     menu = gs.menu
-    menu.width = MAP_WIDTH / 2.2
+    menu.width = MAP_WIDTH * 7 / 8
     border_width = menu.width + 2 * border_padding
 
     menu.height = MAP_HEIGHT / 2.2
     border_height = menu.height + 2 * border_padding
 
-    menu.x = 1 / 4 * WIDTH
+    menu.x = 1 / 16 * WIDTH
     menu.y =  1 / 4 * HEIGHT
 
     draw_menu_border(screen, menu, border_width, border_height)

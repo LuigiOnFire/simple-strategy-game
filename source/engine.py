@@ -221,6 +221,10 @@ class GameState():
     def transition_from_selecting_target_to_awaiting_menu_instruction(self):
         self.phase = Phase.AWAITING_MENU_INSTRUCTION
 
+    def transition_from_selecting_target_to_awaiting_unit_purchase(self):
+        self.prep_buy_menu()
+        self.phase = Phase.AWAITNIG_UNIT_PURCHASE
+
 
     def prep_end_menu(self): # Move to engine TODO
         self.phase = Phase.AWAITING_MENU_INSTRUCTION
@@ -232,6 +236,7 @@ class GameState():
     def refresh_all_units(self):
         for unit in self.unit_list:
             unit.is_active = True
+
 
     def unit_has_active_team(self, unit):
         active_team = self.get_active_team()
