@@ -12,12 +12,15 @@ SQ_SIZE = 16 * SCALE
 WALLSIZE = 8 * SCALE
 MAP_WIDTH = MAP_X * SQ_SIZE
 MAP_HEIGHT = MAP_Y * SQ_SIZE + WALLSIZE * 2
+INFO_HEIGHT = 8 * SCALE
 WIDTH = 128 * SCALE
-HEIGHT = 192 * SCALE
+HEIGHT = 200 * SCALE
 MAX_FPS = 30
 IMAGES = {}
 BOARDART = p.image.load("Sprites/field.png")
 BOARDART = p.transform.scale(BOARDART, (MAP_WIDTH, MAP_HEIGHT))
+BORDER_COLOR = p.Color('gray25')
+
 
 def load_images():
     """Loads the image sprites for each unit type"""
@@ -213,6 +216,9 @@ def draw_game_state(screen, gs):
         display_units(screen, gs)
         display_buy_menu(screen, gs)
 
+    # always do this
+    display_info_bar(screen, gs)
+
 
 def display_map(screen):
     screen.blit(BOARDART, p.Rect(0, 0, MAP_WIDTH, MAP_HEIGHT))
@@ -282,8 +288,7 @@ def display_action_menu(screen, gs):
 
 def draw_menu_border(screen, menu, border_width, border_height):
     border_surface = p.Surface((border_width, border_height))
-    border_color = p.Color('gray25')
-    border_surface.fill(border_color)
+    border_surface.fill(BORDER_COLOR)
     screen.blit(border_surface, (menu.x, menu.y))
 
 def draw_menu_body(screen, menu, border_padding, body_color):
@@ -355,6 +360,19 @@ def display_buy_menu(screen, gs):
 
         draw_button(screen, button, mouse_pos, body_color,
                     body_top_left_x, element_height, button_padding)
+
+
+def display_info_bar(screen, gs):
+    # draw the background
+    info_rect = p.Surface((WIDTH, INFO_HEIGHT))
+    info_rect.fill(BORDER_COLOR)
+    screen.blit(info_rect, (0, HEIGHT - INFO_HEIGHT))
+
+    # put the team text
+    active_team = gs.get_active_team()
+    
+
+    # put the gold count
 
 
 def display_units(screen, gs):
