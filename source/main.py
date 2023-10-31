@@ -370,7 +370,15 @@ def display_info_bar(screen, gs):
 
     # put the team text
     active_team = gs.get_active_team()
-    
+    text = engine.Team.to_string(active_team)
+    text = text + " Team"
+    font_color = engine.Team.to_color(active_team)
+    text_bg_color = None
+
+    font = p.font.Font('Fonts/PressStart2P-Regular.ttf', 24)
+    text_block = font.render(text, True, font_color, text_bg_color)
+    screen.blit(text_block, (0, HEIGHT - INFO_HEIGHT + 2*SCALE))
+
 
     # put the gold count
 
@@ -454,7 +462,7 @@ def animate_still(coords, this_unit, screen):
     else:
         (r, c) = this_unit.anim.square
     this_type = this_unit.unit_name()
-    this_team = engine.Team.to_string(this_unit.team())
+    this_team = engine.Team.to_abbreviation(this_unit.team())
     unit_sprite = IMAGES[this_team, this_type]
     if not this_unit.is_active:
         unit_sprite = convert_sprite_to_greyscale(unit_sprite)
@@ -479,7 +487,7 @@ def animate_moving(this_unit, screen, gs):
     r, c = (start_square[1] + dR*curr/dura, start_square[0] + dC*curr/dura)
 
     # show moving piece
-    this_team = engine.Team.to_string(this_unit.team())
+    this_team = engine.Team.to_abbreviation(this_unit.team())
 
     screen.blit(IMAGES[this_team, this_unit.unit_name()], p.Rect(
         c*SQ_SIZE, r*SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE))
@@ -492,7 +500,7 @@ def animate_moving(this_unit, screen, gs):
 
 def animate_attacking(this_unit, screen, gs):
     this_anim = this_unit.anim
-    this_team = engine.Team.to_string(this_unit.team())
+    this_team = engine.Team.to_abbreviation(this_unit.team())
     this_sprite = IMAGES[this_team, this_unit.unit_name()]
     (c, r) = gs.dest_square
     (dx, dy) = this_anim.get_current_offset()
@@ -507,7 +515,7 @@ def animate_attacking(this_unit, screen, gs):
 
 def animate_taking_damage(this_unit, screen, gs):
     this_anim = this_unit.anim
-    this_team = engine.Team.to_string(this_unit.team())
+    this_team = engine.Team.to_abbreviation(this_unit.team())
     this_sprite = IMAGES[this_team, this_unit.unit_name()].copy()
     (c, r) = gs.target_square
     color_offset = this_anim.get_alpha_offset()
@@ -533,7 +541,7 @@ def animate_taking_damage(this_unit, screen, gs):
 
 def animate_dying(this_unit, screen, gs):
     this_anim = this_unit.anim
-    this_team = engine.Team.to_string(this_unit.team())
+    this_team = engine.Team.to_abbreviation(this_unit.team())
     this_sprite = IMAGES[this_team, this_unit.unit_name()].copy()
     (c, r) = gs.target_square
     alpha_offset = this_anim.get_alpha_offset()
@@ -556,18 +564,14 @@ def animate_turn_banner(screen, gs):
     time = gs.banner_anim.timer
     dura = gs.banner_anim.duration
     blue_to_move = gs.blue_to_move
+    team = gs.get_active_team()
+    text = engine.Team.to_string(team)
+    text += " Turn"
 
     font = p.font.Font('Fonts/PressStart2P-Regular.ttf', 32)
 
-    if blue_to_move:
-        font_color = p.Color(0, 0, 172)
-        text_bg_color = None
-        text = "Blue Turn"
-
-    else:
-        font_color = p.Color(255, 0, 0)
-        text_bg_color = None
-        text = "Red Turn"
+    font_color = engine.Team.to_color(team)
+    text_bg_color = None
     text = font.render(text, True, font_color, text_bg_color)
 
     text_width = text.get_width()
