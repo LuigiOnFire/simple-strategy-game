@@ -19,6 +19,8 @@ MAX_FPS = 30
 IMAGES = {}
 BOARDART = p.image.load("Sprites/field.png")
 BOARDART = p.transform.scale(BOARDART, (MAP_WIDTH, MAP_HEIGHT))
+COINSART = p.image.load("Sprites/coins.png")
+COINSART = p.transform.scale(COINSART, (INFO_HEIGHT, INFO_HEIGHT))
 BORDER_COLOR = p.Color('gray25')
 
 
@@ -379,8 +381,8 @@ def display_info_bar(screen, gs):
     text_block = font.render(text, True, font_color, text_bg_color)
     screen.blit(text_block, (0, HEIGHT - INFO_HEIGHT + 2*SCALE))
 
-
     # put the gold count
+    screen.blit(COINSART, (WIDTH - INFO_HEIGHT, HEIGHT - INFO_HEIGHT))
 
 
 def display_units(screen, gs):
@@ -563,7 +565,6 @@ def animate_dying(this_unit, screen, gs):
 def animate_turn_banner(screen, gs):
     time = gs.banner_anim.timer
     dura = gs.banner_anim.duration
-    blue_to_move = gs.blue_to_move
     team = gs.get_active_team()
     text = engine.Team.to_string(team)
     text += " Turn"
