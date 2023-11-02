@@ -34,6 +34,7 @@ class GameState():
         self.moveLog = []
         self.unit_list = [FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.BLUE),
                           FootSoldier(Team.RED), FootSoldier(Team.RED), FootSoldier(Team.RED), FootSoldier(Team.RED)]
+        self.player_gold = [10, 10] # later maybe make the teams proper classes instead of enums and put this there?
         self.phase = Phase.TURN_TRANSITION
         self.selected_unit = None
         self.selected_unit_index = None

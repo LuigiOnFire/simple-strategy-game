@@ -382,6 +382,15 @@ def display_info_bar(screen, gs):
     screen.blit(text_block, (0, HEIGHT - INFO_HEIGHT + 2*SCALE))
 
     # put the gold count
+    player_gold = gs.player_gold[active_team.value]
+    gold_string = str(player_gold)
+    gold_string_length = len(gold_string)
+    gold_font = p.font.Font('Fonts/PressStart2P-Regular.ttf', 24)
+    gold_color = p.Color(255, 255, 0)
+
+    gold_text_block = gold_font.render(gold_string, True, gold_color, text_bg_color)
+
+    screen.blit(gold_text_block, (WIDTH - INFO_HEIGHT * (1 + gold_string_length), HEIGHT - INFO_HEIGHT))
     screen.blit(COINSART, (WIDTH - INFO_HEIGHT, HEIGHT - INFO_HEIGHT))
 
 
