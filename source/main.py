@@ -213,6 +213,11 @@ def draw_game_state(screen, gs):
         display_units(screen, gs)
         animate_turn_banner(screen, gs)
 
+    elif gs.phase == engine.Phase.TURN_TRANSITION:
+        display_map(screen)
+        display_units(screen, gs)
+        animate_coins(screen, gs)
+
     elif gs.phase == engine.Phase.AWAITNIG_UNIT_PURCHASE:
         display_map(screen)
         display_units(screen, gs)
@@ -606,7 +611,19 @@ def animate_turn_banner(screen, gs):
     gs.banner_anim.timer += 1
 
     if time >= dura:
-        gs.transition_to_awaiting_unit_selection()
+        gs.transition_from_turn_transition_to_counting_gold()
+
+def animate_coins(screen, gs):
+    if gs.coin_anim is None:
+        coin_index = gs.coin_index        
+        for i in range(coin_index, (gs.coin_squares)):
+            current_square = gs.coin_squares[coin_index]
+            if gs.is_occupied(current_square):
+                gs.coin_index = i
+                gs.coin_anim = anim.CoinAnim()
+                break
+        if gs.coin_anim is None: # as in, STILL no anim
+            gs.transition_from_counting_gold_to_awaiting_unit_selection()
 
 
 def get_the_row_and_col(pos):

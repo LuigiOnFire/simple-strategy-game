@@ -47,6 +47,7 @@ class GameState():
         self.valid_moves = []
         self.found_hostiles = []
         self.banner_anim = anim.TurnBannerAnim(Team.BLUE)
+        self.coin_anim = None
 
     def setup_still_anims(self):
         for r in range(len(self.map)):
@@ -197,7 +198,7 @@ class GameState():
         self.dest_square = None
 
 
-    def transition_to_awaiting_unit_selection(self):
+    def transition_to_awaiting_unit_selection(self): # IN THEORY DEPRECATED
         self.phase = Phase.AWAITING_UNIT_SELECTION
 
 
@@ -222,9 +223,19 @@ class GameState():
     def transition_from_selecting_target_to_awaiting_menu_instruction(self):
         self.phase = Phase.AWAITING_MENU_INSTRUCTION
 
+
     def transition_from_selecting_target_to_awaiting_unit_purchase(self):
         self.prep_buy_menu()
         self.phase = Phase.AWAITNIG_UNIT_PURCHASE
+
+
+    def transition_from_turn_transition_to_counting_gold(self):
+        self.phase = Phase.COUNTING_GOLD
+
+
+    def transition_from_counting_gold_to_awaiting_unit_selection(self):
+        self.phase = Phase.AWAITING_UNIT_SELECTION
+
 
 
     def prep_end_menu(self): # Move to engine TODO
@@ -307,4 +318,5 @@ class Phase(Enum):
     SELECTING_TARGET = 4
     ANIMATING_INSTRUCTION = 5
     TURN_TRANSITION = 6
-    AWAITNIG_UNIT_PURCHASE = 7
+    COUNTING_GOLD = 7
+    AWAITNIG_UNIT_PURCHASE = 8
