@@ -615,7 +615,7 @@ def animate_turn_banner(screen, gs):
 
 def animate_coins(screen, gs):
     if gs.coin_anim is None:
-        coin_index = gs.coin_index        
+        coin_index = gs.coin_index
         for i in range(coin_index, (gs.coin_squares)):
             current_square = gs.coin_squares[coin_index]
             if gs.is_occupied(current_square):
@@ -624,6 +624,21 @@ def animate_coins(screen, gs):
                 break
         if gs.coin_anim is None: # as in, STILL no anim
             gs.transition_from_counting_gold_to_awaiting_unit_selection()
+            return
+
+    current_square = gs.coin_squares[gs.coin_index]
+    x = current_square[0]
+    y = current_square[1]
+    coin_anim = gs.coin_anim
+    coin_image = coin_anim.get_surface()
+    coin_offset = coin_anim.get_current_offset()
+
+    screen.blit(coin_image, (x * SQ_SIZE, WALLSIZE + y * SQ_SIZE + coin_offset))
+
+    coin_anim.increment_timer()
+
+    if coin_anim.timer >= coin_anim.duration:
+        gs.coin_anim = None
 
 
 def get_the_row_and_col(pos):

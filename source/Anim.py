@@ -98,3 +98,12 @@ class TurnBannerAnim:
         self.timer = 0
         self.duration = 60
         self.team = team
+
+class CoinAnim:
+    def __init__(self):
+        self.timer = 0
+        self.duration = 10
+
+    def increment_timer(self):
+        """Increments the timer by one tick"""
+        self.timer += 1

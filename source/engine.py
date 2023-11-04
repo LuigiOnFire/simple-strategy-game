@@ -28,8 +28,9 @@ class GameState():
         ]
         self.production_tiles = {
                                Team.BLUE: [(0, 0), (1, 0), (2, 0) ,(3, 0), (4, 0), (5, 0), (6, 0), (7, 0)],
-                               Team.RED: [(11, 0), (11, 0),(12, 0) ,(13, 0), (14, 0), (15, 0), (16, 0), (17, 0)]
+                               Team.RED: [(11, 0), (11, 1),(11, 2) ,(11, 3), (11, 4), (11, 5), (11, 6), (11, 7)]
                                   }
+        self.coin_squares = [(3, 5), (4, 5), (3, 6), (4, 6)]
         self.blue_to_move = True
         self.moveLog = []
         self.unit_list = [FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.BLUE),
