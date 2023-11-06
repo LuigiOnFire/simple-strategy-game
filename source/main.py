@@ -126,6 +126,9 @@ def menu_event_handler(mouse_pos, gs):
 
             elif isinstance(button, engine.game_menu.AttackButton):
                 gs.transition_to_selecting_target()
+            
+            elif isinstance(button, engine.game_menu.BuyFootSoldierButton):
+                gs.spawn_foot_soldier()
 
             # regardless of what button was pushed it's good to check
             check_end_turn(gs)

@@ -150,6 +150,10 @@ class GameState():
         val = team.value
         self.player_gold[val] += 1
 
+    def spawn_foot_soldier(self):
+        team = self.get_active_team()
+        new_footsoldier = FootSoldier(team)
+
     def square_is_occupied(self, square):
         # needs IF list is in range (where is this coming from?)
         return self.map[square[1]][square[0]] != -1
