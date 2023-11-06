@@ -18,8 +18,8 @@ class GameState():
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1,  0,  1,  2,  3, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1],
+            [-1, -1,  0,  -1,  2,  3, -1, -1],
+            [-1, -1, -1, 1, -1, -1, -1, -1],
             [-1, -1,  4,  5,  6,  7, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
@@ -30,12 +30,18 @@ class GameState():
                                Team.BLUE: [(0, 0), (1, 0), (2, 0) ,(3, 0), (4, 0), (5, 0), (6, 0), (7, 0)],
                                Team.RED: [(11, 0), (11, 1),(11, 2) ,(11, 3), (11, 4), (11, 5), (11, 6), (11, 7)]
                                   }
-        self.coin_squares = [(3, 5), (4, 5), (3, 6), (4, 6)]
+        self.coin_squares = [(1, 2), (6, 2),
+                             (1, 4), (6, 4),
+                             (1, 5), (3, 5), (4, 5), (6, 5),
+                             (1, 6), (6, 6),
+                             (1, 8), (6, 8),
+                             ]        
+        self.coin_index = 0
         self.blue_to_move = True
         self.moveLog = []
         self.unit_list = [FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.BLUE),
                           FootSoldier(Team.RED), FootSoldier(Team.RED), FootSoldier(Team.RED), FootSoldier(Team.RED)]
-        self.player_gold = [10, 10] # later maybe make the teams proper classes instead of enums and put this there?
+        self.player_gold = [0, 0] # later maybe make the teams proper classes instead of enums and put this there?
         self.phase = Phase.TURN_TRANSITION
         self.selected_unit = None
         self.selected_unit_index = None
@@ -58,19 +64,16 @@ class GameState():
                     this_unit = self.unit_list[index]
                     this_unit.anim = anim.StillAnim((r, c))
 
-    def makeMove(self, move):
+    def make_move(self, move):
         self.map[move.startRow][move.startCol] = -1
         self.map[move.endRow][move.endCol] = move.pieceMoved
         self.moveLog.append(move) #log the move for later reference
 
-    def undoMove(self):
+    def undo_move(self):
         if len(self.moveLog) != 0:
             move = self.moveLog.pop()
             self.map[move.startRow][move.startCol] = move.pieceMoved
             self.map[move.endRow][move.endCol] = move.pieceCaptured
-
-    def squareContainsUnit(self, row, col):
-        return self.map[row][col] != -1
 
     def update_valid_moves(self, unit):
         move_range = unit.move_range
@@ -79,24 +82,23 @@ class GameState():
         to_seek = []
         visited = set()
         valid_squares = [(col, row)]
-        team = unit.team()
 
         to_seek.append(((col, row), move_range))
         visited.add((col, row))
-        while to_seek:            
+        while to_seek:           
             q = to_seek.pop()
             sq = q[0]
             check_range = q[1]
 
             adj_list = (
-                (sq[0] + 1, sq[1]), 
-                (sq[0] - 1, sq[1]), 
-                (sq[0], sq[1] + 1), 
+                (sq[0] + 1, sq[1]),
+                (sq[0] - 1, sq[1]),
+                (sq[0], sq[1] + 1),
                 (sq[0], sq[1] - 1)
             )
             for adj in adj_list: # need to add make sure that square is not occupied by hostile
                 if self.is_on_map(adj) and self not in visited and check_range - 1 >= 0:
-                    if not self.square_is_occupied_by_hostile(adj, team):
+                    if not self.square_is_occupied_by_hostile(adj):
                         to_seek.append((adj, check_range - 1))
                     if not self.square_is_occupied(adj):
                         valid_squares.append(adj)
@@ -112,7 +114,6 @@ class GameState():
         to_seek = []
         visited = set()
         self.found_hostiles = []
-        team = unit.team()
 
         to_seek.append(((col, row), attack_range))
         visited.add((col, row))
@@ -131,12 +132,12 @@ class GameState():
             for adj in adj_list:
                 if self.is_on_map(adj) and self not in visited and check_range - 1 >= 0:
                     to_seek.append((adj, check_range - 1))
-                    if self.square_is_occupied_by_hostile(adj, team):
+                    if self.square_is_occupied_by_hostile(adj):
                         self.found_hostiles.append(adj)
                     visited.add((adj))
 
 
-    def validatePair(self, r, c):
+    def validate_pair(self, r, c):
         r_in = ( r >= 0 and r < len(self.map))
         c_in = ( c >= 0 and c < len(self.map[0]))
         if not r_in or not c_in:
@@ -144,14 +145,31 @@ class GameState():
         no_unit = self.map[r][c] < 0
         return no_unit
 
+    def add_money(self):
+        team = self.get_active_team()
+        val = team.value
+        self.player_gold[val] += 1
 
     def square_is_occupied(self, square):
         # needs IF list is in range (where is this coming from?)
         return self.map[square[1]][square[0]] != -1
 
 
-    def square_is_occupied_by_hostile(self, square, active_team):
+    def square_is_occupied_by_friendly(self, square):
         unit_index = self.map[square[1]][square[0]]
+        active_team = self.get_active_team()
+
+        if unit_index == -1:
+            return False
+        unit = self.unit_list[unit_index]
+        # active_team = Team.BLUE if self.blue_to_move == true else Team.RED
+        return active_team == unit.team()
+
+
+    def square_is_occupied_by_hostile(self, square):
+        unit_index = self.map[square[1]][square[0]]
+        active_team = self.get_active_team()
+
         if unit_index == -1:
             return False
         unit = self.unit_list[unit_index]
@@ -236,7 +254,7 @@ class GameState():
 
     def transition_from_counting_gold_to_awaiting_unit_selection(self):
         self.phase = Phase.AWAITING_UNIT_SELECTION
-
+        self.coin_index = 0
 
 
     def prep_end_menu(self): # Move to engine TODO

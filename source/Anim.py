@@ -1,4 +1,6 @@
 """Contains animations for units and other game objects"""
+import pygame as p
+
 CONST_ATTACK_DURATION = 10
 
 class StillAnim():
@@ -99,11 +101,38 @@ class TurnBannerAnim:
         self.duration = 60
         self.team = team
 
+        p.image.load("Sprites/field.png")
+
 class CoinAnim:
+    coin_sprite_0 = p.image.load("Sprites/coin_0.png")
+    coin_sprite_1 = p.image.load("Sprites/coin_1.png")
+    coin_sprite_2 = p.image.load("Sprites/coin_2.png")
+
     def __init__(self):
         self.timer = 0
         self.duration = 10
 
+
     def increment_timer(self):
         """Increments the timer by one tick"""
         self.timer += 1
+
+
+    def get_sprite(self, SQ_SIZE):
+        """Gets the right phase of the coinsprite animation depending on the timer"""
+        # 0 1 2 1 0
+        sprite = None
+        if self.timer % 2 == 1:
+            sprite = CoinAnim.coin_sprite_1
+
+        elif self.timer % 4 == 0:
+            sprite = CoinAnim.coin_sprite_0
+
+        elif self.timer % 4 == 2:
+            sprite = CoinAnim.coin_sprite_2
+
+        return p.transform.scale(sprite, (SQ_SIZE / 2, SQ_SIZE / 2))
+
+    def get_current_offset(self):
+        return 0 # for now, later we'll make it slowly rise
+        

@@ -61,7 +61,7 @@ def main():
 
             elif e.type == p.KEYDOWN:  # later move this to menu
                 if e.key == p.K_z:
-                    gs.undoMove()
+                    gs.undo_move()
 
         draw_game_state(screen, gs)
         clock.tick(MAX_FPS)
@@ -213,7 +213,7 @@ def draw_game_state(screen, gs):
         display_units(screen, gs)
         animate_turn_banner(screen, gs)
 
-    elif gs.phase == engine.Phase.TURN_TRANSITION:
+    elif gs.phase == engine.Phase.COUNTING_GOLD:
         display_map(screen)
         display_units(screen, gs)
         animate_coins(screen, gs)
@@ -431,7 +431,6 @@ def prep_unit_move(ref_square, gs):
     gs.dest_square = ref_square
     this_anim = anim.MovingAnim(duration, start_square, ref_square)
     unit = gs.selected_unit
-    team = unit.team()
     if not distance == 0:
         unit.anim = this_anim
         gs.phase = engine.Phase.ANIMATING_MOVE
@@ -445,12 +444,13 @@ def prep_unit_move(ref_square, gs):
     for adj_square in adj_squares:
         if gs.is_on_map(adj_square):
         # if it's in range AND if it's occupied
-            if gs.square_is_occupied_by_hostile(adj_square, team):
+            if gs.square_is_occupied_by_hostile(adj_square):
                 gs.menu.buttons.append(engine.game_menu.AttackButton())
                 break
 
     gs.menu.buttons.append(engine.game_menu.WaitButton())
     gs.menu.buttons.append(engine.game_menu.CancelButton())
+
 
 def prep_unit_attack(ref_square, gs):
     dest_square = gs.dest_square
@@ -616,9 +616,9 @@ def animate_turn_banner(screen, gs):
 def animate_coins(screen, gs):
     if gs.coin_anim is None:
         coin_index = gs.coin_index
-        for i in range(coin_index, (gs.coin_squares)):
-            current_square = gs.coin_squares[coin_index]
-            if gs.is_occupied(current_square):
+        for i in range(coin_index, len(gs.coin_squares)):
+            current_square = gs.coin_squares[i]
+            if gs.square_is_occupied_by_friendly(current_square):
                 gs.coin_index = i
                 gs.coin_anim = anim.CoinAnim()
                 break
@@ -630,15 +630,17 @@ def animate_coins(screen, gs):
     x = current_square[0]
     y = current_square[1]
     coin_anim = gs.coin_anim
-    coin_image = coin_anim.get_surface()
+    coin_image = coin_anim.get_sprite(SQ_SIZE)
     coin_offset = coin_anim.get_current_offset()
 
-    screen.blit(coin_image, (x * SQ_SIZE, WALLSIZE + y * SQ_SIZE + coin_offset))
+    screen.blit(coin_image, (x * SQ_SIZE + SQ_SIZE / 4, WALLSIZE + y * SQ_SIZE + coin_offset))
 
     coin_anim.increment_timer()
 
-    if coin_anim.timer >= coin_anim.duration:
+    if coin_anim.timer >= coin_anim.duration:        
         gs.coin_anim = None
+        gs.add_money()
+        gs.coin_index += 1
 
 
 def get_the_row_and_col(pos):
