@@ -80,7 +80,7 @@ def map_event_handler(mouse_pos, gs):
 
     selected_square = get_the_row_and_col(mouse_pos)
     if phase == engine.Phase.AWAITING_UNIT_SELECTION:
-        select_space(selected_square, gs)  # also need to support buying
+        select_space(selected_square, gs)
 
     elif phase == engine.Phase.UNIT_SELECTED:
         if selected_square in gs.valid_moves:
@@ -126,9 +126,10 @@ def menu_event_handler(mouse_pos, gs):
 
             elif isinstance(button, engine.game_menu.AttackButton):
                 gs.transition_to_selecting_target()
-            
+
             elif isinstance(button, engine.game_menu.BuyFootSoldierButton):
                 gs.spawn_foot_soldier()
+                gs.transition_to_awaiting_unit_selection()
 
             # regardless of what button was pushed it's good to check
             check_end_turn(gs)
@@ -145,6 +146,7 @@ def highlight_spaces(screen, gs):
         y = square[1]
         screen.blit(s, (x*SQ_SIZE, y*SQ_SIZE + WALLSIZE))
 
+
 def highlight_enemies(screen, gs):
     """Highlights squares that contain enemies"""
     s = p.Surface((SQ_SIZE - SCALE / 2, SQ_SIZE - SCALE /2))
@@ -155,6 +157,7 @@ def highlight_enemies(screen, gs):
         x = square[0]
         y = square[1]
         screen.blit(s, (x*SQ_SIZE, y*SQ_SIZE + WALLSIZE))
+
 
 def select_space(selected_square, gs):
     """Gets a selected space once it's been clicked on"""
@@ -296,15 +299,18 @@ def display_action_menu(screen, gs):
         draw_button(screen, button, mouse_pos, body_color,
                     body_top_left_x, element_height, button_padding)
 
+
 def draw_menu_border(screen, menu, border_width, border_height):
     border_surface = p.Surface((border_width, border_height))
     border_surface.fill(BORDER_COLOR)
     screen.blit(border_surface, (menu.x, menu.y))
 
+
 def draw_menu_body(screen, menu, border_padding, body_color):
     body_surface = p.Surface((menu.width, menu.height))
     body_surface.fill(body_color)
     screen.blit(body_surface, (menu.x + border_padding, menu.y + border_padding))
+
 
 def draw_button(screen, button, mouse_pos, body_color, body_top_left_x, element_height, button_padding):
     element_spacing = 2 * SCALE  # spacing between the icon and the button

@@ -35,7 +35,7 @@ class GameState():
                              (1, 5), (3, 5), (4, 5), (6, 5),
                              (1, 6), (6, 6),
                              (1, 8), (6, 8),
-                             ]        
+                             ]
         self.coin_index = 0
         self.blue_to_move = True
         self.moveLog = []
@@ -153,6 +153,11 @@ class GameState():
     def spawn_foot_soldier(self):
         team = self.get_active_team()
         new_footsoldier = FootSoldier(team)
+        self.unit_list.append(new_footsoldier)
+        selected_x = self.selected_square[0]
+        selected_y = self.selected_square[1]
+        self.map[selected_y][selected_x] = len(self.unit_list) - 1 # the index of the guy we just put in
+
 
     def square_is_occupied(self, square):
         # needs IF list is in range (where is this coming from?)
