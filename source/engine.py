@@ -123,9 +123,9 @@ class GameState():
             check_range = q[1]
 
             adj_list = (
-                (sq[0] + 1, sq[1]), 
-                (sq[0] - 1, sq[1]), 
-                (sq[0], sq[1] + 1), 
+                (sq[0] + 1, sq[1]),
+                (sq[0] - 1, sq[1]),
+                (sq[0], sq[1] + 1),
                 (sq[0], sq[1] - 1)
             )
 
@@ -333,10 +333,10 @@ class FootSoldier(ArmyUnit):
             "hit_points": 1,
             "max_hit_points": 1,
             "unit_name": "footsoldier",
-            "anim": anim.StillAnim((0, 0)),
+            "anim": anim.StillAnim(None),
         }
         super().__init__(**kwargs)
-        self._team = team        
+        self._team = team
 
 class Phase(Enum):
     AWAITING_UNIT_SELECTION = 0
