@@ -7,14 +7,13 @@ import engine
 
 SCALE = 4
 MAP_X = 8
-MAP_Y = 11
+MAP_Y = 13
 SQ_SIZE = 16 * SCALE
-WALLSIZE = 8 * SCALE
 MAP_WIDTH = MAP_X * SQ_SIZE
-MAP_HEIGHT = MAP_Y * SQ_SIZE + WALLSIZE * 2
+MAP_HEIGHT = MAP_Y * SQ_SIZE
 INFO_HEIGHT = 8 * SCALE
 WIDTH = 128 * SCALE
-HEIGHT = 200 * SCALE
+HEIGHT = MAP_HEIGHT + INFO_HEIGHT
 MAX_FPS = 30
 IMAGES = {}
 BOARDART = p.image.load("Sprites/field.png")
@@ -144,7 +143,7 @@ def highlight_spaces(screen, gs):
     for square in gs.valid_moves:
         x = square[0]
         y = square[1]
-        screen.blit(s, (x*SQ_SIZE, y*SQ_SIZE + WALLSIZE))
+        screen.blit(s, (x*SQ_SIZE, y*SQ_SIZE))
 
 
 def highlight_enemies(screen, gs):
@@ -156,7 +155,7 @@ def highlight_enemies(screen, gs):
     for square in gs.found_hostiles:
         x = square[0]
         y = square[1]
-        screen.blit(s, (x*SQ_SIZE, y*SQ_SIZE + WALLSIZE))
+        screen.blit(s, (x*SQ_SIZE, y*SQ_SIZE))
 
 
 def select_space(selected_square, gs):
@@ -411,7 +410,6 @@ def display_info_bar(screen, gs):
 def display_units(screen, gs):
     for r in range(MAP_Y):
         for c in range(MAP_X):
-            # print(f"the vertical value is {r*SQ_SIZE+WALLSIZE}")
             index = gs.map[r][c]
             coords = (r, c)
             if index != -1:
@@ -492,7 +490,7 @@ def animate_still(coords, this_unit, screen):
     if not this_unit.is_active:
         unit_sprite = convert_sprite_to_greyscale(unit_sprite)
 
-    screen.blit(unit_sprite, p.Rect(c*SQ_SIZE, r*SQ_SIZE+WALLSIZE, SQ_SIZE, SQ_SIZE))
+    screen.blit(unit_sprite, p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
 
 def animate_moving(this_unit, screen, gs):
@@ -515,7 +513,7 @@ def animate_moving(this_unit, screen, gs):
     this_team = engine.Team.to_abbreviation(this_unit.team())
 
     screen.blit(IMAGES[this_team, this_unit.unit_name()], p.Rect(
-        c*SQ_SIZE, r*SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE))
+        c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
     this_unit.anim.timer += 1
     if this_unit.anim.timer >= this_unit.anim.duration:
@@ -530,7 +528,7 @@ def animate_attacking(this_unit, screen, gs):
     (c, r) = gs.dest_square
     (dx, dy) = this_anim.get_current_offset()
 
-    screen.blit(this_sprite, p.Rect(c*SQ_SIZE + dx, r*SQ_SIZE + WALLSIZE + dy, SQ_SIZE, SQ_SIZE))
+    screen.blit(this_sprite, p.Rect(c*SQ_SIZE + dx, r*SQ_SIZE + dy, SQ_SIZE, SQ_SIZE))
 
     this_anim.increment_timer()
     if this_unit.anim.timer >= this_unit.anim.duration:
@@ -551,7 +549,7 @@ def animate_taking_damage(this_unit, screen, gs):
     # check this later, color offset should not be needed here? TODO
 
     this_sprite.fill(sprite_color, None, p.BLEND_RGB_ADD)
-    screen.blit(this_sprite, p.Rect(c * SQ_SIZE, r * SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE))
+    screen.blit(this_sprite, p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
     this_anim.increment_timer()
     if this_unit.anim.timer >= this_unit.anim.duration:
@@ -576,7 +574,7 @@ def animate_dying(this_unit, screen, gs):
     sprite_color = shade_color + (alpha_offset,)
 
     this_sprite.fill(sprite_color, None, p.BLEND_RGBA_MULT)
-    screen.blit(this_sprite, p.Rect(c*SQ_SIZE, r* SQ_SIZE + WALLSIZE, SQ_SIZE, SQ_SIZE))
+    screen.blit(this_sprite, p.Rect(c*SQ_SIZE, r* SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
     this_anim.increment_timer()
     if this_unit.anim.timer >= this_unit.anim.duration:
@@ -642,7 +640,7 @@ def animate_coins(screen, gs):
     coin_image = coin_anim.get_sprite(SQ_SIZE)
     coin_offset = coin_anim.get_current_offset()
 
-    screen.blit(coin_image, (x * SQ_SIZE + SQ_SIZE / 4, WALLSIZE + y * SQ_SIZE + coin_offset))
+    screen.blit(coin_image, (x * SQ_SIZE + SQ_SIZE / 4, y * SQ_SIZE + coin_offset))
 
     coin_anim.increment_timer()
 
@@ -654,13 +652,13 @@ def animate_coins(screen, gs):
 
 def get_the_row_and_col(pos):
     x = pos[0] // SQ_SIZE
-    y = (pos[1] - WALLSIZE) // SQ_SIZE
+    y = pos[1] // SQ_SIZE
     return (x, y)
 
 
 def get_square_coords(square):
     (c, r) = square
-    return (c*SQ_SIZE, r*SQ_SIZE+WALLSIZE)
+    return (c*SQ_SIZE, r*SQ_SIZE)
 
 
 def mouse_in_button(mouse_pos, button):
