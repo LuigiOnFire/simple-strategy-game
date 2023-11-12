@@ -14,7 +14,7 @@ class GameState():
         # *l - spear/lance
         # *b - bow
         self.map = [
-            [-1, -1, -1, -1, -1, -1, -1, -1],
+            [-2, -2, -2, -2, -2, -2, -2, -2],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
@@ -26,12 +26,12 @@ class GameState():
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1],
+            [-2, -2, -2 -2, -2, -2, -2, -2],
 
         ]
         self.production_tiles = {
-                               Team.BLUE: [(0, 0), (1, 0), (2, 0) ,(3, 0), (4, 0), (5, 0), (6, 0), (7, 0)],
-                               Team.RED: [(11, 0), (11, 1),(11, 2) ,(11, 3), (11, 4), (11, 5), (11, 6), (11, 7)]
+                               Team.BLUE: [(0, 1), (1, 1), (2, 1) ,(3, 1), (4, 1), (5, 1), (6, 1), (7, 1)],
+                               Team.RED: [(0, 11), (1, 11), (2, 11) ,(3, 11), (4, 11), (5, 11), (6, 11), (7, 11)]
                                   }
         self.coin_squares = [(1, 2), (6, 2),
                              (1, 4), (6, 4),
@@ -336,6 +336,33 @@ class FootSoldier(ArmyUnit):
             "hit_points": 1,
             "max_hit_points": 1,
             "unit_name": "footsoldier",
+            "anim": anim.StillAnim(None),
+        }
+        super().__init__(**kwargs)
+        self._team = team
+
+class LeftDoor(ArmyUnit):
+    def __init__(self, team):
+        kwargs = {
+            "attack_range": 0,
+            "move_range": 0,
+            "hit_points": 4,
+            "max_hit_points": 1,
+            "unit_name": "door",
+            "anim": anim.StillAnim(None),
+        }
+        super().__init__(**kwargs)
+        self._team = team
+
+
+class RightDoor(ArmyUnit):
+    def __init__(self, team):
+        kwargs = {
+            "attack_range": 0,
+            "move_range": 0,
+            "hit_points": 4,
+            "max_hit_points": 1,
+            "unit_name": "door",
             "anim": anim.StillAnim(None),
         }
         super().__init__(**kwargs)
