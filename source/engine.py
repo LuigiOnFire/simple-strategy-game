@@ -14,19 +14,19 @@ class GameState():
         # *l - spear/lance
         # *b - bow
         self.map = [
-            [-2, -2, -2, -2, -2, -2, -2, -2],
+            [-2, -2, -2, 0, 1, -2, -2, -2],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1,  0,  -1,  2,  3, -1, -1],
-            [-1, -1, -1, 1, -1, -1, -1, -1],
-            [-1, -1,  4,  5,  6,  7, -1, -1],
+            [-1, -1,  4,  -1,  6,  7, -1, -1],
+            [-1, -1, -1, 5, -1, -1, -1, -1],
+            [-1, -1,  8,  9,  10,  11, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
-            [-2, -2, -2 -2, -2, -2, -2, -2],
+            [-2, -2, -2, 2, 3, -2, -2, -2],
 
         ]
         self.production_tiles = {
@@ -42,7 +42,8 @@ class GameState():
         self.coin_index = 0
         self.blue_to_move = True
         self.moveLog = []
-        self.unit_list = [FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.BLUE),
+        self.unit_list = [Door(Team.BLUE, "left"), Door(Team.BLUE, "right"), Door(Team.RED, "left"), Door(Team.RED, "right"),
+                          FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.BLUE),
                           FootSoldier(Team.RED), FootSoldier(Team.RED), FootSoldier(Team.RED), FootSoldier(Team.RED)]
         self.player_gold = [0, 0] # later maybe make the teams proper classes instead of enums and put this there?
         self.phase = Phase.TURN_TRANSITION
@@ -341,8 +342,8 @@ class FootSoldier(ArmyUnit):
         super().__init__(**kwargs)
         self._team = team
 
-class LeftDoor(ArmyUnit):
-    def __init__(self, team):
+class Door(ArmyUnit):
+    def __init__(self, team, side):
         kwargs = {
             "attack_range": 0,
             "move_range": 0,
@@ -352,20 +353,11 @@ class LeftDoor(ArmyUnit):
             "anim": anim.StillAnim(None),
         }
         super().__init__(**kwargs)
-        self._team = team
 
-
-class RightDoor(ArmyUnit):
-    def __init__(self, team):
-        kwargs = {
-            "attack_range": 0,
-            "move_range": 0,
-            "hit_points": 4,
-            "max_hit_points": 1,
-            "unit_name": "door",
-            "anim": anim.StillAnim(None),
-        }
-        super().__init__(**kwargs)
+        # this is to be 'left' or 'right'
+        # it should technically be an enum but idc
+        self.side = side
+        self._unit_name = self._unit_name + "_" + side
         self._team = team
 
 class Phase(Enum):

@@ -86,7 +86,7 @@ class DeathAnim:
         self.timer = 0
         self.duration = 20 # this will be a constant
 
-    def get_alpha_offset(self):                
+    def get_alpha_offset(self):
         scale = 1 - self.timer / self.duration
 
         return scale * 255

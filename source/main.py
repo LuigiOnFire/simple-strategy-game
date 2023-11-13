@@ -27,12 +27,25 @@ def load_images():
     """Loads the image sprites for each unit type"""
     teams = ["b", "r"]
     unit_types = ["footsoldier"]
-    for team in teams:
+    load_door_images()
+    for team in teams:        
         for unit_type in unit_types:
             IMAGES[team, unit_type] = p.image.load(
                 "Sprites/" + team + "_" + unit_type + ".png")
             IMAGES[team, unit_type] = p.transform.scale(
                 IMAGES[team, unit_type], (SQ_SIZE, SQ_SIZE))
+            
+def load_door_images():
+    IMAGES["r", "door_left"] = p.image.load(  # the doors are special case
+        "Sprites/door_l.png")
+    IMAGES["r", "door_left"] = p.transform.scale(
+        IMAGES["r", "door_left"], (SQ_SIZE, SQ_SIZE))
+    IMAGES["r", "door_right"] = p.image.load(
+        "Sprites/door_r.png")
+    IMAGES["r", "door_right"] = p.transform.scale(
+        IMAGES["r", "door_right"], (SQ_SIZE, SQ_SIZE))
+    IMAGES["b", "door_left"] = p.transform.flip(IMAGES["r", "door_left"], 0, 1)
+    IMAGES["b", "door_right"] = p.transform.flip(IMAGES["r", "door_right"], 0, 1)
 
 
 def main():
