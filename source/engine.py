@@ -19,25 +19,25 @@ class GameState():
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1,  4,  -1,  6,  7, -1, -1],
-            [-1, -1, -1, 5, -1, -1, -1, -1],
-            [-1, -1,  8,  9,  10,  11, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
-            [-2, -2, -2, 2, 3, -2, -2, -2],
+            [-1, -1, -1, -1, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -1, -1, -1, -1],
+            [-2, -2, -2,  2,  3, -2, -2, -2],
 
         ]
         self.production_tiles = {
                                Team.BLUE: [(0, 1), (1, 1), (2, 1) ,(3, 1), (4, 1), (5, 1), (6, 1), (7, 1)],
                                Team.RED: [(0, 11), (1, 11), (2, 11) ,(3, 11), (4, 11), (5, 11), (6, 11), (7, 11)]
                                   }
-        self.coin_squares = [(1, 2), (6, 2),
-                             (1, 4), (6, 4),
-                             (1, 5), (3, 5), (4, 5), (6, 5),
-                             (1, 6), (6, 6),
-                             (1, 8), (6, 8),
+        self.coin_squares = [(1, 3), (6, 3),
+                             (1, 5), (6, 5),
+                             (1, 6), (3, 6), (4, 6), (6, 6),
+                             (1, 7), (6, 7),
+                             (1, 9), (6, 9),
                              ]
         self.coin_index = 0
         self.blue_to_move = True
@@ -45,7 +45,7 @@ class GameState():
         self.unit_list = [Door(Team.BLUE, "left"), Door(Team.BLUE, "right"), Door(Team.RED, "left"), Door(Team.RED, "right"),
                           FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.BLUE),
                           FootSoldier(Team.RED), FootSoldier(Team.RED), FootSoldier(Team.RED), FootSoldier(Team.RED)]
-        self.player_gold = [0, 0] # later maybe make the teams proper classes instead of enums and put this there?
+        self.player_gold = [2, 2] # later maybe make the teams proper classes instead of enums and put this there?
         self.phase = Phase.TURN_TRANSITION
         self.selected_unit = None
         self.selected_unit_index = None
@@ -157,10 +157,17 @@ class GameState():
     def spawn_foot_soldier(self):
         team = self.get_active_team()
         new_footsoldier = FootSoldier(team)
+        new_footsoldier.is_active = False
         self.unit_list.append(new_footsoldier)
         selected_x = self.selected_square[0]
         selected_y = self.selected_square[1]
-        self.map[selected_y][selected_x] = len(self.unit_list) - 1 # the index of the guy we just put in
+
+        # the index of the guy we just put in
+        self.map[selected_y][selected_x] = len(self.unit_list) - 1
+
+        # subract the gold
+        index = team.value
+        self.player_gold[index] -= 1
 
 
     def square_is_occupied(self, square):
@@ -318,6 +325,7 @@ class ArmyUnit:
         self.move_range = kwargs["move_range"]
         self.hit_points = kwargs["hit_points"]
         self._max_hit_points = kwargs["max_hit_points"]
+        self.cost = kwargs["max_hit_points"]
         self._team = "b"
         self._unit_name = kwargs["unit_name"]
         self.anim = kwargs["anim"]
@@ -330,6 +338,8 @@ class ArmyUnit:
         return self._team
 
 class FootSoldier(ArmyUnit):
+    cost = 1
+
     def __init__(self, team):
         kwargs = {
             "attack_range": 1,

@@ -140,8 +140,11 @@ def menu_event_handler(mouse_pos, gs):
                 gs.transition_to_selecting_target()
 
             elif isinstance(button, engine.game_menu.BuyFootSoldierButton):
-                gs.spawn_foot_soldier()
-                gs.transition_to_awaiting_unit_selection()
+                active_team = gs.get_active_team()
+                index = active_team.value
+                if gs.player_gold[index] >= engine.FootSoldier.cost: # TODO: should not be a literal value
+                    gs.spawn_foot_soldier()
+                    gs.transition_to_awaiting_unit_selection()
 
             # regardless of what button was pushed it's good to check
             check_end_turn(gs)
@@ -425,7 +428,7 @@ def display_units(screen, gs):
         for c in range(MAP_X):
             index = gs.map[r][c]
             coords = (r, c)
-            if index != -1:
+            if index > -1:
                 this_unit = gs.unit_list[index]
                 this_anim = this_unit.anim
                 if isinstance(this_anim, anim.StillAnim):
@@ -458,6 +461,7 @@ def prep_unit_move(ref_square, gs):
     else:  # if the user selected the same square twice, skip the move animation
         gs.phase = engine.Phase.AWAITING_MENU_INSTRUCTION
 
+    gs.menu = engine.game_menu.GameMenu()
     # move to new method
     adj_squares = [(ref_square[0] + 1, ref_square[1]), (ref_square[0] - 1, ref_square[1]),
                    (ref_square[0], ref_square[1] + 1), (ref_square[0], ref_square[1] - 1)]
@@ -591,6 +595,7 @@ def animate_dying(this_unit, screen, gs):
 
     this_anim.increment_timer()
     if this_unit.anim.timer >= this_unit.anim.duration:
+        this_unit.anim = anim.StillAnim()
         gs.map[r][c] = -1
         gs.phase = engine.Phase.AWAITING_UNIT_SELECTION
 
