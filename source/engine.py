@@ -211,8 +211,12 @@ class GameState():
         return square in active_production_tiles
 
 
-    def prep_buy_menu(self):
+    def reset_menu(self):
         self.menu = game_menu.GameMenu()
+
+
+    def prep_buy_menu(self):
+        self.reset_menu()
         self.menu.buttons.append(game_menu.BuyFootSoldierButton())
         self.menu.buttons.append(game_menu.CancelButton())
 

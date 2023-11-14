@@ -145,6 +145,7 @@ def menu_event_handler(mouse_pos, gs):
                 if gs.player_gold[index] >= engine.FootSoldier.cost: # TODO: should not be a literal value
                     gs.spawn_foot_soldier()
                     gs.transition_to_awaiting_unit_selection()
+                    gs.reset_menu()
 
             # regardless of what button was pushed it's good to check
             check_end_turn(gs)
