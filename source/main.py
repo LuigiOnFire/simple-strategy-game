@@ -16,6 +16,7 @@ WIDTH = 128 * SCALE
 HEIGHT = MAP_HEIGHT + INFO_HEIGHT
 MAX_FPS = 30
 IMAGES = {}
+INACTIVE_IMAGES = {}
 BOARDART = p.image.load("Sprites/field.png")
 BOARDART = p.transform.scale(BOARDART, (MAP_WIDTH, MAP_HEIGHT))
 COINSART = p.image.load("Sprites/coins.png")
@@ -34,7 +35,8 @@ def load_images():
                 "Sprites/" + team + "_" + unit_type + ".png")
             IMAGES[team, unit_type] = p.transform.scale(
                 IMAGES[team, unit_type], (SQ_SIZE, SQ_SIZE))
-            
+        INACTIVE_IMAGES[team, unit_type] = convert_sprite_to_greyscale(IMAGES[team, unit_type])
+
 def load_door_images():
     IMAGES["r", "door_left"] = p.image.load(  # the doors are special case
         "Sprites/door_l.png")
@@ -504,9 +506,11 @@ def animate_still(coords, this_unit, screen):
         (r, c) = this_unit.anim.square
     this_type = this_unit.unit_name()
     this_team = engine.Team.to_abbreviation(this_unit.team())
-    unit_sprite = IMAGES[this_team, this_type]
-    if not this_unit.is_active:
-        unit_sprite = convert_sprite_to_greyscale(unit_sprite)
+    active = this_unit.is_active
+    if active:
+        unit_sprite = IMAGES[this_team, this_type]
+    else:
+        unit_sprite = INACTIVE_IMAGES[this_team, this_type]
 
     screen.blit(unit_sprite, p.Rect(c*SQ_SIZE, r*SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
