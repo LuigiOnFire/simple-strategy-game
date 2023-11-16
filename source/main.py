@@ -37,7 +37,7 @@ def load_images():
                 IMAGES[team, unit_type], (SQ_SIZE, SQ_SIZE))
         INACTIVE_IMAGES[team, unit_type] = convert_sprite_to_greyscale(IMAGES[team, unit_type])
 
-def load_door_images():
+def load_door_images():    
     IMAGES["r", "door_left"] = p.image.load(  # the doors are special case
         "Sprites/door_l.png")
     IMAGES["r", "door_left"] = p.transform.scale(
@@ -48,6 +48,9 @@ def load_door_images():
         IMAGES["r", "door_right"], (SQ_SIZE, SQ_SIZE))
     IMAGES["b", "door_left"] = p.transform.flip(IMAGES["r", "door_left"], 0, 1)
     IMAGES["b", "door_right"] = p.transform.flip(IMAGES["r", "door_right"], 0, 1)
+    IMAGES["fragment"] = p.image.load(
+        "Sprites/door_fragment.png"
+    )
 
 
 def main():
@@ -603,6 +606,38 @@ def animate_dying(this_unit, screen, gs):
         this_unit.anim = anim.StillAnim()
         gs.map[r][c] = -1
         gs.phase = engine.Phase.AWAITING_UNIT_SELECTION
+
+
+def animate_expoding_door(this_unit, screen, gs):    
+    this_anim = this_unit.anim
+
+    # if it's in the first phase
+    if this_anim.phase == 0:
+        this_team = engine.Team.to_abbreviation(this_unit.team())
+
+        # really the team doesn't matter ma vabbè
+        this_sprite = IMAGES[this_team, this_unit.unit_name()].copy()
+        (c, r) = gs.target_square
+        alpha_offset = this_anim.get_alpha_offset()
+
+        shade_color = (255, 255, 255)
+
+        sprite_color = shade_color + (alpha_offset,)
+
+        this_sprite.fill(sprite_color, None, p.BLEND_RGBA_MULT)
+        screen.blit(this_sprite, p.Rect(c*SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
+
+        this_anim.increment_timer()
+        if this_unit.anim.timer >= this_unit.anim.duration:
+            this_unit.anim = anim.StillAnim()
+            gs.map[r][c] = -1
+            gs.phase = engine.Phase.AWAITING_UNIT_SELECTION
+
+    elif this_anim.phase == 1:
+        fragment_sprite = IMAGES["fragment"]
+        for shard in this_anim.shards:
+            sprite_copy = fragment_sprite
+
 
 
 
