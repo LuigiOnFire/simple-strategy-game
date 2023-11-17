@@ -82,18 +82,55 @@ class TakingDamageAnim:
         self.timer += 1
 
 class DeathAnim:
+    duration = 20 # this will be a constant
     def __init__(self):
         self.timer = 0
-        self.duration = 20 # this will be a constant
 
     def get_alpha_offset(self):
-        scale = 1 - self.timer / self.duration
+        scale = 1 - self.timer / DeathAnim.duration
 
         return scale * 255
 
     def increment_timer(self):
         """Increments the timer by one tick"""
         self.timer += 1
+
+class DoorExplodingAnim:
+    durations = [40, 80]
+    x_pixels = 16
+    y_pixels = 12
+    shard_cols = x_pixels / 1.5
+    shard_rows = y_pixels / 1.5
+    def __init__(self):
+        self.timer = 0
+        self.phase = 0
+
+        shards = []
+
+        for x in range (1, DoorExplodingAnim.shard_cols):
+            for y in range (1, DoorExplodingAnim.shard_rows):
+                
+                shard.offset = (
+                    DoorExplodingAnim.x_pixels * x / DoorExplodingAnim.shard_rows,
+                    DoorExplodingAnim.y_pixels * y / DoorExplodingAnim.shard_cols
+                )
+                shards.append
+
+
+    def get_alpha_offset(self):
+        scale = 1 - self.timer / DoorExplodingAnim.durations[0]
+
+        return scale * 255    
+
+    def increment_timer(self):
+        """Increments the timer by one tick"""
+        self.timer += 1
+
+
+
+    def advance_phase(self):
+        self.phase = 1
+
 
 class TurnBannerAnim:
     def __init__(self, team):
