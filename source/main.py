@@ -51,6 +51,7 @@ def load_door_images():
     IMAGES["fragment"] = p.image.load(
         "Sprites/door_fragment.png"
     )
+    IMAGES["fragment"] = p.transform.scale(IMAGES["fragment"], (2 * SCALE, 2 * SCALE))
 
 
 def main():
@@ -582,7 +583,10 @@ def animate_taking_damage(this_unit, screen, gs):
     if this_unit.anim.timer >= this_unit.anim.duration:
         this_unit.hit_points -= 1
         if this_unit.hit_points <= 0:
-            this_unit.anim = anim.DeathAnim()
+            if isinstance(this_unit, engine.Door):
+                this_unit.anim = anim.DoorExplodingAnim()
+            else:
+                this_unit.anim = anim.DeathAnim()
 
         else:
             this_unit.anim = anim.StillAnim()
@@ -632,20 +636,23 @@ def animate_expoding_door(this_unit, screen, gs):
         screen.blit(this_sprite, p.Rect(x, y, SQ_SIZE, SQ_SIZE))
 
         this_anim.increment_timer()
-        if this_unit.anim.timer >= this_unit.anim.duration[0]:
+        if this_unit.anim.timer >= this_unit.anim.durations[0]:
             this_unit.anim.advance_phase()
 
     elif this_anim.phase == 1:
         fragment_sprite = IMAGES["fragment"]
-        for shard in this_anim.shards:
-            sprite_copy = fragment_sprite
-            angle = shard.angle
-            p.transform.rotate(sprite_copy, angle)
-            offset = shard.offset
-            screen.blit(x + offset.x, y + offset.y, 2 * SCALE, 2 * SCALE)
+        for row in this_anim.shards:
+            for shard in row:
+                sprite_copy = fragment_sprite
+                angle = shard.angle
+                p.transform.rotate(sprite_copy, angle)
+                offset = shard.offset
+                offset_x = offset[0]
+                offset_y = offset[1]
+                screen.blit(fragment_sprite, p.Rect(x + offset_x, y + offset_y, 2 * SCALE, 2 * SCALE))
 
         this_anim.increment_timer()
-        if this_unit.anim.timer >= this_unit.anim.duration:
+        if this_unit.anim.timer >= this_unit.anim.durations[1]:
             pass
             # for now just freeze the game whatever we'll add a main menu later
 

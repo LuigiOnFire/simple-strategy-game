@@ -99,22 +99,30 @@ class DoorExplodingAnim:
     durations = [40, 80]
     x_pixels = 16
     y_pixels = 12
-    shard_cols = x_pixels / 1.5
-    shard_rows = y_pixels / 1.5
+    shard_cols = 6 # x_pixels / 1.5
+    shard_rows = 4 # y_pixels / 1.5
+
+
+
+    class Shard:
+        def __init__(self, offset):
+            self.offset = offset
+            self.angle = 0
+
     def __init__(self):
         self.timer = 0
         self.phase = 0
 
-        shards = []
+        self.shards = [[0] * DoorExplodingAnim.shard_cols] * DoorExplodingAnim.shard_rows
 
-        for x in range (1, DoorExplodingAnim.shard_cols):
-            for y in range (1, DoorExplodingAnim.shard_rows):
-                
-                shard.offset = (
+        for x in range (0, DoorExplodingAnim.shard_cols):
+            for y in range (0, DoorExplodingAnim.shard_rows):
+                offset = (
                     DoorExplodingAnim.x_pixels * x / DoorExplodingAnim.shard_rows,
                     DoorExplodingAnim.y_pixels * y / DoorExplodingAnim.shard_cols
                 )
-                shards.append
+                shard = self.Shard(offset)
+                self.shards[y][x] = shard
 
 
     def get_alpha_offset(self):
@@ -126,6 +134,14 @@ class DoorExplodingAnim:
         """Increments the timer by one tick"""
         self.timer += 1
 
+        if self.phase == 1:
+            for x in range (0, DoorExplodingAnim.shard_cols):
+                for y in range (0, DoorExplodingAnim.shard_rows):
+                    
+                    self.shards[y][x].offset += (
+                        x - DoorExplodingAnim.shard_cols / 2,
+                        y - DoorExplodingAnim.shard_rows / 2
+                    )
 
 
     def advance_phase(self):

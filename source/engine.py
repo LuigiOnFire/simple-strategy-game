@@ -15,7 +15,7 @@ class GameState():
         # *b - bow
         self.map = [
             [-2, -2, -2, 0, 1, -2, -2, -2],
-            [-1, -1, -1, -1, -1, -1, -1, -1],
+            [-1, -1, -1, -1, 4, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
@@ -43,8 +43,7 @@ class GameState():
         self.blue_to_move = True
         self.moveLog = []
         self.unit_list = [Door(Team.BLUE, "left"), Door(Team.BLUE, "right"), Door(Team.RED, "left"), Door(Team.RED, "right"),
-                          FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.BLUE), FootSoldier(Team.BLUE),
-                          FootSoldier(Team.RED), FootSoldier(Team.RED), FootSoldier(Team.RED), FootSoldier(Team.RED)]
+                          FootSoldier(Team.RED)]
         self.player_gold = [2, 2] # later maybe make the teams proper classes instead of enums and put this there?
         self.phase = Phase.TURN_TRANSITION
         self.selected_unit = None
@@ -361,7 +360,7 @@ class Door(ArmyUnit):
         kwargs = {
             "attack_range": 0,
             "move_range": 0,
-            "hit_points": 4,
+            "hit_points": 1,
             "max_hit_points": 1,
             "unit_name": "door",
             "anim": anim.StillAnim(None),
