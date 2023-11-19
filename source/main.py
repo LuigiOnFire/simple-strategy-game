@@ -569,11 +569,11 @@ def animate_taking_damage(this_unit, screen, gs):
     this_team = engine.Team.to_abbreviation(this_unit.team())
     this_sprite = IMAGES[this_team, this_unit.unit_name()].copy()
     (c, r) = gs.target_square
-    color_offset = this_anim.get_alpha_offset()
+    color_offset = this_anim.get_whiteness_offset()
 
     shade_color = (color_offset, color_offset, color_offset)
 
-    sprite_color = shade_color + (color_offset,) 
+    sprite_color = shade_color + (color_offset,)
     # check this later, color offset should not be needed here? TODO
 
     this_sprite.fill(sprite_color, None, p.BLEND_RGB_ADD)
@@ -617,7 +617,7 @@ def animate_dying(this_unit, screen, gs):
 def animate_expoding_door(this_unit, screen, gs):
     this_anim = this_unit.anim
     (c, r) = gs.target_square
-    (x, y) = (c*SQ_SIZE, r * SQ_SIZE)
+    (x, y) = (c * SQ_SIZE, r * SQ_SIZE)
 
     # if it's in the first phase
     if this_anim.phase == 0:
@@ -625,15 +625,16 @@ def animate_expoding_door(this_unit, screen, gs):
 
         # really the team doesn't matter ma vabbè
         this_sprite = IMAGES[this_team, this_unit.unit_name()].copy()
-        
-        alpha_offset = this_anim.get_alpha_offset()
 
-        shade_color = (255, 255, 255)
+        color_offset = this_anim.get_alpha_offset()
 
-        sprite_color = shade_color + (alpha_offset,)
+        shade_color = (color_offset, color_offset, color_offset)
 
-        this_sprite.fill(sprite_color, None, p.BLEND_RGBA_MULT)
-        screen.blit(this_sprite, p.Rect(x, y, SQ_SIZE, SQ_SIZE))
+        sprite_color = shade_color + (color_offset,)
+        # check this later, color offset should not be needed here? TODO
+
+        this_sprite.fill(sprite_color, None, p.BLEND_RGB_ADD)
+        screen.blit(this_sprite, p.Rect(c * SQ_SIZE, r * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
         this_anim.increment_timer()
         if this_unit.anim.timer >= this_unit.anim.durations[0]:
@@ -645,11 +646,12 @@ def animate_expoding_door(this_unit, screen, gs):
             for shard in row:
                 sprite_copy = fragment_sprite
                 angle = shard.angle
-                p.transform.rotate(sprite_copy, angle)
+                sprite_copy = p.transform.rotate(sprite_copy, angle)
                 offset = shard.offset
                 offset_x = offset[0]
                 offset_y = offset[1]
-                screen.blit(fragment_sprite, p.Rect(x + offset_x, y + offset_y, 2 * SCALE, 2 * SCALE))
+                screen.blit(sprite_copy, p.Rect(x + SCALE * offset_x,
+                            y + SCALE * offset_y, 2 * SCALE, 2 * SCALE))
 
         this_anim.increment_timer()
         if this_unit.anim.timer >= this_unit.anim.durations[1]:

@@ -25,7 +25,7 @@ class GameState():
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1],
+            [-1, -1, -1, 5, -1, -1, -1, -1],
             [-2, -2, -2,  2,  3, -2, -2, -2],
 
         ]
@@ -43,7 +43,7 @@ class GameState():
         self.blue_to_move = True
         self.moveLog = []
         self.unit_list = [Door(Team.BLUE, "left"), Door(Team.BLUE, "right"), Door(Team.RED, "left"), Door(Team.RED, "right"),
-                          FootSoldier(Team.RED)]
+                          FootSoldier(Team.RED), FootSoldier(Team.BLUE)]
         self.player_gold = [2, 2] # later maybe make the teams proper classes instead of enums and put this there?
         self.phase = Phase.TURN_TRANSITION
         self.selected_unit = None
