@@ -5,7 +5,7 @@ import pygame as p
 import anim
 import engine
 
-SCALE = 4
+SCALE = 3
 MAP_X = 8
 MAP_Y = 13
 SQ_SIZE = 16 * SCALE
@@ -651,7 +651,7 @@ def animate_expoding_door(this_unit, screen, gs):
                 offset_x = offset[0]
                 offset_y = offset[1]
                 screen.blit(sprite_copy, p.Rect(x + SCALE * offset_x,
-                            y + SCALE * offset_y, 2 * SCALE, 2 * SCALE))
+                            y + SCALE * offset_y, 2 * SCALE,2 * SCALE))
 
         this_anim.increment_timer()
         if this_unit.anim.timer >= this_unit.anim.durations[1]:

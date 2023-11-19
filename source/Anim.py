@@ -1,5 +1,6 @@
 """Contains animations for units and other game objects"""
 import pygame as p
+import random
 
 CONST_ATTACK_DURATION = 10
 
@@ -119,6 +120,10 @@ class DoorExplodingAnim:
 
         self.shards = [[None] * DoorExplodingAnim.shard_cols for _ in range(DoorExplodingAnim.shard_rows)]
 
+        # matrix of translation vectors
+        self.tv = [[0, 0] * DoorExplodingAnim.shard_cols for _ in range(DoorExplodingAnim.shard_rows)]
+
+
         for y in range (0, DoorExplodingAnim.shard_rows):
             for x in range (0, DoorExplodingAnim.shard_cols):
                 # x offset:
@@ -134,6 +139,18 @@ class DoorExplodingAnim:
                 angle = 180 - ((x) % 2) * 180
                 shard = self.Shard(offset, angle)
                 self.shards[y][x] = shard
+
+                # generate the translation vectors
+                # rand_max: maximum magnitude of the random element
+                rand_max = 0.25
+                delta_x = DoorExplodingAnim.translation_rate * \
+                    (x - (DoorExplodingAnim.shard_cols - 1) / 2)
+                delta_y = DoorExplodingAnim.translation_rate * \
+                    (y - (DoorExplodingAnim.shard_rows - 1) / 2)
+                
+                rand_x = rand_max * random.random()
+                rand_y = rand_max * random.random()
+                self.tv[y][x] = [delta_x + rand_x, delta_y + rand_y]
         pass
 
 
@@ -156,8 +173,8 @@ class DoorExplodingAnim:
                     delta_y = DoorExplodingAnim.translation_rate * \
                         (y - (DoorExplodingAnim.shard_rows - 1) / 2)
                     self.shards[y][x].offset = (
-                        old_offset_x + delta_x,
-                        old_offset_y + delta_y
+                        old_offset_x + self.tv[y][x][0],
+                        old_offset_y + self.tv[y][x][1]
                     )
                     if x < (DoorExplodingAnim.shard_cols - 1) / 2:
                         rotatoin_direction_sign = 1
