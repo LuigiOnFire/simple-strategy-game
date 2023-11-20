@@ -4,6 +4,7 @@ import math
 import pygame as p
 import anim
 import engine
+import top_state
 
 SCALE = 3
 MAP_X = 8
@@ -61,9 +62,11 @@ def main():
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     gs = engine.GameState()
+    mm_s = main_menu_state.MainMenuState()
     load_images()
     running = True
     gs.setup_still_anims()
+    current_state = top_state.MainPhase.IN_GAME
     # this_unit = EngineScript.ArmyUnit(kwargs)
     while running:
         for e in p.event.get():
@@ -72,19 +75,28 @@ def main():
 
             elif e.type == p.MOUSEBUTTONDOWN:
                 target = p.mouse.get_pos()
-                if mouse_in_menu(target, gs.menu):
-                    menu_event_handler(target, gs)
-                else:
-                    map_event_handler(target, gs)
+                master_event_handler(current_state, targer, gs)
 
-            elif e.type == p.KEYDOWN:  # later move this to menu
-                if e.key == p.K_z:
-                    gs.undo_move()
-
-        draw_game_state(screen, gs)
+        master_draw(current_state, screen, mm_s, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
 
+
+def master_event_handler(main_state, target, gs):
+    if main_state == main_state.MainPhase.MAIN_MENU:
+        main_menu_event_handler(target, gs)
+    elif main_state == main_state.MainPhase.IN_MATCH:
+        in_match_event_handler(target, gs)
+
+def main_menu_event_handler(target, gs):
+    pass # fill in later
+
+def in_match_event_handler(target, gs):
+    if mouse_in_menu(target, gs.menu): 
+        menu_event_handler(target, gs)
+ 
+    else:
+        map_event_handler(target, gs)
 
 def map_event_handler(mouse_pos, gs):
     """Gets mouse clicks on the map"""
@@ -207,6 +219,20 @@ def select_space(selected_square, gs):
         gs.dest_square = selected_square
         gs.prep_end_menu()
 
+def master_draw(current_state, screen, mm_s, gs):
+    if current_state == top_state.MainPhase.MAIN_MENU:
+        draw_menu_state(screen, mm_s)
+
+    elif current_state == top_state.MainPhase.MAIN_MENU:
+        draw_game_state(screen, gs)
+
+def draw_menu_state(screen, mm_s):
+    # display background
+
+    # display title
+    
+    # display menu text/content 
+    pass
 
 def draw_game_state(screen, gs):
     if gs.phase == engine.Phase.AWAITING_UNIT_SELECTION:

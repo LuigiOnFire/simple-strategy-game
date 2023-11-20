@@ -1,4 +1,0 @@
-- get gold working
-- get gold display working
-- get gold counting working
-- get unit spawning working
