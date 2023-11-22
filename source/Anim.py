@@ -118,10 +118,12 @@ class DoorExplodingAnim:
         self.timer = 0
         self.phase = 0
 
-        self.shards = [[None] * DoorExplodingAnim.shard_cols for _ in range(DoorExplodingAnim.shard_rows)]
+        self.shards = [[None] * DoorExplodingAnim.shard_cols \
+                       for _ in range(DoorExplodingAnim.shard_rows)]
 
         # matrix of translation vectors
-        self.tv = [[0, 0] * DoorExplodingAnim.shard_cols for _ in range(DoorExplodingAnim.shard_rows)]
+        self.tv = [[0, 0] * DoorExplodingAnim.shard_cols for \
+                    _ in range(DoorExplodingAnim.shard_rows)]
 
 
         for y in range (0, DoorExplodingAnim.shard_rows):

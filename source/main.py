@@ -5,8 +5,9 @@ import pygame as p
 import anim
 import engine
 import top_state
+import main_menu_state
 
-SCALE = 3
+SCALE = 4
 MAP_X = 8
 MAP_Y = 13
 SQ_SIZE = 16 * SCALE
@@ -62,11 +63,11 @@ def main():
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     gs = engine.GameState()
-    mm_s = main_menu_state.MainMenuState()
+    mm_s = main_menu_state.MainMenuState(SQ_SIZE)
     load_images()
     running = True
     gs.setup_still_anims()
-    current_state = top_state.MainPhase.IN_GAME
+    current_state = top_state.MainPhase.MAIN_MENU
     # this_unit = EngineScript.ArmyUnit(kwargs)
     while running:
         for e in p.event.get():
@@ -75,24 +76,24 @@ def main():
 
             elif e.type == p.MOUSEBUTTONDOWN:
                 target = p.mouse.get_pos()
-                master_event_handler(current_state, targer, gs)
+                master_event_handler(current_state, target, gs)
 
         master_draw(current_state, screen, mm_s, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
 
 
-def master_event_handler(main_state, target, gs):
-    if main_state == main_state.MainPhase.MAIN_MENU:
+def master_event_handler(current_state, target, gs):
+    if current_state == top_state.MainPhase.MAIN_MENU:
         main_menu_event_handler(target, gs)
-    elif main_state == main_state.MainPhase.IN_MATCH:
+    elif current_state == top_state.MainPhase.IN_MATCH:
         in_match_event_handler(target, gs)
 
 def main_menu_event_handler(target, gs):
     pass # fill in later
 
 def in_match_event_handler(target, gs):
-    if mouse_in_menu(target, gs.menu): 
+    if mouse_in_menu(target, gs.menu):
         menu_event_handler(target, gs)
  
     else:
@@ -160,7 +161,7 @@ def menu_event_handler(mouse_pos, gs):
             elif isinstance(button, engine.game_menu.BuyFootSoldierButton):
                 active_team = gs.get_active_team()
                 index = active_team.value
-                if gs.player_gold[index] >= engine.FootSoldier.cost: # TODO: should not be a literal value
+                if gs.player_gold[index] >= engine.FootSoldier.cost:
                     gs.spawn_foot_soldier()
                     gs.transition_to_awaiting_unit_selection()
                     gs.reset_menu()
@@ -223,14 +224,15 @@ def master_draw(current_state, screen, mm_s, gs):
     if current_state == top_state.MainPhase.MAIN_MENU:
         draw_menu_state(screen, mm_s)
 
-    elif current_state == top_state.MainPhase.MAIN_MENU:
+    elif current_state == top_state.MainPhase.IN_MATCH:
         draw_game_state(screen, gs)
 
 def draw_menu_state(screen, mm_s):
     # display background
+    mm_s.draw_bg(screen)
 
     # display title
-    
+
     # display menu text/content 
     pass
 
