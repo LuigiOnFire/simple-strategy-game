@@ -56,7 +56,7 @@ class AttackAnim:
         if dimension == "x":
             ind = 0
         else:
-            ind = 1        
+            ind = 1
         if start_square[ind] < ref_square[ind]:
             return 1
         if start_square[ind] == ref_square[ind]:

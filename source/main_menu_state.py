@@ -1,5 +1,7 @@
 import random
 import pygame as p
+import font_util
+import game_menu
 
 class MainMenuState():
     mm_grid_height = 14 # one higher than the screen since we need a bit extra
@@ -13,6 +15,8 @@ class MainMenuState():
         p.image.load("Sprites/b_footsoldier.png"),
         p.image.load("Sprites/r_footsoldier.png")
         ]
+
+    unsized_title = p.image.load("Sprites/title.png")
 
     def __init__(self, sq_size):
         self.sq_size = sq_size
@@ -33,6 +37,10 @@ class MainMenuState():
         for tile in MainMenuState.unsized_unit_tiles:
             self.bg_unit_tiles.append(p.transform.scale(tile, (self.sq_size, self.sq_size)))
 
+        unsized_title = MainMenuState.unsized_title
+        dim = self.sq_size / 16 * (3 / 4)
+        self.title = p.transform.scale_by(unsized_title, dim)
+
         self.active_layer = 0
 
         self.generate_bg_grid(0)
@@ -44,6 +52,11 @@ class MainMenuState():
         ]
         self.x_jump = sq_size / 128
         self.x_offset_current = 0
+
+        top_menu = game_menu.GameMenu()
+        
+
+        self.menus = []
 
 
 
@@ -108,6 +121,24 @@ class MainMenuState():
         self.x_offset_current -= self.x_jump
         if -self.x_offset_current >= surface_width:
             self.reload_surfaces()
+
+    def draw_title(self, screen):       
+        (x_screen, y_screen) = screen.get_size()
+        x_sprite = self.title.get_width()
+        y_sprite = self.title.get_height()
+
+        x = x_screen / 2 - x_sprite / 2
+        y = y_screen / 4 - y_sprite / 2 # will place it in the middle of the top half of the screen
+        screen.blit(self.title, (x, y))
+
+    def draw_submenu(self, screen):
+        (x_screen, y_screen) = screen.get_size()
+        x = x_screen / 2
+        y = y_screen / 2
+        font = p.font.Font('Fonts/PixeloidSans.ttf', 24)
+        font_color = p.Color("white")
+        outline_color = p.Color("black")
+        font_util.render_w_outline(screen, "Start", font, font_color, outline_color, (x, y), 3)
 
     def reload_surfaces(self):
         self.surfaces[0] = self.surfaces[1]
