@@ -1,7 +1,7 @@
 import random
 import pygame as p
 import font_util
-import game_menu
+import menu_menu
 
 class MainMenuState():
     mm_grid_height = 14 # one higher than the screen since we need a bit extra
@@ -53,14 +53,20 @@ class MainMenuState():
         self.x_jump = sq_size / 128
         self.x_offset_current = 0
 
-        top_menu = game_menu.GameMenu()
+        self.setup_top_menu()
         
+        
+    def setup_top_menu(self):
+        top_menu = menu_menu.MenuMenu()        
+        start_button = self.make_button("Start Game")
 
-        self.menus = []
+    def make_button(self, btn_text):
+        btn = menu_menu.MenuButton(btn_text, 6 * self.sq_size)
+        btn.outline_width = 3
+        # can change color, bg whatever we want here
 
-
-
-
+        return btn
+    
     def generate_bg_grid(self, layer):
         terrain_probs = [0.95, 0.05]
         self.bg_terrain_grid[layer] = MainMenuState.generate_grid_layer(terrain_probs)
@@ -97,7 +103,6 @@ class MainMenuState():
         bg_surface = p.Surface((self.sq_size * MainMenuState.mm_grid_width, \
                                self.sq_size * MainMenuState.mm_grid_height))
 
-
         for y in range(MainMenuState.mm_grid_height):
             for x in range(MainMenuState.mm_grid_width):
                 terrain_grid_index = self.bg_terrain_grid[layer][y][x]
@@ -122,6 +127,7 @@ class MainMenuState():
         if -self.x_offset_current >= surface_width:
             self.reload_surfaces()
 
+
     def draw_title(self, screen):       
         (x_screen, y_screen) = screen.get_size()
         x_sprite = self.title.get_width()
@@ -131,19 +137,25 @@ class MainMenuState():
         y = y_screen / 4 - y_sprite / 2 # will place it in the middle of the top half of the screen
         screen.blit(self.title, (x, y))
 
+
     def draw_submenu(self, screen):
         (x_screen, y_screen) = screen.get_size()
-        x = x_screen / 2
-        y = y_screen / 2
-        font = p.font.Font('Fonts/PixeloidSans.ttf', 24)
-        font_color = p.Color("white")
-        outline_color = p.Color("black")
-        font_util.render_w_outline(screen, "Start", font, font_color, outline_color, (x, y), 3)
+        
+        # later, check if we're in the boundaries of any of the buttons and 
+        # do someting to the corresponding button text (e.g. bold, change color)
+
+        surface = self.top_menu.surface
+        x = x_screen / 2 - surface.get_width()
+        y = 3 * y_screen / 4 - surface.get_height()        
+
+        screen.blit(surface, (x, y))
+
 
     def reload_surfaces(self):
         self.surfaces[0] = self.surfaces[1]
         self.generate_bg_grid(1)
         self.x_offset_current = 0
+
 
     def swap_active_layer(self):
         self.active_layer = 1 - self.active_layer
