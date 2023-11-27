@@ -57,10 +57,11 @@ class MainMenuState():
         
         
     def setup_top_menu(self):
-        top_menu = menu_menu.MenuMenu()        
-        start_button = self.make_button("Start Game")
+        self.top_menu = menu_menu.MenuMenu()        
+        start_button = self.add_top_menu_button("Start Game", self.top_menu)
+        quit_button
 
-    def make_button(self, btn_text):
+    def add_top_menu_button(self, btn_text):
         btn = menu_menu.MenuButton(btn_text, 6 * self.sq_size)
         btn.outline_width = 3
         # can change color, bg whatever we want here
