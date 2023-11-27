@@ -54,20 +54,24 @@ class MainMenuState():
         self.x_offset_current = 0
 
         self.setup_top_menu()
-        
-        
-    def setup_top_menu(self):
-        self.top_menu = menu_menu.MenuMenu()        
-        start_button = self.add_top_menu_button("Start Game", self.top_menu)
-        quit_button
 
-    def add_top_menu_button(self, btn_text):
-        btn = menu_menu.MenuButton(btn_text, 6 * self.sq_size)
-        btn.outline_width = 3
+    def setup_top_menu(self):
+        self.top_menu = menu_menu.MenuMenu()
+        self.add_top_menu_button("Start Game", self.top_menu)
+        self.add_top_menu_button("Quit", self.top_menu)
+        self.top_menu.gen_surface()
+
+
+    def add_top_menu_button(self, btn_text, menu):
+        font = p.font.Font('Fonts/PressStart2P-Regular.ttf',  6 * self.sq_size)
+        btn = menu_menu.MenuButton(btn_text, font)
         # can change color, bg whatever we want here
+        btn.outline_width = 3
+        menu.add_button(btn)
 
         return btn
-    
+
+
     def generate_bg_grid(self, layer):
         terrain_probs = [0.95, 0.05]
         self.bg_terrain_grid[layer] = MainMenuState.generate_grid_layer(terrain_probs)
@@ -145,9 +149,9 @@ class MainMenuState():
         # later, check if we're in the boundaries of any of the buttons and 
         # do someting to the corresponding button text (e.g. bold, change color)
 
-        surface = self.top_menu.surface
+        surface = self.top_menu.gen_surface()
         x = x_screen / 2 - surface.get_width()
-        y = 3 * y_screen / 4 - surface.get_height()        
+        y = 3 * y_screen / 4 - surface.get_height()
 
         screen.blit(surface, (x, y))
 
