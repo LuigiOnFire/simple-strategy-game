@@ -67,6 +67,7 @@ class MainMenuState():
         btn = menu_menu.MenuButton(btn_text, font)
         # can change color, bg whatever we want here
         btn.outline_width = 3
+        btn.margin = 2
         menu.add_button(btn)
 
         return btn
