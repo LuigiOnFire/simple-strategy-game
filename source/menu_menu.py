@@ -1,12 +1,14 @@
 import pygame as p
 
 class MenuMenu():
-    def __init__(self):
+    def __init__(self, x, y):
         self.buttons = []
         self.alignment = "l" # l - left, c - center, r - right
         self.width = 0
         self.height = 0
-        
+        self.border_width = 0
+        self.x = x
+        self.y = y
 
 
     def gen_surface(self):
@@ -20,7 +22,16 @@ class MenuMenu():
 
             self.height += height
 
-            # generate each button surface with the correct menu-wide dimensions
+        self.width += 2 * self.border_width
+        self.height += 2 * self.border_width
+
+        # generate border rect
+        outer_surface = p.Rect(self.x, self.y, self.width, self.height)
+        screen
+
+        # generate button bg
+
+        # generate each button surface with the correct menu-wide dimensions            
 
     def add_button(self, button):
         self.buttons.append(button)
