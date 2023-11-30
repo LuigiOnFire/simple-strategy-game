@@ -59,11 +59,10 @@ class MainMenuState():
         self.top_menu = menu_menu.MenuMenu()
         self.add_top_menu_button("Start Game", self.top_menu)
         self.add_top_menu_button("Quit", self.top_menu)
-        self.top_menu.gen_surface()
 
 
     def add_top_menu_button(self, btn_text, menu):
-        font = p.font.Font('Fonts/PressStart2P-Regular.ttf',  6 * self.sq_size)
+        font = p.font.Font('Fonts/PressStart2P-Regular.ttf',  self.sq_size // 3)
         btn = menu_menu.MenuButton(btn_text, font)
         # can change color, bg whatever we want here
         btn.outline_width = 3
@@ -146,13 +145,15 @@ class MainMenuState():
 
     def draw_submenu(self, screen):
         (x_screen, y_screen) = screen.get_size()
-        
+
         # later, check if we're in the boundaries of any of the buttons and 
         # do someting to the corresponding button text (e.g. bold, change color)
 
         surface = self.top_menu.gen_surface()
-        x = x_screen / 2 - surface.get_width()
-        y = 3 * y_screen / 4 - surface.get_height()
+        w = surface.get_width()
+        h = surface.get_height()
+        x = x_screen / 2 - w / 2
+        y = 3 * y_screen / 4 - h / 2
 
         screen.blit(surface, (x, y))
 

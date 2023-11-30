@@ -234,8 +234,9 @@ def draw_menu_state(screen, mm_s):
     # display title
     mm_s.draw_title(screen)
 
-    # display menu text/content 
+    # display menu text/content
     mm_s.draw_submenu(screen)
+
 
 def draw_game_state(screen, gs):
     if gs.phase == engine.Phase.AWAITING_UNIT_SELECTION:
