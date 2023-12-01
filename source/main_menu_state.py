@@ -124,6 +124,7 @@ class MainMenuState():
 
         return bg_surface
 
+
     def draw_bg(self, screen):
         surface_width = self.surfaces[0].get_width()
         screen.blit(self.surfaces[0], (self.x_offset_current, 0))
@@ -134,7 +135,7 @@ class MainMenuState():
             self.reload_surfaces()
 
 
-    def draw_title(self, screen):       
+    def draw_title(self, screen):
         (x_screen, y_screen) = screen.get_size()
         x_sprite = self.title.get_width()
         y_sprite = self.title.get_height()
@@ -148,23 +149,12 @@ class MainMenuState():
         (x_screen, y_screen) = screen.get_size()
         mouse_pos = p.mouse.get_pos()
 
-        (w, h) = self.top_menu.get_dims()
+        (w, h) = self.top_menu.find_dims()
 
         x = x_screen / 2 - w / 2
         y = 3 * y_screen / 4 - h / 2
 
-        def within_x(mouse):
-            return (x < mouse and mouse < x + w)
-        
-        def within_y(mouse):
-            return (y < mouse and mouse < y + h)
-
-        if within_x(mouse_pos[0]) and within_y(mouse_pos[1]):
-            mouse_pos = (mouse_pos[0] - x, mouse_pos[1] - y)
-            self.top_menu.grow_button(mouse_pos)
-            surface = self.top_menu.menu_surface
-
-        surface = self.top_menu.gen_surface()
+        surface = self.top_menu.gen_surface(mouse_pos)
 
         screen.blit(surface, (x, y))
 

@@ -13,9 +13,8 @@ class MenuMenu():
         self.menu_surface = None
 
 
-    def gen_surface(self):
+    def find_dims(self):
         inner_width = 0
-        inner_height = 0
         button_heights = []
         for button in self.buttons:
             # find the dims of the buttons
@@ -28,6 +27,13 @@ class MenuMenu():
 
         self.width = inner_width
         self.height = sum(button_heights)
+        return (self.width, self.height)
+
+
+    def gen_surface(self, mouse_pos):
+        (mouse_x, mouse_y) = mouse_pos
+        inner_width = self.width - self.border_width
+        inner_height = self.height -self.border_width
 
         # generate border rect
         menu_surface = p.Surface((self.width, self.height), p.SRCALPHA)
@@ -39,20 +45,27 @@ class MenuMenu():
         menu_surface.blit(border_surface, (0, 0))
 
         # generate button bg
-        inner_surface = p.Surface((inner_width, inner_height))
+        inner_surface = p.Surface((inner_width, inner_height), p.SRCALPHA)
         if self.bg_color:
             inner_surface.fill(self.bg_color)
 
         menu_surface.blit(inner_surface, (self.border_width, self.border_width))
 
+        current_y = 0
+
+        mouse_in_x = mouse_x < self.border_width or mouse_x > self.width - self.border_width
+
         # generate each button surface with the correct menu-wide dimensions
-        for i, button in enumerate(self.buttons):
-            mouse_in = False
+        for button in self.buttons:
+            mouse_in_y = current_y < mouse_y and mouse_y < current_y + button.height
+            mouse_in = mouse_in_y and mouse_in_x
+
             button_surface = button.gen_surface(mouse_in)
             menu_surface.blit(
                 button_surface,
-                (self.border_width, self.border_width + sum(button_heights[:i]))
+                (self.border_width, self.border_width + current_y)
             )
+            current_y += button.height
 
         self.menu_surface = menu_surface
 
@@ -87,7 +100,6 @@ class MenuMenu():
                 )
 
 
-
 class MenuButton(): # this will be responsible for making its own surface
     def __init__(self, text, font_style, font_size):
         self.text = text
@@ -117,7 +129,7 @@ class MenuButton(): # this will be responsible for making its own surface
             surface.fill(self.bg_color)
 
         font_size = self.font_size
-        if mouse_in == True:
+        if mouse_in is True:
             font_size += 4
 
         font = p.font.Font(self.font_style, font_size)
