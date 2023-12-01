@@ -31,7 +31,7 @@ def load_images():
     teams = ["b", "r"]
     unit_types = ["footsoldier"]
     load_door_images()
-    for team in teams:        
+    for team in teams:
         for unit_type in unit_types:
             IMAGES[team, unit_type] = p.image.load(
                 "Sprites/" + team + "_" + unit_type + ".png")

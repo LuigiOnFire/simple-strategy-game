@@ -5,11 +5,12 @@ class MenuMenu():
     def __init__(self):
         self.buttons = []
         self.alignment = "l" # l - left, c - center, r - right
-        self.width = 0
+        self.width = 0 # these refer to the TOTAL width and height of the menu
         self.height = 0
         self.border_width = 0
         self.border_color = p.Color(255, 255, 255, 0)
         self.bg_color = p.Color(255, 255, 255, 0)
+        self.menu_surface = None
 
 
     def gen_surface(self):
@@ -23,6 +24,7 @@ class MenuMenu():
                 inner_width = width
 
             button_heights.append(height)
+            button.height = height
 
         self.width = inner_width
         self.height = sum(button_heights)
@@ -52,41 +54,78 @@ class MenuMenu():
                 (self.border_width, self.border_width + sum(button_heights[:i]))
             )
 
+        self.menu_surface = menu_surface
+
         return menu_surface
 
 
     def add_button(self, button):
         self.buttons.append(button)
 
+    def grow_button(self, pos):
+        x = pos[0]
+        y = pos[1]
+
+        h = 0
+
+        if x < self.border_width or x > self.width - self.border_width:
+            return
+
+        if y < self.border_width or y > self.height - self.border_width:
+            return
+
+        for button in self.buttons:
+            if y < h + button.height:
+                mouse_in = True
+                button_surface = button.gen_surface(mouse_in)
+                self.menu_surface.blit(
+                    button_surface,
+                    (
+                        self.border_width,
+                        self.border_width + h
+                    )
+                )
+
+
 
 class MenuButton(): # this will be responsible for making its own surface
-    def __init__(self, text, font):
+    def __init__(self, text, font_style, font_size):
         self.text = text
         self.bg_color = None
         self.text_color = p.Color("white")
         self.outline_width = 0
         self.outline_color = p.Color("black")
-        self.font = font # font size in encapsulated in this
+        self.font_style = font_style
+        self.font_size = font_size
         self.margin = 2
+        self.height = 0
+        self.text_delta = 4 # how much to expand the text when we hover
         # we should have getters and setters but I'm rushing
 
 
     def find_dims(self):
-        width, height = self.font.size(self.text)
+        font = p.font.Font(self.font_style, self.font_size + self.text_delta)
+        width, height = font.size(self.text)
         extra = self.outline_width + self.margin
         return (width + extra, height + extra)
 
 
-    def gen_surface(self, mosue_in):
+    def gen_surface(self, mouse_in):
         (width, height) = self.find_dims()
         surface = p.Surface((width, height), p.SRCALPHA)
         if self.bg_color:
             surface.fill(self.bg_color)
 
+        font_size = self.font_size
+        if mouse_in == True:
+            font_size += 4
+
+        font = p.font.Font(self.font_style, font_size)
+
         font_util.render_w_outline(
             surface,
             self.text,
-            self.font,
+            font,
             self.text_color,
             self.outline_color,
             (self.margin, self.margin),

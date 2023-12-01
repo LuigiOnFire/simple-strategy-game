@@ -56,17 +56,18 @@ class MainMenuState():
         self.setup_top_menu()
 
     def setup_top_menu(self):
-        self.top_menu = menu_menu.MenuMenu()
+        self.top_menu = menu_menu.MenuMenu()        
         self.add_top_menu_button("Start Game", self.top_menu)
         self.add_top_menu_button("Quit", self.top_menu)
 
 
     def add_top_menu_button(self, btn_text, menu):
-        font = p.font.Font('Fonts/PressStart2P-Regular.ttf',  self.sq_size // 3)
-        btn = menu_menu.MenuButton(btn_text, font)
+        font_style = "Fonts/PressStart2P-Regular.ttf"
+        font_size = self.sq_size // 3
+        btn = menu_menu.MenuButton(btn_text, font_style, font_size)
         # can change color, bg whatever we want here
         btn.outline_width = 3
-        btn.margin = 2
+        btn.margin = 8
         menu.add_button(btn)
 
         return btn
@@ -145,15 +146,25 @@ class MainMenuState():
 
     def draw_submenu(self, screen):
         (x_screen, y_screen) = screen.get_size()
+        mouse_pos = p.mouse.get_pos()
 
-        # later, check if we're in the boundaries of any of the buttons and 
-        # do someting to the corresponding button text (e.g. bold, change color)
+        (w, h) = self.top_menu.get_dims()
 
-        surface = self.top_menu.gen_surface()
-        w = surface.get_width()
-        h = surface.get_height()
         x = x_screen / 2 - w / 2
         y = 3 * y_screen / 4 - h / 2
+
+        def within_x(mouse):
+            return (x < mouse and mouse < x + w)
+        
+        def within_y(mouse):
+            return (y < mouse and mouse < y + h)
+
+        if within_x(mouse_pos[0]) and within_y(mouse_pos[1]):
+            mouse_pos = (mouse_pos[0] - x, mouse_pos[1] - y)
+            self.top_menu.grow_button(mouse_pos)
+            surface = self.top_menu.menu_surface
+
+        surface = self.top_menu.gen_surface()
 
         screen.blit(surface, (x, y))
 
