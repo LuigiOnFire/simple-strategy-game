@@ -76,26 +76,29 @@ def main():
 
             elif e.type == p.MOUSEBUTTONDOWN:
                 target = p.mouse.get_pos()
-                master_event_handler(current_state, target, gs)
+                master_event_handler(current_state, target, mm_s, gs)
 
         master_draw(current_state, screen, mm_s, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
 
 
-def master_event_handler(current_state, target, gs):
+def master_event_handler(current_state, target, mm_s, gs):
     if current_state == top_state.MainPhase.MAIN_MENU:
         main_menu_event_handler(target, gs)
-    elif current_state == top_state.MainPhase.IN_MATCH:
-        in_match_event_handler(target, gs)
+        if mm_s.state == main_menu_state.State.TURN_OFF:
+            current_state = top_state.MainPhase.MAIN_MENU
 
-def main_menu_event_handler(target, gs):
-    pass # fill in later
+    elif current_state == top_state.MainPhase.IN_MATCH:
+        in_match_event_handler(target, mm_s)
+
+def main_menu_event_handler(target, mm_s):
+    mm_s.event_hander(target)
 
 def in_match_event_handler(target, gs):
     if mouse_in_menu(target, gs.menu):
         menu_event_handler(target, gs)
- 
+
     else:
         map_event_handler(target, gs)
 
@@ -751,7 +754,7 @@ def animate_coins(screen, gs):
 
     coin_anim.increment_timer()
 
-    if coin_anim.timer >= coin_anim.duration:        
+    if coin_anim.timer >= coin_anim.duration: 
         gs.coin_anim = None
         gs.add_money()
         gs.coin_index += 1

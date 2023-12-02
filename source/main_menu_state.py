@@ -2,13 +2,14 @@ import random
 import pygame as p
 import font_util
 import menu_menu
+from enum import Enum
 
 class MainMenuState():
     mm_grid_height = 14 # one higher than the screen since we need a bit extra
     mm_grid_width = 9
     mm_grid_layers = 2
 
-    unsized_terrain_tiles = [p.image.load("Sprites/grass_tile.png"),
+    unsized_terrain_tiles = [p.image.load("Sprites/g rass_tile.png"),
         p.image.load("Sprites/wheat_tile.png")]
 
     unsized_unit_tiles = [
@@ -18,8 +19,12 @@ class MainMenuState():
 
     unsized_title = p.image.load("Sprites/title.png")
 
+    start_text = "Start Game"
+    quit_text = "Quit"
+
     def __init__(self, sq_size):
         self.sq_size = sq_size
+        self.state = State.ACTIVE_MENU
 
         self.bg_terrain_grid = [[[[0] for _ in range(MainMenuState.mm_grid_width)]
                            for _ in range(MainMenuState.mm_grid_height)]
@@ -27,8 +32,7 @@ class MainMenuState():
         self.bg_unit_grid = [[[[0] for _ in range(MainMenuState.mm_grid_width)]
                          for _ in range(MainMenuState.mm_grid_height)]
                          for _ in range(MainMenuState.mm_grid_layers)]
-
-
+                         
         self.bg_terrain_tiles = []
         for tile in MainMenuState.unsized_terrain_tiles:
             self.bg_terrain_tiles.append(p.transform.scale(tile, (self.sq_size, self.sq_size)))
@@ -57,8 +61,8 @@ class MainMenuState():
 
     def setup_top_menu(self):
         self.top_menu = menu_menu.MenuMenu()        
-        self.add_top_menu_button("Start Game", self.top_menu)
-        self.add_top_menu_button("Quit", self.top_menu)
+        self.add_top_menu_button(menu_menu.start_text, self.top_menu)
+        self.add_top_menu_button(menu_menu.quit_text, self.top_menu)
 
 
     def add_top_menu_button(self, btn_text, menu):
@@ -169,3 +173,20 @@ class MainMenuState():
 
     def swap_active_layer(self):
         self.active_layer = 1 - self.active_layer
+
+    def event_hander(self, mosue_pos):
+        if self.state == State.ACTIVE_MENU:
+            btn = self.top_menu.is_clicked(mouse_pos)
+            if btn.text == menu_menu.start_text:
+                self.start_match()
+            if btn == menu_menu.quit_text:
+                self.quit_client()
+
+    def start_match(self):
+        self.state = State.INPUT_LOCKED
+        
+
+class State(Enum):
+    ACTIVE_MENU = 0
+    INPUT_LOCKED = 1
+    TURN_OFF = 2
