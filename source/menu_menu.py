@@ -53,7 +53,7 @@ class MenuMenu():
 
         current_y = 0
 
-        mouse_in_x = mouse_x < self.border_width or mouse_x > self.width - self.border_width
+        mouse_in_x = mouse_x > self.border_width and mouse_x < self.width - self.border_width
 
         # generate each button surface with the correct menu-wide dimensions
         for button in self.buttons:
@@ -74,30 +74,6 @@ class MenuMenu():
 
     def add_button(self, button):
         self.buttons.append(button)
-
-    def grow_button(self, pos):
-        x = pos[0]
-        y = pos[1]
-
-        h = 0
-
-        if x < self.border_width or x > self.width - self.border_width:
-            return
-
-        if y < self.border_width or y > self.height - self.border_width:
-            return
-
-        for button in self.buttons:
-            if y < h + button.height:
-                mouse_in = True
-                button_surface = button.gen_surface(mouse_in)
-                self.menu_surface.blit(
-                    button_surface,
-                    (
-                        self.border_width,
-                        self.border_width + h
-                    )
-                )
 
 
 class MenuButton(): # this will be responsible for making its own surface

@@ -147,12 +147,14 @@ class MainMenuState():
 
     def draw_submenu(self, screen):
         (x_screen, y_screen) = screen.get_size()
-        mouse_pos = p.mouse.get_pos()
+        (mouse_x, mouse_y) = p.mouse.get_pos()
 
         (w, h) = self.top_menu.find_dims()
 
         x = x_screen / 2 - w / 2
         y = 3 * y_screen / 4 - h / 2
+
+        (mouse_pos) = (mouse_x - x, mouse_y - y)
 
         surface = self.top_menu.gen_surface(mouse_pos)
 
