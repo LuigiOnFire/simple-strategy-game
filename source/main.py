@@ -25,6 +25,10 @@ COINSART = p.image.load("Sprites/coins.png")
 COINSART = p.transform.scale(COINSART, (INFO_HEIGHT, INFO_HEIGHT))
 BORDER_COLOR = p.Color('gray25')
 
+CURRENT_STATE = top_state.MainPhase.MAIN_MENU
+
+
+
 
 def load_images():
     """Loads the image sprites for each unit type"""
@@ -67,7 +71,6 @@ def main():
     load_images()
     running = True
     gs.setup_still_anims()
-    current_state = top_state.MainPhase.MAIN_MENU
     # this_unit = EngineScript.ArmyUnit(kwargs)
     while running:
         for e in p.event.get():
@@ -76,28 +79,29 @@ def main():
 
             elif e.type == p.MOUSEBUTTONDOWN:
                 target = p.mouse.get_pos()
-                running = master_event_handler(current_state, target, mm_s, gs)
+                running = master_event_handler(target, mm_s, gs)
 
-        master_draw(current_state, screen, mm_s, gs)
+        master_draw(screen, mm_s, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
 
 
-def master_event_handler(current_state, target, mm_s, gs):
-    if current_state == top_state.MainPhase.MAIN_MENU:
-        main_menu_event_handler(target, gs)
-        if mm_s.state == main_menu_state.State.TO_GAME:
-            current_state = top_state.MainPhase.MAIN_MENU
-        elif mm_s.state == main_menu_state.State.TURN_OFF:
-            return False        
+def master_event_handler(target, mm_s, gs):
+    if CURRENT_STATE == top_state.MainPhase.MAIN_MENU:
+        main_menu_event_handler(target, mm_s)
 
-    elif current_state == top_state.MainPhase.IN_MATCH:
-        in_match_event_handler(target, mm_s)
+        if mm_s.state == main_menu_state.State.TURN_OFF:
+            return False
+
+    elif CURRENT_STATE == top_state.MainPhase.IN_MATCH:
+        in_match_event_handler(target, gs)
 
     return True
 
+
 def main_menu_event_handler(target, mm_s):
-    mm_s.event_hander(target)
+    mm_s.event_handler(target)
+
 
 def in_match_event_handler(target, gs):
     if mouse_in_menu(target, gs.menu):
@@ -113,7 +117,9 @@ def map_event_handler(mouse_pos, gs):
             engine.Phase.ANIMATING_MOVE,
             engine.Phase.AWAITING_MENU_INSTRUCTION,
             engine.Phase.ANIMATING_INSTRUCTION,
-            engine.Phase.TURN_TRANSITION}:
+            engine.Phase.TURN_TRANSITION,
+            engine.Phase.PLAYER_WON
+        }:
         return
 
     selected_square = get_the_row_and_col(mouse_pos)
@@ -227,24 +233,19 @@ def select_space(selected_square, gs):
         gs.dest_square = selected_square
         gs.prep_end_menu()
 
-def master_draw(current_state, screen, mm_s, gs):
-    if current_state == top_state.MainPhase.MAIN_MENU:
+def master_draw(screen, mm_s, gs):
+    global CURRENT_STATE  # pylint: disable=global-statement
+    if CURRENT_STATE == top_state.MainPhase.MAIN_MENU:
         draw_menu_state(screen, mm_s)
+        if mm_s.state == main_menu_state.State.TO_GAME:
+            CURRENT_STATE = top_state.MainPhase.IN_MATCH
 
-    elif current_state == top_state.MainPhase.IN_MATCH:
+    elif CURRENT_STATE == top_state.MainPhase.IN_MATCH:
         draw_game_state(screen, gs)
 
+
 def draw_menu_state(screen, mm_s):
-    mm_s.draw_all(screen)
-
-    # display background
-    mm_s.draw_bg(screen)
-
-    # display title
-    mm_s.draw_title(screen)
-
-    # display menu text/content
-    mm_s.draw_submenu(screen)
+    mm_s.draw_all(screen)   
 
 
 def draw_game_state(screen, gs):
@@ -289,6 +290,11 @@ def draw_game_state(screen, gs):
         display_map(screen)
         display_units(screen, gs)
         display_buy_menu(screen, gs)
+
+    elif gs.phase == engine.Phase.PLAYER_WON:
+        display_map(screen)
+        display_units(screen, gs)
+        animate_win_banner(screen, gs)
 
     # always do this
     display_info_bar(screen, gs)
@@ -624,6 +630,7 @@ def animate_taking_damage(this_unit, screen, gs):
         if this_unit.hit_points <= 0:
             if isinstance(this_unit, engine.Door):
                 this_unit.anim = anim.DoorExplodingAnim()
+                gs.transition_to_player_winning()
             else:
                 this_unit.anim = anim.DeathAnim()
 
@@ -735,6 +742,38 @@ def animate_turn_banner(screen, gs):
 
     if time >= dura:
         gs.transition_from_turn_transition_to_counting_gold()
+
+
+def animate_win_banner(screen, gs):
+    banner_anim = gs.banner_anim
+    alpha_offset = banner_anim.get_alpha_offset()
+
+    team = gs.get_active_team()
+    text = engine.Team.to_string(team)
+    text += " Wins!"
+
+    font = p.font.Font('Fonts/PressStart2P-Regular.ttf', 32)
+
+    font_color = engine.Team.to_color(team)
+
+    # font_color = font_color + (alpha_offset,)
+
+    text_bg_color = None
+    text = font.render(text, True, font_color, text_bg_color)
+
+    text_width = text.get_width()
+    text_height = text.get_height()
+
+    x = (MAP_WIDTH - text_width) / 2
+    y = (MAP_HEIGHT - text_height) / 2
+
+    text_width = text.get_width()
+    text_height = text.get_height()
+
+    screen.blit(text, (x, y))
+
+
+
 
 def animate_coins(screen, gs):
     if gs.coin_anim is None:

@@ -1,6 +1,6 @@
 import random
 import pygame as p
-import font_util
+
 import menu_menu
 from enum import Enum
 
@@ -9,7 +9,7 @@ class MainMenuState():
     mm_grid_width = 9
     mm_grid_layers = 2
 
-    unsized_terrain_tiles = [p.image.load("Sprites/g rass_tile.png"),
+    unsized_terrain_tiles = [p.image.load("Sprites/grass_tile.png"),
         p.image.load("Sprites/wheat_tile.png")]
 
     unsized_unit_tiles = [
@@ -59,7 +59,7 @@ class MainMenuState():
 
         self.setup_top_menu()
 
-        self.fade = None        
+        self.fade = 0
 
     def setup_top_menu(self):
         self.top_menu = menu_menu.MenuMenu()        
@@ -141,10 +141,22 @@ class MainMenuState():
         # display menu text/content
         self.draw_submenu(screen)
 
-        if self.fade is not None
-            shade_color = (self.fade, self.fade, self.fade)
+        if self.state == State.AWAITING_GAME:
+            if self.fade > 255:
+                self.state = State.TO_GAME
 
-            screen.fill()
+            else:
+                screen_x = screen.get_width()
+                screen_y = screen.get_height()
+
+                dark_surface = p.Surface((screen_x, screen_y), p.SRCALPHA)
+
+                fade_step = 8
+                shade_color = (0, 0, 0, self.fade)
+
+                dark_surface.fill(shade_color)
+                screen.blit(dark_surface, (0, 0))
+                self.fade += fade_step
 
 
     def draw_bg(self, screen):
@@ -169,14 +181,15 @@ class MainMenuState():
 
     def draw_submenu(self, screen):
         (x_screen, y_screen) = screen.get_size()
-        (mouse_x, mouse_y) = p.mouse.get_pos()
+        (mouse_pos) = p.mouse.get_pos()
 
         (w, h) = self.top_menu.find_dims()
 
         x = x_screen / 2 - w / 2
         y = 3 * y_screen / 4 - h / 2
 
-        (mouse_pos) = (mouse_x - x, mouse_y - y)
+        self.top_menu.x = x # should be a function
+        self.top_menu.y = y
 
         surface = self.top_menu.gen_surface(mouse_pos)
 
@@ -192,16 +205,20 @@ class MainMenuState():
     def swap_active_layer(self):
         self.active_layer = 1 - self.active_layer
 
-    def event_hander(self, mouse_pos):
+
+    def event_handler(self, mouse_pos):
         if self.state == State.ACTIVE_MENU:
             btn = self.top_menu.is_clicked(mouse_pos)
-            if btn.text == MainMenuState.start_text:
-                self.start_match()
-            if btn == MainMenuState.quit_text:
-                self.quit_client()
+            if btn:
+                if btn.text == MainMenuState.start_text:
+                    self.start_match()
+                if btn.text == MainMenuState.quit_text:
+                    self.quit_client()
+
 
     def start_match(self):
-        self.state = State.INPUT_LOCKED
+        self.state = State.AWAITING_GAME
+
 
     def quit_client(self):
         self.state = State.TURN_OFF
@@ -209,6 +226,6 @@ class MainMenuState():
 
 class State(Enum):
     ACTIVE_MENU = 0
-    INPUT_LOCKED = 1
+    AWAITING_GAME = 1
     TO_GAME = 2
-    TURN_OFF = 2
+    TURN_OFF = 3

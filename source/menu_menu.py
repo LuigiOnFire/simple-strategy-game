@@ -11,6 +11,8 @@ class MenuMenu():
         self.border_color = p.Color(255, 255, 255, 0)
         self.bg_color = p.Color(255, 255, 255, 0)
         self.menu_surface = None
+        self.x = 0
+        self.y = 0
 
 
     def find_dims(self):
@@ -32,6 +34,7 @@ class MenuMenu():
 
     def gen_surface(self, mouse_pos):
         (mouse_x, mouse_y) = mouse_pos
+        (mouse_x, mouse_y) = (mouse_x - self.x, mouse_y - self.y)
         inner_width = self.width - self.border_width
         inner_height = self.height -self.border_width
 
@@ -78,6 +81,8 @@ class MenuMenu():
 
     def is_clicked(self, mouse_pos):
         (mouse_x, mouse_y) = mouse_pos
+        (mouse_x, mouse_y) = (mouse_x - self.x, mouse_y - self.y)
+
         mouse_in_x = mouse_x > self.border_width and mouse_x < self.width - self.border_width
 
         current_y = self.border_width
@@ -87,6 +92,10 @@ class MenuMenu():
             mouse_in = mouse_in_y and mouse_in_x
             if mouse_in:
                 return button
+            current_y += button.height
+    
+        return None
+
 
 
 class MenuButton(): # this will be responsible for making its own surface

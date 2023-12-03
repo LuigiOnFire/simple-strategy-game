@@ -1,5 +1,3 @@
-import pygame as p
-
 def render_w_outline(screen, text, font, font_color, outline_color, pos, thickness):
     text_r = font.render(text, False, font_color, None)
     outline_text_r = font.render(text, False, outline_color, None)

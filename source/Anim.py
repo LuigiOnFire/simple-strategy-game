@@ -198,6 +198,18 @@ class TurnBannerAnim:
 
         p.image.load("Sprites/field.png")
 
+class WinBannerAnim:
+    def __init__(self, team):
+        self.timer = 0
+        self.duration = 60
+        self.team = team
+
+    def get_alpha_offset(self):
+        scale = self.timer / self.duration
+
+        return scale * 255
+
+
 class CoinAnim:
     coin_sprite_0 = p.image.load("Sprites/coin_0.png")
     coin_sprite_1 = p.image.load("Sprites/coin_1.png")

@@ -279,6 +279,11 @@ class GameState():
         self.phase = Phase.AWAITING_UNIT_SELECTION
         self.coin_index = 0
 
+    def transition_to_player_winning(self):
+        self.phase = Phase.PLAYER_WON
+        team = self.get_active_team()
+        self.banner_anim = anim.WinBannerAnim(team)
+
 
     def prep_end_menu(self): # Move to engine TODO
         self.phase = Phase.AWAITING_MENU_INSTRUCTION
@@ -383,3 +388,4 @@ class Phase(Enum):
     TURN_TRANSITION = 6
     COUNTING_GOLD = 7
     AWAITNIG_UNIT_PURCHASE = 8
+    PLAYER_WON = 9
