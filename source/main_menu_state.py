@@ -59,10 +59,12 @@ class MainMenuState():
 
         self.setup_top_menu()
 
+        self.fade = None        
+
     def setup_top_menu(self):
         self.top_menu = menu_menu.MenuMenu()        
-        self.add_top_menu_button(menu_menu.start_text, self.top_menu)
-        self.add_top_menu_button(menu_menu.quit_text, self.top_menu)
+        self.add_top_menu_button(MainMenuState.start_text, self.top_menu)
+        self.add_top_menu_button(MainMenuState.quit_text, self.top_menu)
 
 
     def add_top_menu_button(self, btn_text, menu):
@@ -129,6 +131,22 @@ class MainMenuState():
         return bg_surface
 
 
+    def draw_all(self, screen):
+         # display background
+        self.draw_bg(screen)
+
+        # display title
+        self.draw_title(screen)
+
+        # display menu text/content
+        self.draw_submenu(screen)
+
+        if self.fade is not None
+            shade_color = (self.fade, self.fade, self.fade)
+
+            screen.fill()
+
+
     def draw_bg(self, screen):
         surface_width = self.surfaces[0].get_width()
         screen.blit(self.surfaces[0], (self.x_offset_current, 0))
@@ -174,19 +192,23 @@ class MainMenuState():
     def swap_active_layer(self):
         self.active_layer = 1 - self.active_layer
 
-    def event_hander(self, mosue_pos):
+    def event_hander(self, mouse_pos):
         if self.state == State.ACTIVE_MENU:
             btn = self.top_menu.is_clicked(mouse_pos)
-            if btn.text == menu_menu.start_text:
+            if btn.text == MainMenuState.start_text:
                 self.start_match()
-            if btn == menu_menu.quit_text:
+            if btn == MainMenuState.quit_text:
                 self.quit_client()
 
     def start_match(self):
         self.state = State.INPUT_LOCKED
-        
+
+    def quit_client(self):
+        self.state = State.TURN_OFF
+
 
 class State(Enum):
     ACTIVE_MENU = 0
     INPUT_LOCKED = 1
+    TO_GAME = 2
     TURN_OFF = 2

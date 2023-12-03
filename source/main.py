@@ -76,7 +76,7 @@ def main():
 
             elif e.type == p.MOUSEBUTTONDOWN:
                 target = p.mouse.get_pos()
-                master_event_handler(current_state, target, mm_s, gs)
+                running = master_event_handler(current_state, target, mm_s, gs)
 
         master_draw(current_state, screen, mm_s, gs)
         clock.tick(MAX_FPS)
@@ -86,11 +86,15 @@ def main():
 def master_event_handler(current_state, target, mm_s, gs):
     if current_state == top_state.MainPhase.MAIN_MENU:
         main_menu_event_handler(target, gs)
-        if mm_s.state == main_menu_state.State.TURN_OFF:
+        if mm_s.state == main_menu_state.State.TO_GAME:
             current_state = top_state.MainPhase.MAIN_MENU
+        elif mm_s.state == main_menu_state.State.TURN_OFF:
+            return False        
 
     elif current_state == top_state.MainPhase.IN_MATCH:
         in_match_event_handler(target, mm_s)
+
+    return True
 
 def main_menu_event_handler(target, mm_s):
     mm_s.event_hander(target)
@@ -231,6 +235,8 @@ def master_draw(current_state, screen, mm_s, gs):
         draw_game_state(screen, gs)
 
 def draw_menu_state(screen, mm_s):
+    mm_s.draw_all(screen)
+
     # display background
     mm_s.draw_bg(screen)
 

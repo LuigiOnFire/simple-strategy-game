@@ -51,7 +51,7 @@ class MenuMenu():
 
         menu_surface.blit(inner_surface, (self.border_width, self.border_width))
 
-        current_y = 0
+        current_y = self.border_width
 
         mouse_in_x = mouse_x > self.border_width and mouse_x < self.width - self.border_width
 
@@ -74,6 +74,19 @@ class MenuMenu():
 
     def add_button(self, button):
         self.buttons.append(button)
+
+
+    def is_clicked(self, mouse_pos):
+        (mouse_x, mouse_y) = mouse_pos
+        mouse_in_x = mouse_x > self.border_width and mouse_x < self.width - self.border_width
+
+        current_y = self.border_width
+
+        for button in self.buttons:
+            mouse_in_y = current_y < mouse_y and mouse_y < current_y + button.height
+            mouse_in = mouse_in_y and mouse_in_x
+            if mouse_in:
+                return button
 
 
 class MenuButton(): # this will be responsible for making its own surface
