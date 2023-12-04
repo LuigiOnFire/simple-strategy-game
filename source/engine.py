@@ -4,16 +4,7 @@ import game_menu
 from team import Team
 
 class GameState():
-    def __init__(self):
-        # 000 - empty
-        # f* - foot soldier
-        # h* - horse soldier
-        # a* - armored soldier
-        # k* - armored horse soldier (knight)
-        # *s - sword
-        # *l - spear/lance
-        # *b - bow
-        self.map = [
+    starting_map =  [
             [-2, -2, -2, 0, 1, -2, -2, -2],
             [-1, -1, -1, -1, 4, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
@@ -27,8 +18,19 @@ class GameState():
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, 5, -1, -1, -1, -1],
             [-2, -2, -2,  2,  3, -2, -2, -2],
+    ]
 
-        ]
+
+    def __init__(self):
+        # 000 - empty
+        # f* - foot soldier
+        # h* - horse soldier
+        # a* - armored soldier
+        # k* - armored horse soldier (knight)
+        # *s - sword
+        # *l - spear/lance
+        # *b - bow
+        self.map = GameState.starting_map
         self.production_tiles = {
                                Team.BLUE: [(0, 1), (1, 1), (2, 1) ,(3, 1), (4, 1), (5, 1), (6, 1), (7, 1)],
                                Team.RED: [(0, 11), (1, 11), (2, 11) ,(3, 11), (4, 11), (5, 11), (6, 11), (7, 11)]
@@ -42,8 +44,11 @@ class GameState():
         self.coin_index = 0
         self.blue_to_move = True
         self.moveLog = []
-        self.unit_list = [Door(Team.BLUE, "left"), Door(Team.BLUE, "right"), Door(Team.RED, "left"), Door(Team.RED, "right"),
+        self.starting_unit_list = [Door(Team.BLUE, "left"), Door(Team.BLUE, "right"), Door(Team.RED, "left"), Door(Team.RED, "right"),
                           FootSoldier(Team.RED), FootSoldier(Team.BLUE)]
+        
+        self.unit_list = self.starting_unit_list.copy()
+
         self.player_gold = [2, 2] # later maybe make the teams proper classes instead of enums and put this there?
         self.phase = Phase.TURN_TRANSITION
         self.selected_unit = None
@@ -284,6 +289,9 @@ class GameState():
         team = self.get_active_team()
         self.banner_anim = anim.WinBannerAnim(team)
 
+    def transition_to_ready_for_main_menu(self):
+        self.phase = Phase.READY_FOR_MAIN_MENU
+
 
     def prep_end_menu(self): # Move to engine TODO
         self.phase = Phase.AWAITING_MENU_INSTRUCTION
@@ -389,3 +397,4 @@ class Phase(Enum):
     COUNTING_GOLD = 7
     AWAITNIG_UNIT_PURCHASE = 8
     PLAYER_WON = 9
+    READY_FOR_MAIN_MENU = 10

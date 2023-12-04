@@ -185,7 +185,6 @@ class DoorExplodingAnim:
 
                     self.shards[y][x].angle += rotatoin_direction_sign * DoorExplodingAnim.rotation_rate
 
-
     def advance_phase(self):
         self.phase = 1
 
@@ -201,13 +200,26 @@ class TurnBannerAnim:
 class WinBannerAnim:
     def __init__(self, team):
         self.timer = 0
-        self.duration = 60
+        self.appear_time = 90
+        self.fade_in_time = 30
+        self.duration = self.appear_time + self.fade_in_time
         self.team = team
 
     def get_alpha_offset(self):
-        scale = self.timer / self.duration
+        if self.timer < self.appear_time:
+            return 0
 
+        if self.timer > self.duration:
+            return 255        
+
+        scale = (self.timer - self.appear_time) / self.fade_in_time
         return scale * 255
+
+    def increment_timer(self):
+        self.timer += 1
+
+    def anim_done(self):
+        return self.timer >= self.duration
 
 
 class CoinAnim:

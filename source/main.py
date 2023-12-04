@@ -6,6 +6,7 @@ import anim
 import engine
 import top_state
 import main_menu_state
+import font_util
 
 SCALE = 4
 MAP_X = 8
@@ -95,6 +96,7 @@ def master_event_handler(target, mm_s, gs):
 
     elif CURRENT_STATE == top_state.MainPhase.IN_MATCH:
         in_match_event_handler(target, gs)
+        print(CURRENT_STATE)
 
     return True
 
@@ -141,6 +143,10 @@ def map_event_handler(mouse_pos, gs):
 
         else:
             gs.transition_from_selecting_target_to_awaiting_menu_instruction()
+
+    elif phase == engine.Phase.READY_FOR_MAIN_MENU:
+        global CURRENT_STATE
+        CURRENT_STATE = top_state.MainPhase.MAIN_MENU
 
 
 def menu_event_handler(mouse_pos, gs):
@@ -239,6 +245,7 @@ def master_draw(screen, mm_s, gs):
         draw_menu_state(screen, mm_s)
         if mm_s.state == main_menu_state.State.TO_GAME:
             CURRENT_STATE = top_state.MainPhase.IN_MATCH
+            mm_s.reset_menu()
 
     elif CURRENT_STATE == top_state.MainPhase.IN_MATCH:
         draw_game_state(screen, gs)
@@ -292,6 +299,11 @@ def draw_game_state(screen, gs):
         display_buy_menu(screen, gs)
 
     elif gs.phase == engine.Phase.PLAYER_WON:
+        display_map(screen)
+        display_units(screen, gs)
+        animate_win_banner(screen, gs)
+
+    elif gs.phase == engine.Phase.READY_FOR_MAIN_MENU:
         display_map(screen)
         display_units(screen, gs)
         animate_win_banner(screen, gs)
@@ -755,24 +767,26 @@ def animate_win_banner(screen, gs):
     font = p.font.Font('Fonts/PressStart2P-Regular.ttf', 32)
 
     font_color = engine.Team.to_color(team)
+    outline_color = p.Color("black")
 
-    # font_color = font_color + (alpha_offset,)
+    thickness = 3
 
-    text_bg_color = None
-    text = font.render(text, True, font_color, text_bg_color)
+    # text = font.render(text, True, font_color, text_bg_color)
+    text_surface = font_util.surface_render_w_outline(text, font, font_color,
+                                                      outline_color, thickness, alpha_offset)
 
-    text_width = text.get_width()
-    text_height = text.get_height()
+    text_width = text_surface.get_width()
+    text_height = text_surface.get_height()
 
     x = (MAP_WIDTH - text_width) / 2
     y = (MAP_HEIGHT - text_height) / 2
 
-    text_width = text.get_width()
-    text_height = text.get_height()
+    screen.blit(text_surface, (x, y))
 
-    screen.blit(text, (x, y))
+    banner_anim.increment_timer()
 
-
+    if gs.phase == engine.Phase.PLAYER_WON and banner_anim.anim_done():
+        gs.transition_to_ready_for_main_menu()
 
 
 def animate_coins(screen, gs):

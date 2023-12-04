@@ -223,6 +223,9 @@ class MainMenuState():
     def quit_client(self):
         self.state = State.TURN_OFF
 
+    def reset_menu(self):
+        self.state = State.ACTIVE_MENU
+
 
 class State(Enum):
     ACTIVE_MENU = 0
