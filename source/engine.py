@@ -2,6 +2,7 @@ from enum import Enum
 import anim
 import game_menu
 from team import Team
+import copy
 
 class GameState():
     starting_map =  [
@@ -15,7 +16,7 @@ class GameState():
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1],
+            [-1, -1, -1, 6, -1, -1, -1, -1],
             [-1, -1, -1, 5, -1, -1, -1, -1],
             [-2, -2, -2,  2,  3, -2, -2, -2],
     ]
@@ -30,11 +31,12 @@ class GameState():
         # *s - sword
         # *l - spear/lance
         # *b - bow
-        self.map = GameState.starting_map
+        self.map = copy.deepcopy(GameState.starting_map)
         self.production_tiles = {
                                Team.BLUE: [(0, 1), (1, 1), (2, 1) ,(3, 1), (4, 1), (5, 1), (6, 1), (7, 1)],
                                Team.RED: [(0, 11), (1, 11), (2, 11) ,(3, 11), (4, 11), (5, 11), (6, 11), (7, 11)]
                                   }
+
         self.coin_squares = [(1, 3), (6, 3),
                              (1, 5), (6, 5),
                              (1, 6), (3, 6), (4, 6), (6, 6),
@@ -45,11 +47,12 @@ class GameState():
         self.blue_to_move = True
         self.moveLog = []
         self.starting_unit_list = [Door(Team.BLUE, "left"), Door(Team.BLUE, "right"), Door(Team.RED, "left"), Door(Team.RED, "right"),
-                          FootSoldier(Team.RED), FootSoldier(Team.BLUE)]
-        
-        self.unit_list = self.starting_unit_list.copy()
+                                   FootSoldier(Team.RED), FootSoldier(Team.BLUE),  FootSoldier(Team.RED)]
 
-        self.player_gold = [2, 2] # later maybe make the teams proper classes instead of enums and put this there?
+        self.unit_list = copy.deepcopy(self.starting_unit_list)
+
+        self.starting_player_gold = [2, 2] # later maybe make the teams proper classes instead of enums and put this there?
+        self.player_gold = self.starting_player_gold.copy()
         self.phase = Phase.TURN_TRANSITION
         self.selected_unit = None
         self.selected_unit_index = None
@@ -312,6 +315,14 @@ class GameState():
 
     def get_active_team(self):
         return Team.BLUE if self.blue_to_move else Team.RED
+
+
+    def reset_game(self):
+        self.map = copy.deepcopy(GameState.starting_map)
+        self.unit_list = copy.deepcopy(self.starting_unit_list)
+        self.player_gold = self.starting_player_gold.copy()
+        self.blue_to_move = True
+        self.phase = Phase.TURN_TRANSITION
 
 
 class Move():

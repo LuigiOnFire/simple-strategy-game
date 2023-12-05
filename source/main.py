@@ -96,7 +96,6 @@ def master_event_handler(target, mm_s, gs):
 
     elif CURRENT_STATE == top_state.MainPhase.IN_MATCH:
         in_match_event_handler(target, gs)
-        print(CURRENT_STATE)
 
     return True
 
@@ -244,6 +243,7 @@ def master_draw(screen, mm_s, gs):
     if CURRENT_STATE == top_state.MainPhase.MAIN_MENU:
         draw_menu_state(screen, mm_s)
         if mm_s.state == main_menu_state.State.TO_GAME:
+            gs.reset_game()
             CURRENT_STATE = top_state.MainPhase.IN_MATCH
             mm_s.reset_menu()
 
