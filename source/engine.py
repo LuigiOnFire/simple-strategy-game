@@ -349,6 +349,7 @@ class Move():
 class ArmyUnit:
     def __init__(self, **kwargs):
         self.attack_range = kwargs["attack_range"]
+        self.attack_power = kwargs["attack_power"]
         self.move_range = kwargs["move_range"]
         self.hit_points = kwargs["hit_points"]
         self._max_hit_points = kwargs["max_hit_points"]
@@ -365,12 +366,13 @@ class ArmyUnit:
         return self._team
 
 class FootSoldier(ArmyUnit):
-    cost = 1
+    cost = 2
 
     def __init__(self, team):
         kwargs = {
             "attack_range": 1,
-            "move_range": 1,
+            "attack_power": 2,
+            "move_range": 2,
             "hit_points": 1,
             "max_hit_points": 1,
             "unit_name": "footsoldier",
@@ -378,6 +380,41 @@ class FootSoldier(ArmyUnit):
         }
         super().__init__(**kwargs)
         self._team = team
+
+
+class Lancer(ArmyUnit):
+    cost = 4
+
+    def __init__(self, team):
+        kwargs = {
+            "attack_range": 2,
+            "attack_power": 2,
+            "move_range": 2,
+            "hit_points": 1,
+            "max_hit_points": 1,
+            "unit_name": "lancer",
+            "anim": anim.StillAnim(None),
+        }
+        super().__init__(**kwargs)
+        self._team = team
+
+
+class Lancer(ArmyUnit):
+    cost = 4
+
+    def __init__(self, team):
+        kwargs = {
+            "attack_range": 1,
+            "attack_power": 2,
+            "move_range": 2,
+            "hit_points": 1,
+            "max_hit_points": 1,
+            "unit_name": "lancer",
+            "anim": anim.StillAnim(None),
+        }
+        super().__init__(**kwargs)
+        self._team = team
+
 
 class Door(ArmyUnit):
     def __init__(self, team, side):

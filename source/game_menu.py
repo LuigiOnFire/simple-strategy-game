@@ -42,8 +42,35 @@ class CancelButton(Button):
 class BuyFootSoldierButton(Button):
     def __init__(self):
         self.icon = p.image.load("Sprites/ButtonIcons/AttackButtonIcon.png")
-        self.text = "Foot Soldier 1"
+        self.text = "Foot Soldier 2"
         self.priority = 3
+
+
+class BuyLancerButton(Button):
+    def __init__(self):
+        self.icon = p.image.load("Sprites/ButtonIcons/AttackButtonIcon.png")
+        self.text = "Lancer 6"
+        self.priority = 4
+
+
+class BuyArmoredSoldierButton(Button):
+    def __init__(self):
+        self.icon = p.image.load("Sprites/ButtonIcons/AttackButtonIcon.png")
+        self.text = "Armored Soldier 6"
+        self.priority = 5
+
+class BuyArcherButton(Button):
+    def __init__(self):
+        self.icon = p.image.load("Sprites/ButtonIcons/AttackButtonIcon.png")
+        self.text = "Armored Soldier 7"
+        self.priority = 6
+
+
+class BuyKnightButton(Button):
+    def __init__(self):
+        self.icon = p.image.load("Sprites/ButtonIcons/AttackButtonIcon.png")
+        self.text = "Knight 7"
+        self.priority = 7
 
 class EndTurnButton(Button):
     def __init__(self):
