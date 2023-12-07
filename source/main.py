@@ -7,6 +7,7 @@ import engine
 import top_state
 import main_menu_state
 import font_util
+import units
 
 SCALE = 4
 MAP_X = 8
@@ -29,12 +30,10 @@ BORDER_COLOR = p.Color('gray25')
 CURRENT_STATE = top_state.MainPhase.MAIN_MENU
 
 
-
-
 def load_images():
     """Loads the image sprites for each unit type"""
     teams = ["b", "r"]
-    unit_types = ["footsoldier"]
+    unit_types = ["footsoldier", "lancer", "armored", "archer", "knight"]
     load_door_images()
     for team in teams:
         for unit_type in unit_types:
@@ -42,7 +41,8 @@ def load_images():
                 "Sprites/" + team + "_" + unit_type + ".png")
             IMAGES[team, unit_type] = p.transform.scale(
                 IMAGES[team, unit_type], (SQ_SIZE, SQ_SIZE))
-        INACTIVE_IMAGES[team, unit_type] = convert_sprite_to_greyscale(IMAGES[team, unit_type])
+            INACTIVE_IMAGES[team, unit_type] = convert_sprite_to_greyscale(IMAGES[team, unit_type])
+
 
 def load_door_images():    
     IMAGES["r", "door_left"] = p.image.load(  # the doors are special case
@@ -177,12 +177,19 @@ def menu_event_handler(mouse_pos, gs):
                 gs.transition_to_selecting_target()
 
             elif isinstance(button, engine.game_menu.BuyFootSoldierButton):
-                active_team = gs.get_active_team()
-                index = active_team.value
-                if gs.player_gold[index] >= engine.FootSoldier.cost:
-                    gs.spawn_foot_soldier()
-                    gs.transition_to_awaiting_unit_selection()
-                    gs.reset_menu()
+                gs.buy_unit("footsoldier")
+
+            elif isinstance(button, engine.game_menu.BuyLancerButton):
+                gs.buy_unit("lancer")
+
+            elif isinstance(button, engine.game_menu.BuyArmoredSoldierButton):
+                gs.buy_unit("armored")
+
+            elif isinstance(button, engine.game_menu.BuyArcherButton):
+                gs.buy_unit("archer")
+
+            elif isinstance(button, engine.game_menu.BuyKnightButton):
+                gs.buy_unit("knight")
 
             # regardless of what button was pushed it's good to check
             check_end_turn(gs)
@@ -640,7 +647,7 @@ def animate_taking_damage(this_unit, screen, gs):
     if this_unit.anim.timer >= this_unit.anim.duration:
         this_unit.hit_points -= 1
         if this_unit.hit_points <= 0:
-            if isinstance(this_unit, engine.Door):
+            if isinstance(this_unit, units.Door):
                 this_unit.anim = anim.DoorExplodingAnim()
                 gs.transition_to_player_winning()
             else:

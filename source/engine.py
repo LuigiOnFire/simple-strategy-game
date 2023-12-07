@@ -3,6 +3,7 @@ import anim
 import game_menu
 from team import Team
 import copy
+import units
 
 class GameState():
     starting_map =  [
@@ -46,8 +47,8 @@ class GameState():
         self.coin_index = 0
         self.blue_to_move = True
         self.moveLog = []
-        self.starting_unit_list = [Door(Team.BLUE, "left"), Door(Team.BLUE, "right"), Door(Team.RED, "left"), Door(Team.RED, "right"),
-                                   FootSoldier(Team.RED), FootSoldier(Team.BLUE),  FootSoldier(Team.RED)]
+        self.starting_unit_list = [units.Door(Team.BLUE, "left"), units.Door(Team.BLUE, "right"), units.Door(Team.RED, "left"), units.Door(Team.RED, "right"),
+                                   units.FootSoldier(Team.RED), units.FootSoldier(Team.BLUE),  units.FootSoldier(Team.RED)]
 
         self.unit_list = copy.deepcopy(self.starting_unit_list)
 
@@ -161,9 +162,9 @@ class GameState():
         val = team.value
         self.player_gold[val] += 1
 
-    def spawn_foot_soldier(self):
+    def spawn_unit(self):
         team = self.get_active_team()
-        new_footsoldier = FootSoldier(team)
+        new_footsoldier = units.FootSoldier(team)
         new_footsoldier.is_active = False
         self.unit_list.append(new_footsoldier)
         selected_x = self.selected_square[0]
@@ -176,6 +177,25 @@ class GameState():
         index = team.value
         self.player_gold[index] -= 1
 
+    def buy_unit(self, unit_type):
+        active_team = self.get_active_team()
+        index = active_team.value
+        if self.player_gold[index] >= units.FootSoldier.cost:
+            team = self.get_active_team()
+            new_footsoldier = units.FootSoldier(team)
+            new_footsoldier.is_active = False
+            self.unit_list.append(new_footsoldier)
+            selected_x = self.selected_square[0]
+            selected_y = self.selected_square[1]
+
+            # the index of the guy we just put in
+            self.map[selected_y][selected_x] = len(self.unit_list) - 1
+    
+            # subract the gold
+            index = team.value
+            self.player_gold[index] -= 1
+            self.transition_to_awaiting_unit_selection()
+            self.reset_menu()
 
     def square_is_occupied(self, square):
         # needs IF list is in range (where is this coming from?)
@@ -225,6 +245,11 @@ class GameState():
     def prep_buy_menu(self):
         self.reset_menu()
         self.menu.buttons.append(game_menu.BuyFootSoldierButton())
+        self.menu.buttons.append(game_menu.BuyLancerButton())
+        self.menu.buttons.append(game_menu.BuyArmoredSoldierButton())
+        self.menu.buttons.append(game_menu.BuyArcherButton())
+        self.menu.buttons.append(game_menu.BuyKnightButton())
+
         self.menu.buttons.append(game_menu.CancelButton())
 
 
@@ -346,93 +371,6 @@ class Move():
         return False
 
 
-class ArmyUnit:
-    def __init__(self, **kwargs):
-        self.attack_range = kwargs["attack_range"]
-        self.attack_power = kwargs["attack_power"]
-        self.move_range = kwargs["move_range"]
-        self.hit_points = kwargs["hit_points"]
-        self._max_hit_points = kwargs["max_hit_points"]
-        self.cost = kwargs["max_hit_points"]
-        self._team = "b"
-        self._unit_name = kwargs["unit_name"]
-        self.anim = kwargs["anim"]
-        self.is_active = True
-
-    def unit_name(self):
-        return self._unit_name
-
-    def team(self):
-        return self._team
-
-class FootSoldier(ArmyUnit):
-    cost = 2
-
-    def __init__(self, team):
-        kwargs = {
-            "attack_range": 1,
-            "attack_power": 2,
-            "move_range": 2,
-            "hit_points": 1,
-            "max_hit_points": 1,
-            "unit_name": "footsoldier",
-            "anim": anim.StillAnim(None),
-        }
-        super().__init__(**kwargs)
-        self._team = team
-
-
-class Lancer(ArmyUnit):
-    cost = 4
-
-    def __init__(self, team):
-        kwargs = {
-            "attack_range": 2,
-            "attack_power": 2,
-            "move_range": 2,
-            "hit_points": 1,
-            "max_hit_points": 1,
-            "unit_name": "lancer",
-            "anim": anim.StillAnim(None),
-        }
-        super().__init__(**kwargs)
-        self._team = team
-
-
-class Lancer(ArmyUnit):
-    cost = 4
-
-    def __init__(self, team):
-        kwargs = {
-            "attack_range": 1,
-            "attack_power": 2,
-            "move_range": 2,
-            "hit_points": 1,
-            "max_hit_points": 1,
-            "unit_name": "lancer",
-            "anim": anim.StillAnim(None),
-        }
-        super().__init__(**kwargs)
-        self._team = team
-
-
-class Door(ArmyUnit):
-    def __init__(self, team, side):
-        kwargs = {
-            "attack_range": 0,
-            "move_range": 0,
-            "hit_points": 1,
-            "max_hit_points": 1,
-            "unit_name": "door",
-            "anim": anim.StillAnim(None),
-        }
-        super().__init__(**kwargs)
-
-        # this is to be 'left' or 'right'
-        # it should technically be an enum but idc
-        self.side = side
-        self._unit_name = self._unit_name + "_" + side
-        self._team = team
 
 class Phase(Enum):
     AWAITING_UNIT_SELECTION = 0
