@@ -415,7 +415,7 @@ def draw_button(screen, button, mouse_pos, body_color, body_top_left_x, element_
                      button.y + button_padding)
     icon_image = p.transform.scale(icon_image, icon_size)
     screen.blit(icon_image, icon_location)
-    font = p.font.Font('Fonts/PressStart2P-Regular.ttf', 24)
+    font = p.font.Font('Fonts/PixeloidSansBold.ttf', 24)
     font_color = p.Color(255, 255, 127)
     text_bg_color = None
     text = font.render(button.text, True, font_color, text_bg_color)
@@ -477,15 +477,15 @@ def display_info_bar(screen, gs):
     font_color = engine.Team.to_color(active_team)
     text_bg_color = None
 
-    font = p.font.Font('Fonts/PressStart2P-Regular.ttf', 24)
+    font = p.font.Font('Fonts/PixeloidSansBold.ttf', 24)
     text_block = font.render(text, True, font_color, text_bg_color)
-    screen.blit(text_block, (0, HEIGHT - INFO_HEIGHT + 2*SCALE))
+    screen.blit(text_block, (SCALE, HEIGHT - INFO_HEIGHT))
 
     # put the gold count
     player_gold = gs.player_gold[active_team.value]
     gold_string = str(player_gold)
     gold_string_length = len(gold_string)
-    gold_font = p.font.Font('Fonts/PressStart2P-Regular.ttf', 24)
+    gold_font = p.font.Font('Fonts/PixeloidSansBold.ttf', 24)
     gold_color = p.Color(255, 255, 0)
 
     gold_text_block = gold_font.render(gold_string, True, gold_color, text_bg_color)
@@ -650,7 +650,11 @@ def animate_taking_damage(this_unit, screen, gs):
 
     this_anim.increment_timer()
     if this_unit.anim.timer >= this_unit.anim.duration:
-        this_unit.hit_points -= 1
+
+        # find the atttacking units power
+        power = gs.selected_unit.attack_power
+
+        this_unit.hit_points -= power
         if this_unit.hit_points <= 0:
             if isinstance(this_unit, units.Door):
                 this_unit.anim = anim.DoorExplodingAnim()
@@ -737,7 +741,7 @@ def animate_turn_banner(screen, gs):
     text = engine.Team.to_string(team)
     text += " Turn"
 
-    font = p.font.Font('Fonts/PressStart2P-Regular.ttf', 32)
+    font = p.font.Font('Fonts/PixeloidSansBold.ttf', 32)
 
     font_color = engine.Team.to_color(team)
     text_bg_color = None
@@ -776,7 +780,7 @@ def animate_win_banner(screen, gs):
     text = engine.Team.to_string(team)
     text += " Wins!"
 
-    font = p.font.Font('Fonts/PressStart2P-Regular.ttf', 32)
+    font = p.font.Font('Fonts/PixeloidSansBold.ttf', 32)
 
     font_color = engine.Team.to_color(team)
     outline_color = p.Color("black")

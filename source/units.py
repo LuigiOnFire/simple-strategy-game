@@ -20,7 +20,7 @@ class ArmyUnit:
         return self._team
 
 class FootSoldier(ArmyUnit):
-    cost = 2
+    cost = 1
 
     def __init__(self, team):
         kwargs = {
@@ -37,7 +37,7 @@ class FootSoldier(ArmyUnit):
 
 
 class Lancer(ArmyUnit):
-    cost = 4
+    cost = 2
 
     def __init__(self, team):
         kwargs = {
@@ -54,15 +54,15 @@ class Lancer(ArmyUnit):
 
 
 class Armored(ArmyUnit):
-    cost = 4
+    cost = 2
 
     def __init__(self, team):
         kwargs = {
             "attack_range": 1,
             "attack_power": 2,
             "move_range": 2,
-            "hit_points": 1,
-            "max_hit_points": 2,
+            "hit_points": 3,
+            "max_hit_points": 3,
             "unit_name": "armored",
             "anim": anim.StillAnim(None),
         }
@@ -71,7 +71,7 @@ class Armored(ArmyUnit):
 
 
 class Archer(ArmyUnit):
-    cost = 4
+    cost = 2
 
     def __init__(self, team):
         kwargs = {
@@ -88,7 +88,7 @@ class Archer(ArmyUnit):
 
 
 class Knight(ArmyUnit):
-    cost = 4 
+    cost = 2
 
     def __init__(self, team):
         kwargs = {
@@ -109,7 +109,7 @@ class Door(ArmyUnit):
             "attack_range": 0,
             "attack_power": 0,
             "move_range": 0,
-            "hit_points": 1,
+            "hit_points": 4,
             "max_hit_points": 1,
             "unit_name": "door",
             "anim": anim.StillAnim(None),

@@ -8,7 +8,6 @@ import units
 class GameState():
     starting_map =  [
             [-2, -2, -2, 0, 1, -2, -2, -2],
-            [-1, -1, -1, -1, 4, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
@@ -17,8 +16,9 @@ class GameState():
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, 6, -1, -1, -1, -1],
-            [-1, -1, -1, 5, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -1, -1, -1, -1],
             [-2, -2, -2,  2,  3, -2, -2, -2],
     ]
 
@@ -47,12 +47,11 @@ class GameState():
         self.coin_index = 0
         self.blue_to_move = True
         self.moveLog = []
-        self.starting_unit_list = [units.Door(Team.BLUE, "left"), units.Door(Team.BLUE, "right"), units.Door(Team.RED, "left"), units.Door(Team.RED, "right"),
-                                   units.FootSoldier(Team.RED), units.FootSoldier(Team.BLUE),  units.FootSoldier(Team.RED)]
+        self.starting_unit_list = [units.Door(Team.BLUE, "left"), units.Door(Team.BLUE, "right"), units.Door(Team.RED, "left"), units.Door(Team.RED, "right")]
 
         self.unit_list = copy.deepcopy(self.starting_unit_list)
 
-        self.starting_player_gold = [100, 100] # later maybe make the teams proper classes instead of enums and put this there?
+        self.starting_player_gold = [2, 2] # later maybe make the teams proper classes instead of enums and put this there?
         self.player_gold = self.starting_player_gold.copy()
         self.phase = Phase.TURN_TRANSITION
         self.selected_unit = None
