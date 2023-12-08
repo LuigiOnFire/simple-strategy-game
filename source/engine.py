@@ -52,7 +52,7 @@ class GameState():
 
         self.unit_list = copy.deepcopy(self.starting_unit_list)
 
-        self.starting_player_gold = [2, 2] # later maybe make the teams proper classes instead of enums and put this there?
+        self.starting_player_gold = [100, 100] # later maybe make the teams proper classes instead of enums and put this there?
         self.player_gold = self.starting_player_gold.copy()
         self.phase = Phase.TURN_TRANSITION
         self.selected_unit = None
@@ -64,7 +64,7 @@ class GameState():
         self.menu = game_menu.GameMenu()
         # self.buy_menu = game_menu.GameMenu()
         self.valid_moves = []
-        self.found_hostiles = []
+        self.found_hostiles = set()
         self.banner_anim = anim.TurnBannerAnim(Team.BLUE)
         self.coin_anim = None
 
@@ -93,11 +93,11 @@ class GameState():
         row = self.selected_square[1]
         to_seek = []
         visited = set()
-        valid_squares = [(col, row)]
+        valid_squares = {(col, row)}
 
         to_seek.append(((col, row), move_range))
         visited.add((col, row))
-        while to_seek:           
+        while to_seek:
             q = to_seek.pop()
             sq = q[0]
             check_range = q[1]
@@ -113,7 +113,7 @@ class GameState():
                     if not self.square_is_occupied_by_hostile(adj):
                         to_seek.append((adj, check_range - 1))
                     if not self.square_is_occupied(adj):
-                        valid_squares.append(adj)
+                        valid_squares.add(adj)
                     visited.add((adj))
         self.valid_moves = valid_squares
 
@@ -125,7 +125,7 @@ class GameState():
         row = self.dest_square[1]
         to_seek = []
         visited = set()
-        self.found_hostiles = []
+        self.found_hostiles = set()
 
         to_seek.append(((col, row), attack_range))
         visited.add((col, row))
@@ -145,7 +145,7 @@ class GameState():
                 if self.is_on_map(adj) and self not in visited and check_range - 1 >= 0:
                     to_seek.append((adj, check_range - 1))
                     if self.square_is_occupied_by_hostile(adj):
-                        self.found_hostiles.append(adj)
+                        self.found_hostiles.add(adj)
                     visited.add((adj))
 
 
@@ -179,18 +179,18 @@ class GameState():
 
     def buy_unit(self, unit_type):
         active_team = self.get_active_team()
-        index = active_team.value
-        if self.player_gold[index] >= units.FootSoldier.cost:
+        index = active_team.value        
+        if self.player_gold[index] >= unit_type.cost:
             team = self.get_active_team()
-            new_footsoldier = units.FootSoldier(team)
-            new_footsoldier.is_active = False
-            self.unit_list.append(new_footsoldier)
+            new_unit = unit_type(team)
+            new_unit.is_active = False
+            self.unit_list.append(new_unit)
             selected_x = self.selected_square[0]
             selected_y = self.selected_square[1]
 
             # the index of the guy we just put in
             self.map[selected_y][selected_x] = len(self.unit_list) - 1
-    
+
             # subract the gold
             index = team.value
             self.player_gold[index] -= 1
@@ -217,7 +217,7 @@ class GameState():
         unit_index = self.map[square[1]][square[0]]
         active_team = self.get_active_team()
 
-        if unit_index == -1:
+        if unit_index < 0:
             return False
         unit = self.unit_list[unit_index]
         # active_team = Team.BLUE if self.blue_to_move == true else Team.RED

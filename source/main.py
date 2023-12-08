@@ -177,19 +177,19 @@ def menu_event_handler(mouse_pos, gs):
                 gs.transition_to_selecting_target()
 
             elif isinstance(button, engine.game_menu.BuyFootSoldierButton):
-                gs.buy_unit("footsoldier")
+                gs.buy_unit(units.FootSoldier)
 
             elif isinstance(button, engine.game_menu.BuyLancerButton):
-                gs.buy_unit("lancer")
+                gs.buy_unit(units.Lancer)
 
             elif isinstance(button, engine.game_menu.BuyArmoredSoldierButton):
-                gs.buy_unit("armored")
+                gs.buy_unit(units.Armored)
 
             elif isinstance(button, engine.game_menu.BuyArcherButton):
-                gs.buy_unit("archer")
+                gs.buy_unit(units.Archer)
 
             elif isinstance(button, engine.game_menu.BuyKnightButton):
-                gs.buy_unit("knight")
+                gs.buy_unit(units.Knight)
 
             # regardless of what button was pushed it's good to check
             check_end_turn(gs)
@@ -535,15 +535,20 @@ def prep_unit_move(ref_square, gs):
         gs.phase = engine.Phase.AWAITING_MENU_INSTRUCTION
 
     gs.menu = engine.game_menu.GameMenu()
+
     # move to new method
-    adj_squares = [(ref_square[0] + 1, ref_square[1]), (ref_square[0] - 1, ref_square[1]),
-                   (ref_square[0], ref_square[1] + 1), (ref_square[0], ref_square[1] - 1)]
-    for adj_square in adj_squares:
-        if gs.is_on_map(adj_square):
-        # if it's in range AND if it's occupied
-            if gs.square_is_occupied_by_hostile(adj_square):
-                gs.menu.buttons.append(engine.game_menu.AttackButton())
-                break
+    gs.find_in_range_hostiles()
+    if gs.found_hostiles:
+        gs.menu.buttons.append(engine.game_menu.AttackButton())
+
+    # adj_squares = [(ref_square[0] + 1, ref_square[1]), (ref_square[0] - 1, ref_square[1]),
+    #                (ref_square[0], ref_square[1] + 1), (ref_square[0], ref_square[1] - 1)]
+    # for adj_square in adj_squares:
+    #     if gs.is_on_map(adj_square):
+    #     # if it's in range AND if it's occupied
+    #         if gs.square_is_occupied_by_hostile(adj_square):
+    #             gs.menu.buttons.append(engine.game_menu.AttackButton())
+    #             break
 
     gs.menu.buttons.append(engine.game_menu.WaitButton())
     gs.menu.buttons.append(engine.game_menu.CancelButton())
