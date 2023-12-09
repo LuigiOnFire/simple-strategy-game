@@ -8,7 +8,6 @@ import units
 class GameState():
     starting_map =  [
             [-2, -2, -2, 0, 1, -2, -2, -2],
-            [-1, -1, -1, -1, 4, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
@@ -17,8 +16,9 @@ class GameState():
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, 6, -1, -1, -1, -1],
-            [-1, -1, -1, 5, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -1, -1, -1, -1],
             [-2, -2, -2,  2,  3, -2, -2, -2],
     ]
 
@@ -47,8 +47,8 @@ class GameState():
         self.coin_index = 0
         self.blue_to_move = True
         self.moveLog = []
-        self.starting_unit_list = [units.Door(Team.BLUE, "left"), units.Door(Team.BLUE, "right"), units.Door(Team.RED, "left"), units.Door(Team.RED, "right"),
-                                   units.FootSoldier(Team.RED), units.FootSoldier(Team.BLUE),  units.FootSoldier(Team.RED)]
+        self.starting_unit_list = [units.Door(Team.BLUE, "left"), units.Door(Team.BLUE, "right"), units.Door(Team.RED, "left"), units.Door(Team.RED, "right")]
+                                   
 
         self.unit_list = copy.deepcopy(self.starting_unit_list)
 
