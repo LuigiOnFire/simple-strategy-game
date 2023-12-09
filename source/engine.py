@@ -19,6 +19,9 @@ class GameState():
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -1, -1, -1, -1],
             [-2, -2, -2,  2,  3, -2, -2, -2],
     ]
 
@@ -52,7 +55,7 @@ class GameState():
 
         self.unit_list = copy.deepcopy(self.starting_unit_list)
 
-        self.starting_player_gold = [100, 100] # later maybe make the teams proper classes instead of enums and put this there?
+        self.starting_player_gold = [3, 3] # later maybe make the teams proper classes instead of enums and put this there?
         self.player_gold = self.starting_player_gold.copy()
         self.phase = Phase.TURN_TRANSITION
         self.selected_unit = None
@@ -179,8 +182,9 @@ class GameState():
 
     def buy_unit(self, unit_type):
         active_team = self.get_active_team()
+        cost = unit_type.cost
         index = active_team.value        
-        if self.player_gold[index] >= unit_type.cost:
+        if self.player_gold[index] >= cost:
             team = self.get_active_team()
             new_unit = unit_type(team)
             new_unit.is_active = False
@@ -193,7 +197,7 @@ class GameState():
 
             # subract the gold
             index = team.value
-            self.player_gold[index] -= 1
+            self.player_gold[index] -= cost
             self.transition_to_awaiting_unit_selection()
             self.reset_menu()
 

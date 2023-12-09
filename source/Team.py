@@ -17,6 +17,7 @@ class Team(Enum):
 
     @staticmethod    
     def to_color(color):
-        colors = [p.Color(0, 0, 172), p.Color(255, 0, 0)]
+        # this blue corresponds to azure
+        colors = [p.Color(0, 128, 255), p.Color(255, 0, 0)]
         return colors[color.value]
     

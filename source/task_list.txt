@@ -1,0 +1,3 @@
+- balance (keep playtesting!)
+- ui to make computer player
+- api like thing to get AI moves
