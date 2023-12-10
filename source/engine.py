@@ -19,10 +19,7 @@ class GameState():
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
             [-1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1],
-            [-1, -1, -1, -1, -1, -1, -1, -1],
-            [-2, -2, -2,  2,  3, -2, -2, -2],
+            [-2, -2, -2,  2,  3, -2, -2, -2]
     ]
 
 
@@ -50,12 +47,11 @@ class GameState():
         self.coin_index = 0
         self.blue_to_move = True
         self.moveLog = []
-        self.starting_unit_list = [units.Door(Team.BLUE, "left"), units.Door(Team.BLUE, "right"), units.Door(Team.RED, "left"), units.Door(Team.RED, "right")]
-                                   
 
+        self.starting_unit_list = [units.Door(Team.BLUE, "left"), units.Door(Team.BLUE, "right"), units.Door(Team.RED, "left"), units.Door(Team.RED, "right")]
         self.unit_list = copy.deepcopy(self.starting_unit_list)
 
-        self.starting_player_gold = [3, 3] # later maybe make the teams proper classes instead of enums and put this there?
+        self.starting_player_gold = [2, 2] # later maybe make the teams proper classes instead of enums and put this there?
         self.player_gold = self.starting_player_gold.copy()
         self.phase = Phase.TURN_TRANSITION
         self.selected_unit = None
