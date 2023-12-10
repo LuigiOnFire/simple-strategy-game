@@ -1,5 +1,6 @@
 import random
 import pygame as p
+import pygame_menu
 
 import menu_menu
 from enum import Enum
@@ -24,7 +25,8 @@ class MainMenuState():
 
     def __init__(self, sq_size):
         self.sq_size = sq_size
-        self.state = State.ACTIVE_MENU
+        self.state = State.START_MENU
+        self.slide_offset = 0
 
         self.bg_terrain_grid = [[[[0] for _ in range(MainMenuState.mm_grid_width)]
                            for _ in range(MainMenuState.mm_grid_height)]
@@ -132,14 +134,23 @@ class MainMenuState():
 
 
     def draw_all(self, screen):
-         # display background
-        self.draw_bg(screen)
+        screen_width = screen.get_width()
+        if self.state == State.MOVING_TO_GAME_SETUP:
+            self.increment_slide(screen_width)
 
-        # display title
-        self.draw_title(screen)
+        display_start_menu = \
+            self.state = State.START_MENU or State.MOVING_TO_GAME_SETUP
 
-        # display menu text/content
-        self.draw_submenu(screen)
+        display_setup_menu = \
+            self.state = State.START_MENU or State.MOVING_TO_GAME_SETUP
+
+        if display_start_menu:
+            self.draw_start_menu(screen)
+
+        if display_setup_menu:
+            self.display_steup_menu(screen)
+
+        
 
         if self.state == State.AWAITING_GAME:
             if self.fade > 255:
@@ -157,6 +168,24 @@ class MainMenuState():
                 dark_surface.fill(shade_color)
                 screen.blit(dark_surface, (0, 0))
                 self.fade += fade_step
+
+    def increment_slide(self, screen_width):
+        self.slide_offset += -1
+        if self.slide_offset >= screen_width:
+            self.state = State.GAME_SETUP
+
+    def draw_start_menu(self, screen):
+         # display background
+        self.draw_bg(screen)
+
+        # display title
+        self.draw_title(screen)
+
+        # display menu text/content
+        self.draw_submenu(screen)
+
+    def draw_setup_menu(self, screen):
+        pass
 
 
     def draw_bg(self, screen):
@@ -176,6 +205,9 @@ class MainMenuState():
 
         x = x_screen / 2 - x_sprite / 2
         y = y_screen / 4 - y_sprite / 2 # will place it in the middle of the top half of the screen
+
+        x -= self.slide_offset
+
         screen.blit(self.title, (x, y))
 
 
@@ -187,6 +219,8 @@ class MainMenuState():
 
         x = x_screen / 2 - w / 2
         y = 3 * y_screen / 4 - h / 2
+
+        x -= self.slide_offset
 
         self.top_menu.x = x # should be a function
         self.top_menu.y = y
@@ -207,7 +241,7 @@ class MainMenuState():
 
 
     def event_handler(self, mouse_pos):
-        if self.state == State.ACTIVE_MENU:
+        if self.state == State.START_MENU:
             btn = self.top_menu.is_clicked(mouse_pos)
             if btn:
                 if btn.text == MainMenuState.start_text:
@@ -217,18 +251,19 @@ class MainMenuState():
 
 
     def start_match(self):
-        self.state = State.AWAITING_GAME
-
+        self.state = State.MOVING_TO_GAME_SETUP
 
     def quit_client(self):
         self.state = State.TURN_OFF
 
     def reset_menu(self):
-        self.state = State.ACTIVE_MENU
+        self.state = State.START_MENU
 
 
 class State(Enum):
-    ACTIVE_MENU = 0
-    AWAITING_GAME = 1
-    TO_GAME = 2
-    TURN_OFF = 3
+    START_MENU = 0
+    MOVING_TO_GAME_SETUP = 1
+    GAME_SETUP = 2
+    AWAITING_GAME = 3
+    TO_GAME = 4
+    TURN_OFF = 5
