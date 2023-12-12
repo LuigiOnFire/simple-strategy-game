@@ -1,6 +1,7 @@
 import random
 import pygame as p
 import pygame_menu
+import team
 
 import menu_menu
 from enum import Enum
@@ -34,7 +35,7 @@ class MainMenuState():
         self.bg_unit_grid = [[[[0] for _ in range(MainMenuState.mm_grid_width)]
                          for _ in range(MainMenuState.mm_grid_height)]
                          for _ in range(MainMenuState.mm_grid_layers)]
-                         
+
         self.bg_terrain_tiles = []
         for tile in MainMenuState.unsized_terrain_tiles:
             self.bg_terrain_tiles.append(p.transform.scale(tile, (self.sq_size, self.sq_size)))
@@ -61,6 +62,8 @@ class MainMenuState():
 
         self.setup_top_menu()
 
+        self.setup_setup_menu()
+
         self.fade = 0
 
     def setup_top_menu(self):
@@ -79,6 +82,20 @@ class MainMenuState():
         menu.add_button(btn)
 
         return btn
+
+    def setup_setup_menu(self):
+        sq_size = self.sq_size
+        font_style = "Fonts/PressStart2P-Regular.ttf"
+        font_size = self.sq_size // 3
+        font = p.font.Font(font_style, font_size)
+        theme = pygame_menu.Theme(
+            background_color=(0, 0, 0, 0),
+            widget_font=font,
+            title_background_color = (0, 0, 0, 0),
+            title_font = font
+        )
+        self.setup_menu = pygame_menu.Menu('Setup', 6 * sq_size, 9 * sq_size, theme=theme)
+        # self.setup_menu.c
 
 
     def generate_bg_grid(self, layer):
@@ -139,18 +156,17 @@ class MainMenuState():
             self.increment_slide(screen_width)
 
         display_start_menu = \
-            self.state = State.START_MENU or State.MOVING_TO_GAME_SETUP
+            self.state == State.START_MENU or State.MOVING_TO_GAME_SETUP
 
         display_setup_menu = \
-            self.state = State.START_MENU or State.MOVING_TO_GAME_SETUP
+            self.state == State.START_MENU or State.MOVING_TO_GAME_SETUP
 
         if display_start_menu:
             self.draw_start_menu(screen)
 
         if display_setup_menu:
-            self.display_steup_menu(screen)
+            self.draw_setup_menu(screen)
 
-        
 
         if self.state == State.AWAITING_GAME:
             if self.fade > 255:
@@ -170,7 +186,7 @@ class MainMenuState():
                 self.fade += fade_step
 
     def increment_slide(self, screen_width):
-        self.slide_offset += -1
+        self.slide_offset += 1
         if self.slide_offset >= screen_width:
             self.state = State.GAME_SETUP
 
@@ -185,7 +201,7 @@ class MainMenuState():
         self.draw_submenu(screen)
 
     def draw_setup_menu(self, screen):
-        pass
+        self.setup_menu.draw(screen)
 
 
     def draw_bg(self, screen):
