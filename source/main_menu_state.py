@@ -87,9 +87,9 @@ class MainMenuState():
     def setup_player_setup_menu(self):
         for player in range(self.player_count):
             # setup the data
+            self.player_type
 
-            # setup the menu
-            ps_menu = menu_menu.MenuMenu()
+            # setup the button
 
 
     def add_setup_menu_button(self)
@@ -197,6 +197,7 @@ class MainMenuState():
 
         # display menu text/content
         self.draw_submenu(screen)
+        
 
     def draw_setup_menu(self, screen):
         # draw player 1 setup
@@ -207,7 +208,6 @@ class MainMenuState():
 
         # draw start game
         self.draw_start_game_button(screen)
-
 
 
     def draw_bg(self, screen):
