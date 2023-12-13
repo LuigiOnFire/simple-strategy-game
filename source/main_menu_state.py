@@ -28,6 +28,7 @@ class MainMenuState():
         self.sq_size = sq_size
         self.state = State.START_MENU
         self.slide_offset = 0
+        self.player_count = 2
 
         self.bg_terrain_grid = [[[[0] for _ in range(MainMenuState.mm_grid_width)]
                            for _ in range(MainMenuState.mm_grid_height)]
@@ -62,7 +63,7 @@ class MainMenuState():
 
         self.setup_top_menu()
 
-        self.setup_setup_menu()
+        self.setup_player_setup_menu()
 
         self.fade = 0
 
@@ -83,19 +84,15 @@ class MainMenuState():
 
         return btn
 
-    def setup_setup_menu(self):
-        sq_size = self.sq_size
-        font_style = "Fonts/PressStart2P-Regular.ttf"
-        font_size = self.sq_size // 3
-        font = p.font.Font(font_style, font_size)
-        theme = pygame_menu.Theme(
-            background_color=(0, 0, 0, 0),
-            widget_font=font,
-            title_background_color = (0, 0, 0, 0),
-            title_font = font
-        )
-        self.setup_menu = pygame_menu.Menu('Setup', 6 * sq_size, 9 * sq_size, theme=theme)
-        # self.setup_menu.c
+    def setup_player_setup_menu(self):
+        for player in range(self.player_count):
+            # setup the data
+
+            # setup the menu
+            ps_menu = menu_menu.MenuMenu()
+
+
+    def add_setup_menu_button(self)
 
 
     def generate_bg_grid(self, layer):
@@ -190,6 +187,7 @@ class MainMenuState():
         if self.slide_offset >= screen_width:
             self.state = State.GAME_SETUP
 
+
     def draw_start_menu(self, screen):
          # display background
         self.draw_bg(screen)
@@ -201,7 +199,15 @@ class MainMenuState():
         self.draw_submenu(screen)
 
     def draw_setup_menu(self, screen):
-        self.setup_menu.draw(screen)
+        # draw player 1 setup
+        self.draw_player_setup(1, screen)
+
+        # draw player 2 setup
+        self.draw_player_setup(2, screen)
+
+        # draw start game
+        self.draw_start_game_button(screen)
+
 
 
     def draw_bg(self, screen):
@@ -244,6 +250,17 @@ class MainMenuState():
         surface = self.top_menu.gen_surface(mouse_pos)
 
         screen.blit(surface, (x, y))
+
+    def draw_player_setup(self, player_no, screen):
+        font_style = "Fonts/PressStart2P-Regular.ttf"
+        font_size = self.sq_size // 3
+
+        # draw player name
+        
+
+        # draw player setting (human, computer)
+
+        # draw arrows
 
 
     def reload_surfaces(self):

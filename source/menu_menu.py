@@ -4,7 +4,7 @@ import font_util
 class MenuMenu():
     def __init__(self):
         self.buttons = []
-        self.alignment = "l" # l - left, c - center, r - right
+        self.alignment = "l" # l - left, c - center, r - right, NOT IMPLEMENTED
         self.width = 0 # these refer to the TOTAL width and height of the menu
         self.height = 0
         self.border_width = 0
