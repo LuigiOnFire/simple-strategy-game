@@ -74,22 +74,23 @@ def main():
     gs.setup_still_anims()
     # this_unit = EngineScript.ArmyUnit(kwargs)
     while running:
-        for e in p.event.get():
+        events = p.event.get()
+        for e in events:        
             if e.type == p.QUIT:
                 running = False
 
             elif e.type == p.MOUSEBUTTONDOWN:
                 target = p.mouse.get_pos()
-                running = master_event_handler(target, mm_s, gs)
+                running = master_event_handler(target, mm_s, gs, events)
 
         master_draw(screen, mm_s, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
 
 
-def master_event_handler(target, mm_s, gs):
+def master_event_handler(target, mm_s, gs, events):
     if CURRENT_STATE == top_state.MainPhase.MAIN_MENU:
-        main_menu_event_handler(target, mm_s)
+        main_menu_event_handler(target, mm_s, events)
 
         if mm_s.state == main_menu_state.State.TURN_OFF:
             return False
@@ -100,8 +101,8 @@ def master_event_handler(target, mm_s, gs):
     return True
 
 
-def main_menu_event_handler(target, mm_s):
-    mm_s.event_handler(target)
+def main_menu_event_handler(target, mm_s, events):
+    mm_s.event_handler(target, events)
 
 
 def in_match_event_handler(target, gs):

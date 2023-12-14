@@ -112,6 +112,10 @@ class MenuButton(): # this will be responsible for making its own surface
         self.text_delta = 4 # how much to expand the text when we hover
         # we should have getters and setters but I'm rushing
 
+        # only used for standalone buttons
+        self.x = 0
+        self.y = 0
+
 
     def find_dims(self):
         font = p.font.Font(self.font_style, self.font_size + self.text_delta)

@@ -85,14 +85,19 @@ class MainMenuState():
         return btn
 
     def setup_player_setup_menu(self):
-        for player in range(self.player_count):
-            # setup the data
-            self.player_type
+        setup_menu_theme = pygame_menu.Theme(background_color=(0, 0, 0, 0),  # transparent background
+                title_background_color=(4, 47, 126),
+                title_font_shadow=True,
+                widget_padding=25)
 
-            # setup the button
+        menu = pygame_menu.Menu('Game Setup', 400, 300, theme = setup_menu_theme)
 
+        menu.add.text_input('Name :', default='John Doe')
+        menu.add.selector('Difficulty :', [('Hard', 1), ('Easy', 2)])
+        menu.add.button('Play')
+        menu.add.button('Quit', pygame_menu.events.EXIT)
 
-    def add_setup_menu_button(self)
+        self.player_setup_menu = menu
 
 
     def generate_bg_grid(self, layer):
@@ -200,14 +205,9 @@ class MainMenuState():
         
 
     def draw_setup_menu(self, screen):
-        # draw player 1 setup
-        self.draw_player_setup(1, screen)
+        self.player_setup_menu.draw(screen)
 
-        # draw player 2 setup
-        self.draw_player_setup(2, screen)
 
-        # draw start game
-        self.draw_start_game_button(screen)
 
 
     def draw_bg(self, screen):
@@ -255,6 +255,8 @@ class MainMenuState():
         font_style = "Fonts/PressStart2P-Regular.ttf"
         font_size = self.sq_size // 3
 
+        self.player_setup_menu.mainloop(screen)
+
         # draw player name
         
 
@@ -273,9 +275,10 @@ class MainMenuState():
         self.active_layer = 1 - self.active_layer
 
 
-    def event_handler(self, mouse_pos):
+    def event_handler(self, mouse_pos, events):
         if self.state == State.START_MENU:
             btn = self.top_menu.is_clicked(mouse_pos)
+            self.player_setup_menu.update(events)
             if btn:
                 if btn.text == MainMenuState.start_text:
                     self.start_match()
