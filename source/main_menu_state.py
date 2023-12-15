@@ -1,10 +1,11 @@
 import random
 import pygame as p
 import pygame_menu
-import team
+from team import Team
 
 import menu_menu
 from enum import Enum
+from player_types import PlayerType
 
 class MainMenuState():
     mm_grid_height = 14 # one higher than the screen since we need a bit extra
@@ -85,15 +86,27 @@ class MainMenuState():
         return btn
 
     def setup_player_setup_menu(self):
+        menu_width = 6 * self.sq_size
+        menu_height = 10 * self.sq_size
         setup_menu_theme = pygame_menu.Theme(background_color=(0, 0, 0, 0),  # transparent background
-                title_background_color=(4, 47, 126),
+                title_background_color=(0, 0, 0, 0),
+                title_font_color=(255, 255, 255),
                 title_font_shadow=True,
-                widget_padding=25)
+                widget_padding=25,
+                title_font = "Fonts/PressStart2P-Regular.ttf",
+                widget_font="Fonts/PressStart2P-Regular.ttf",
+                widget_font_color=(255, 255, 255),
+                widget_font_size = self.sq_size // 3
+            )
 
-        menu = pygame_menu.Menu('Game Setup', 400, 300, theme = setup_menu_theme)
+        
 
-        menu.add.text_input('Name :', default='John Doe')
-        menu.add.selector('Difficulty :', [('Hard', 1), ('Easy', 2)])
+        menu = pygame_menu.Menu('Game Setup', menu_width, menu_height, theme = setup_menu_theme)
+
+        team_color = Team.to_color(Team.BLUE)
+        menu.add.label("Player 1", font_color = team_color) # PROBLEM this needs to set the 
+
+        menu.add.selector('Difficulty :', [('Human', PlayerType.HUMAN), ('Computer', PlayerType.COMPUTER)])
         menu.add.button('Play')
         menu.add.button('Quit', pygame_menu.events.EXIT)
 
