@@ -1,6 +1,5 @@
 import random
 import pygame as p
-import pygame_menu
 from team import Team
 
 import menu_menu
@@ -86,31 +85,65 @@ class MainMenuState():
         return btn
 
     def setup_player_setup_menu(self):
-        menu_width = 6 * self.sq_size
-        menu_height = 10 * self.sq_size
-        setup_menu_theme = pygame_menu.Theme(background_color=(0, 0, 0, 0),  # transparent background
-                title_background_color=(0, 0, 0, 0),
-                title_font_color=(255, 255, 255),
-                title_font_shadow=True,
-                widget_padding=25,
-                title_font = "Fonts/PressStart2P-Regular.ttf",
-                widget_font="Fonts/PressStart2P-Regular.ttf",
-                widget_font_color=(255, 255, 255),
-                widget_font_size = self.sq_size // 3
-            )
+        self.player_setup_buttons= []
 
+        for i in range(self.player_count):
+            self.add_player_setup_module(i)
+
+        # add start game button
+        btn_text = "Start Game!"
+        font_style = "Fonts/PressStart2P-Regular.ttf"
+        font_size = self.sq_size // 3
+        btn = menu_menu.MenuButton(btn_text, font_style, font_size)
+        # can change color, bg whatever we want here
+        btn.outline_width = 3
+        btn.margin = 8
+
+        btn.x = 3 * self.sq_size # do something more intelligent here to center it
+        btn.y = 10 * self.sq_size
+
+        start_game_button = btn
+
+
+    def add_player_setup_module(self, i):
+        font_style = "Fonts/PressStart2P-Regular.ttf"
+        font_size = self.sq_size // 3
+        outline_width = 3
+        margin = 8
+        starting_y = 2
+
+        team = Team(i)
+
+        btn_text = f"Player {i}"
+
+        label_btn = menu_menu.MenuButton(btn_text, font_style, font_size)
+        label_btn.font_color = team.to_color()
+        label_btn.outline_width = outline_width
+        label_btn.margin = margin
+        label_btn.x = 3 * self.sq_size  # do something more intelligent here to center it
+        label_btn.y = (starting_y + i * 4) * self.sq_size
+
+        selector_btn = menu_menu.MenuButton(btn_text, font_style, font_size)
+
+        selector_btn.outline_width = outline_width
+        selector_btn.margin = margin
         
 
-        menu = pygame_menu.Menu('Game Setup', menu_width, menu_height, theme = setup_menu_theme)
 
-        team_color = Team.to_color(Team.BLUE)
-        menu.add.label("Player 1", font_color = team_color) # PROBLEM this needs to set the 
+    def add_player_setup_start_button(self):
+        btn_text = "Start Game!"
+        font_style = "Fonts/PressStart2P-Regular.ttf"
+        font_size = self.sq_size // 3
+        btn = menu_menu.MenuButton(btn_text, font_style, font_size)
+        # can change color, bg whatever we want here
+        btn.outline_width = 3
+        btn.margin = 8
 
-        menu.add.selector('Difficulty :', [('Human', PlayerType.HUMAN), ('Computer', PlayerType.COMPUTER)])
-        menu.add.button('Play')
-        menu.add.button('Quit', pygame_menu.events.EXIT)
+        btn.x = 3 * self.sq_size  # do something more intelligent here to center it
+        btn.y = 10 * self.sq_size
 
-        self.player_setup_menu = menu
+        start_game_button = btn
+        self.player_setup_buttons.append(btn)
 
 
     def generate_bg_grid(self, layer):
@@ -218,8 +251,8 @@ class MainMenuState():
         
 
     def draw_setup_menu(self, screen):
-        self.player_setup_menu.draw(screen)
-
+        # need to iterate through all the buttons
+        pass
 
 
 
@@ -264,19 +297,6 @@ class MainMenuState():
 
         screen.blit(surface, (x, y))
 
-    def draw_player_setup(self, player_no, screen):
-        font_style = "Fonts/PressStart2P-Regular.ttf"
-        font_size = self.sq_size // 3
-
-        self.player_setup_menu.mainloop(screen)
-
-        # draw player name
-        
-
-        # draw player setting (human, computer)
-
-        # draw arrows
-
 
     def reload_surfaces(self):
         self.surfaces[0] = self.surfaces[1]
@@ -291,7 +311,6 @@ class MainMenuState():
     def event_handler(self, mouse_pos, events):
         if self.state == State.START_MENU:
             btn = self.top_menu.is_clicked(mouse_pos)
-            self.player_setup_menu.update(events)
             if btn:
                 if btn.text == MainMenuState.start_text:
                     self.start_match()

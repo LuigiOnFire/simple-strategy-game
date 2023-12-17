@@ -75,7 +75,7 @@ def main():
     # this_unit = EngineScript.ArmyUnit(kwargs)
     while running:
         events = p.event.get()
-        for e in events:        
+        for e in events:
             if e.type == p.QUIT:
                 running = False
 
