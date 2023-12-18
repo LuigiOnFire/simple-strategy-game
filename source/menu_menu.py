@@ -4,7 +4,7 @@ import font_util
 class MenuMenu():
     def __init__(self):
         self.buttons = []
-        self.alignment = "l" # l - left, c - center, r - right
+        self.alignment = "l" # l - left, c - center, r - right, NOT IMPLEMENTED
         self.width = 0 # these refer to the TOTAL width and height of the menu
         self.height = 0
         self.border_width = 0
@@ -111,6 +111,10 @@ class MenuButton(): # this will be responsible for making its own surface
         self.height = 0
         self.text_delta = 4 # how much to expand the text when we hover
         # we should have getters and setters but I'm rushing
+
+        # only used for standalone buttons
+        self.x = 0
+        self.y = 0
 
 
     def find_dims(self):
