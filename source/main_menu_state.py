@@ -29,6 +29,7 @@ class MainMenuState():
         self.state = State.START_MENU
         self.slide_offset = 0
         self.player_count = 2
+        self.player_types = [PlayerType.HUMAN, PlayerType.HUMAN]
 
         self.bg_terrain_grid = [[[[0] for _ in range(MainMenuState.mm_grid_width)]
                            for _ in range(MainMenuState.mm_grid_height)]
@@ -102,7 +103,7 @@ class MainMenuState():
         btn.x = 3 * self.sq_size # do something more intelligent here to center it
         btn.y = 10 * self.sq_size
 
-        start_game_button = btn
+        self.player_setup_buttons.append(btn)
 
 
     def add_player_setup_module(self, i):
@@ -114,20 +115,23 @@ class MainMenuState():
 
         team = Team(i)
 
-        btn_text = f"Player {i}"
+        label_btn_text = f"Player {i}"
 
-        label_btn = menu_menu.MenuButton(btn_text, font_style, font_size)
-        label_btn.font_color = team.to_color()
+        label_btn = menu_menu.MenuButton(label_btn_text, font_style, font_size)
+        label_btn.font_color = Team.to_color(team)
         label_btn.outline_width = outline_width
         label_btn.margin = margin
         label_btn.x = 3 * self.sq_size  # do something more intelligent here to center it
         label_btn.y = (starting_y + i * 4) * self.sq_size
+        self.player_setup_buttons.append(label_btn)
 
-        selector_btn = menu_menu.MenuButton(btn_text, font_style, font_size)
+        selector_btn_text = self.p
+        selector_btn = menu_menu.MenuButton(selector_btn_text, font_style, font_size)
+        selector_btn
 
         selector_btn.outline_width = outline_width
         selector_btn.margin = margin
-        
+        self.player_setup_buttons.append(selector_btn)
 
 
     def add_player_setup_start_button(self):
@@ -151,7 +155,7 @@ class MainMenuState():
         self.bg_terrain_grid[layer] = MainMenuState.generate_grid_layer(terrain_probs)
 
         unit_probs = [0.95, 0.025, 0.025]
-        self.bg_unit_grid[layer] = MainMenuState.generate_grid_layer(unit_probs)        
+        self.bg_unit_grid[layer] = MainMenuState.generate_grid_layer(unit_probs)
 
 
     @staticmethod
@@ -166,6 +170,7 @@ class MainMenuState():
 
         return grid_layer
 
+
     @staticmethod
     def generate_digit(probs):
         """Gets a random digit when given a probability list for each index"""
@@ -177,6 +182,7 @@ class MainMenuState():
             running_sum += prob
             if rand < running_sum:
                 return i
+
 
     def grids_to_surface(self, layer):
         bg_surface = p.Surface((self.sq_size * MainMenuState.mm_grid_width, \
@@ -233,6 +239,7 @@ class MainMenuState():
                 screen.blit(dark_surface, (0, 0))
                 self.fade += fade_step
 
+
     def increment_slide(self, screen_width):
         self.slide_offset += 1
         if self.slide_offset >= screen_width:
@@ -248,12 +255,17 @@ class MainMenuState():
 
         # display menu text/content
         self.draw_submenu(screen)
-        
+
 
     def draw_setup_menu(self, screen):
+        (mouse_pos) = p.mouse.get_pos()
         # need to iterate through all the buttons
-        pass
+        for btn in self.player_setup_buttons:
+            x = btn.x
+            y = btn.y
 
+            surface = btn.gen_surface(mouse_pos)
+            screen.blit(surface, (x, y))
 
 
     def draw_bg(self, screen):
