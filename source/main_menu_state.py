@@ -125,9 +125,10 @@ class MainMenuState():
         label_btn.y = (starting_y + i * 4) * self.sq_size
         self.player_setup_buttons.append(label_btn)
 
-        selector_btn_text = self.p
+        selector_btn_text = self.player_types[i].__repr__
         selector_btn = menu_menu.MenuButton(selector_btn_text, font_style, font_size)
-        selector_btn
+        selector_btn.x = label_btn.x 
+        selector_btn.y = label_btn.y + self.sq_size
 
         selector_btn.outline_width = outline_width
         selector_btn.margin = margin
