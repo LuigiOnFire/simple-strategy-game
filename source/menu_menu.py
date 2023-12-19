@@ -110,7 +110,7 @@ class MenuButton(): # this will be responsible for making its own surface
         self.margin = 2
         self.height = 0
         self.text_delta = 4 # how much to expand the text when we hover
-        # we should have getters and setters but I'm rushing
+        # add proper getters and setters
 
         # only used for standalone buttons
         self.x = 0
@@ -145,5 +145,78 @@ class MenuButton(): # this will be responsible for making its own surface
             (self.margin, self.margin),
             self.outline_width
         )
+
+        return surface
+    
+class Selector():
+    def __init__(self, values, texts, font_style, font_size, symbols):
+        self.values = values
+        self.texts = texts
+        self.font_style = font_style
+        self.font_size = font_size
+        self.symbols = symbols
+
+        self._bg_color = None
+        self._text_color = p.Color("white")
+        self._outline_width = 0
+        self._outline_color = p.Color("black")
+        self._margin = 2
+        self._width = 0
+        self._height = 0
+        self._bg_color = None
+
+        self._arrows = None # load default arrow assets once we've made them
+
+        self.x = 0
+        self.y = 0
+
+    def find_dims(self):
+        max_text_width = 0
+        my_text_height = 0
+        for text in self.texts:
+            font = p.font.Font(self.font_style, self.font_size)
+            text_width, text_height = font.size(text)
+            if text_width > max_text_width:
+                max_text_width = text_width
+                my_text_height = text_height
+
+        width = 2 * self._arrows.get_width() + \
+            2 * self._margin + \
+            max_text_width
+
+        if self.symbols:
+            # boldly assuming all symbols will have the same size
+            # I will draw them as such
+            width += self.symbols[0].get_width() + self._margin
+
+        self._width = width
+        self._height = my_text_height
+
+        return (width, my_text_height)
+
+    def gen_surface(self, mouse_in):
+        (width, height) = self.find_dims()
+        surface = p.Surface((width, height), p.SRCALPHA)
+        if self._bg_color:
+            surface.fill(self._bg_color)
+
+        font = p.font.Font(self.font_style, self.font_size)
+
+        # render left arrow
+
+        # render symbol (if applicable)
+
+        # render text
+        font_util.render_w_outline(
+            surface,
+            self.text,
+            font,
+            self.text_color,
+            self.outline_color,
+            (self.margin, self.margin),
+            self.outline_width
+        )
+
+        # render right arrow
 
         return surface

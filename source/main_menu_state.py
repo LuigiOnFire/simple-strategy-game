@@ -134,6 +134,19 @@ class MainMenuState():
         selector_btn.margin = margin
         self.player_setup_buttons.append(selector_btn)
 
+        values = [PlayerType.HUMAN, PlayerType.COMPUTER]
+        symbols = ["human_player.png", "computer_player.png"] # do this once I've generated the assets
+        texts = ["Human", "Computer"]
+
+
+        p_type_selector = menu_menu.Selector(
+            values,
+            texts,
+            font_style,
+            font_size,
+            symbols, # this will probably end up being an optional argument
+        )
+
 
     def add_player_setup_start_button(self):
         btn_text = "Start Game!"
