@@ -165,10 +165,13 @@ class Selector():
         self._height = 0
         self._bg_color = None
 
+        self._select_index = 0
         self._arrows = None # load default arrow assets once we've made them
 
         self.x = 0
         self.y = 0
+
+        self.setup_imgs()
 
     def find_dims(self):
         max_text_width = 0
@@ -196,27 +199,60 @@ class Selector():
 
     def gen_surface(self, mouse_in):
         (width, height) = self.find_dims()
+        ind = self._select_index
         surface = p.Surface((width, height), p.SRCALPHA)
         if self._bg_color:
             surface.fill(self._bg_color)
 
         font = p.font.Font(self.font_style, self.font_size)
 
+        x = 0
         # render left arrow
+        surface.blit(self.left_arrow_img (x, 0))
+        x += self.left_arrow_img.get_width()
 
         # render symbol (if applicable)
+        if self.symbols:
+            symb_surf = self.symbols[self._select_index]
+            surface.blit(symb_surf, (x, 0))
+            x += symb_surf.get_width()
 
         # render text
         font_util.render_w_outline(
             surface,
-            self.text,
+            self.texts[ind],
             font,
-            self.text_color,
-            self.outline_color,
-            (self.margin, self.margin),
-            self.outline_width
+            self._text_color,
+            self._outline_color,
+            (x, 0),
+            self._outline_width
         )
 
         # render right arrow
+        x = surface.get_width() - self.right_arrow_img.get_width()
+        surface.blit(self.left_arrow_img(x, 0))
 
         return surface
+
+    def setup_imgs(self):
+        left_arrow_img = p.image.load("Sprites/field.png")
+        _, target_height = self.get_font_height() # dependends on our font_size being correct
+
+        left_arrow_img = self.scale_to_height(left_arrow_img, target_height)
+
+        self.left_arrow_img = left_arrow_img
+        self.right_arrow_img = p.transform.flip(left_arrow_img, 1, 0)
+
+        for i, symbol in enumerate(self.symbols):
+            self.symbols[i] = self.scale_to_height(symbol, target_height)
+
+
+    def scale_to_height(self, img, height):
+        curr_height = img.get_height()
+
+        scale = height / curr_height
+        img = p.transform.scale(img, scale)
+        return img
+    
+    def get_font_height(self):
+        # FILL THIS OUT< REFACTOR TO FIX BUGS
