@@ -93,7 +93,7 @@ class MenuMenu():
             if mouse_in:
                 return button
             current_y += button.height
-    
+
         return None
 
 
@@ -176,14 +176,10 @@ class Selector():
     def find_dims(self):
         max_text_width = 0
         my_text_height = 0
-        for text in self.texts:
-            font = p.font.Font(self.font_style, self.font_size)
-            text_width, text_height = font.size(text)
-            if text_width > max_text_width:
-                max_text_width = text_width
-                my_text_height = text_height
 
-        width = 2 * self._arrows.get_width() + \
+        max_text_width, my_text_height = self.get_font_dims()
+
+        width = 2 * self._arrows[0].get_width() + \
             2 * self._margin + \
             max_text_width
 
@@ -208,8 +204,9 @@ class Selector():
 
         x = 0
         # render left arrow
-        surface.blit(self.left_arrow_img (x, 0))
-        x += self.left_arrow_img.get_width()
+        left_arrow_img = self._arrows[0]
+        surface.blit(left_arrow_img, (x, 0))
+        x += left_arrow_img.get_width()
 
         # render symbol (if applicable)
         if self.symbols:
@@ -229,19 +226,25 @@ class Selector():
         )
 
         # render right arrow
-        x = surface.get_width() - self.right_arrow_img.get_width()
-        surface.blit(self.left_arrow_img(x, 0))
+        right_arrow_img = self._arrows[1]
+        x = surface.get_width() - right_arrow_img.get_width()
+        surface.blit(right_arrow_img, (x, 0))
 
         return surface
 
+
+    def set_outline_width(self, width):
+        self._outline_width = width
+
+
     def setup_imgs(self):
-        left_arrow_img = p.image.load("Sprites/field.png")
-        _, target_height = self.get_font_height() # dependends on our font_size being correct
+        left_arrow_img = p.image.load("Sprites/selector_left_arrow.png")
+        _, target_height = self.get_font_dims() # dependends on our font_size being correct
 
         left_arrow_img = self.scale_to_height(left_arrow_img, target_height)
+        right_arrow_img = p.transform.flip(left_arrow_img, 1, 1)
 
-        self.left_arrow_img = left_arrow_img
-        self.right_arrow_img = p.transform.flip(left_arrow_img, 1, 0)
+        self._arrows = [left_arrow_img, right_arrow_img]
 
         for i, symbol in enumerate(self.symbols):
             self.symbols[i] = self.scale_to_height(symbol, target_height)
@@ -251,8 +254,17 @@ class Selector():
         curr_height = img.get_height()
 
         scale = height / curr_height
-        img = p.transform.scale(img, scale)
+        img = p.transform.scale_by(img, scale)
         return img
-    
-    def get_font_height(self):
-        # FILL THIS OUT< REFACTOR TO FIX BUGS
+
+
+    def get_font_dims(self):
+        for text in self.texts:
+            font = p.font.Font(self.font_style, self.font_size)
+            text_width, text_height = font.size(text)
+            max_text_width = 0
+            if text_width > max_text_width:
+                max_text_width = text_width
+                my_text_height = text_height
+
+        return max_text_width, my_text_height

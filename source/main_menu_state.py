@@ -86,7 +86,7 @@ class MainMenuState():
         return btn
 
     def setup_player_setup_menu(self):
-        self.player_setup_buttons= []
+        self.setup_menu_elements = SetupMenuElems()
 
         for i in range(self.player_count):
             self.add_player_setup_module(i)
@@ -103,12 +103,12 @@ class MainMenuState():
         btn.x = 3 * self.sq_size # do something more intelligent here to center it
         btn.y = 10 * self.sq_size
 
-        self.player_setup_buttons.append(btn)
+        self.player_setup_start_btn = btn
 
 
     def add_player_setup_module(self, i):
         font_style = "Fonts/PressStart2P-Regular.ttf"
-        font_size = self.sq_size // 3
+        font_size = self.sq_size // 2
         outline_width = 3
         margin = 8
         starting_y = 2
@@ -123,10 +123,13 @@ class MainMenuState():
         label_btn.margin = margin
         label_btn.x = 3 * self.sq_size  # do something more intelligent here to center it
         label_btn.y = (starting_y + i * 4) * self.sq_size
-        self.player_setup_buttons.append(label_btn)
+        self.setup_menu_elements.player_setup_labels.append(label_btn)
 
         values = [PlayerType.HUMAN, PlayerType.COMPUTER]
-        symbols = ["human_player.png", "computer_player.png"] # do this once I've generated the assets
+        symbols = [
+                    p.image.load("Sprites/player_human.png"),
+                    p.image.load("Sprites/player_computer.png")
+                   ]
         texts = ["Human", "Computer"]
 
 
@@ -138,7 +141,9 @@ class MainMenuState():
             symbols, # this will probably end up being an optional argument
         )
 
-        self.player_setup_buttons.append(p_type_selector)
+        p_type_selector.set_outline_width(3)
+
+        self.setup_menu_elements.player_setup_selectors.append(p_type_selector)
 
 
 
@@ -155,7 +160,7 @@ class MainMenuState():
         btn.y = 10 * self.sq_size
 
         start_game_button = btn
-        self.player_setup_buttons.append(btn)
+        self.setup_menu_elements.player_setup_start_btn.append(btn)
 
 
     def generate_bg_grid(self, layer):
@@ -267,13 +272,20 @@ class MainMenuState():
 
     def draw_setup_menu(self, screen):
         (mouse_pos) = p.mouse.get_pos()
-        # need to iterate through all the buttons
-        for btn in self.player_setup_buttons:
-            x = btn.x
-            y = btn.y
 
-            surface = btn.gen_surface(mouse_pos)
-            screen.blit(surface, (x, y))
+        # divide the screen into players + 1 parts
+        width = screen.get_width()
+        height = screen.get_height()
+        
+        grid_lines_y = [0]
+        for i in range(self.player_count + 1):
+            grid_lines_y.append(height / i)
+
+        # do the player elems labels
+        x = 
+
+        #do the start button
+        
 
 
     def draw_bg(self, screen):
@@ -355,3 +367,9 @@ class State(Enum):
     AWAITING_GAME = 3
     TO_GAME = 4
     TURN_OFF = 5
+
+class SetupMenuElems():
+    def __init__(self):
+        self.player_setup_labels = []
+        self.player_setup_selectors = []
+        self.player_setup_start_btn = None
