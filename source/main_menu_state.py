@@ -281,8 +281,14 @@ class MainMenuState():
         for i in range(self.player_count + 1):
             grid_lines_y.append(height / i)
 
-        # do the player elems labels
-        x = 
+        for player in range(self.player_count):
+            # get the height of both elements
+            label_height = self.setup_menu_elements.player_setup_labels[player].get_height()
+            selector_height = self.setup_menu_elements.player_setup_selectors[player].get_height()
+
+            # do the player elems labels
+            
+            # do the selectors themselves
 
         #do the start button
         
