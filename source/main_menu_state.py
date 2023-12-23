@@ -274,21 +274,38 @@ class MainMenuState():
         (mouse_pos) = p.mouse.get_pos()
 
         # divide the screen into players + 1 parts
-        width = screen.get_width()
-        height = screen.get_height()
+        screen_width = screen.get_width()
+        screen_height = screen.get_height()
         
         grid_lines_y = [0]
-        for i in range(self.player_count + 1):
-            grid_lines_y.append(height / i)
+        height_divisions = self.player_count + 1
+        for i in range(height_divisions + 1):
+            grid_lines_y.append((screen_height / height_divisions) * i)
 
         for player in range(self.player_count):
-            # get the height of both elements
-            label_height = self.setup_menu_elements.player_setup_labels[player].get_height()
-            selector_height = self.setup_menu_elements.player_setup_selectors[player].get_height()
+            label = self.setup_menu_elements.player_setup_labels[player]
+            selector = self.setup_menu_elements.player_setup_selectors[player]
+
+            # get the dims of both elements
+            label_width = label.get_width()
+            label_height = label.get_height()
+
+            selector_width = selector.get_width()
+            selector_height = selector.get_height()
+
+            # find the right starting point for y
+            element_height = label_height + selector_height
+            cell_height = grid_lines_y[player + 1] - grid_lines_y[player]
+
+            y_offset = cell_height / 2 - element_height / 2
+            y = grid_lines_y[player] + y_offset
 
             # do the player elems labels
-            
+            x = screen_width / 2 - label_width / 2
+            screen.blit(selector, (x, y))
+
             # do the selectors themselves
+
 
         #do the start button
         
