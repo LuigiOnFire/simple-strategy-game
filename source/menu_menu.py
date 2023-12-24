@@ -97,7 +97,6 @@ class MenuMenu():
         return None
 
 
-
 class MenuButton(): # this will be responsible for making its own surface
     def __init__(self, text, font_style, font_size):
         self.text = text
@@ -147,7 +146,8 @@ class MenuButton(): # this will be responsible for making its own surface
         )
 
         return surface
-    
+
+
 class Selector():
     def __init__(self, values, texts, font_style, font_size, symbols):
         self.values = values

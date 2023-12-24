@@ -287,11 +287,9 @@ class MainMenuState():
             selector = self.setup_menu_elements.player_setup_selectors[player]
 
             # get the dims of both elements
-            label_width = label.get_width()
-            label_height = label.get_height()
+            (label_width, label_height) = label.find_dims()
 
-            selector_width = selector.get_width()
-            selector_height = selector.get_height()
+            (selector_width, selector_height) = selector.find_dims()
 
             # find the right starting point for y
             element_height = label_height + selector_height
@@ -300,11 +298,20 @@ class MainMenuState():
             y_offset = cell_height / 2 - element_height / 2
             y = grid_lines_y[player] + y_offset
 
+            label_surface = label.gen_surface(mouse_pos)
+
             # do the player elems labels
             x = screen_width / 2 - label_width / 2
-            screen.blit(selector, (x, y))
+            screen.blit(label_surface, (x, y))
 
             # do the selectors themselves
+            width_diff = selector_width - label_width
+            x = x - width_diff
+            y = y + label_height
+
+            selector_surface = selector.gen_surface(mouse_pos)
+
+            screen.blit(selector_surface, (x, y))
 
 
         #do the start button
