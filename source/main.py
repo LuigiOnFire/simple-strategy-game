@@ -68,7 +68,7 @@ def main():
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     gs = engine.GameState()
-    mm_s = main_menu_state.MainMenuState(SQ_SIZE)
+    mm_s = main_menu_state.MainMenuState(SQ_SIZE, screen.get_width())
     load_images()
     running = True
     gs.setup_still_anims()
@@ -260,7 +260,7 @@ def master_draw(screen, mm_s, gs):
 
 
 def draw_menu_state(screen, mm_s):
-    mm_s.draw_all(screen)   
+    mm_s.draw_all(screen)
 
 
 def draw_game_state(screen, gs):

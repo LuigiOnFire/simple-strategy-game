@@ -178,6 +178,7 @@ class Selector():
         my_text_height = 0
 
         max_text_width, my_text_height = self.get_font_dims()
+        
 
         width = 2 * self._arrows[0].get_width() + \
             2 * self._margin + \
@@ -221,7 +222,7 @@ class Selector():
             font,
             self._text_color,
             self._outline_color,
-            (x, 0),
+            (x + self._outline_width, 0 + self._outline_width),
             self._outline_width
         )
 
@@ -266,5 +267,8 @@ class Selector():
             if text_width > max_text_width:
                 max_text_width = text_width
                 my_text_height = text_height
+
+        max_text_width += self._outline_width
+        my_text_height += self._outline_width
 
         return max_text_width, my_text_height

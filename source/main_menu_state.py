@@ -24,10 +24,12 @@ class MainMenuState():
     start_text = "Start Game"
     quit_text = "Quit"
 
-    def __init__(self, sq_size):
+    def __init__(self, sq_size, screen_width):
         self.sq_size = sq_size
         self.state = State.START_MENU
-        self.slide_offset = 0
+        self.slide_offset_l = 0
+        self.slide_offset_r = screen_width
+
         self.player_count = 2
         self.player_types = [PlayerType.HUMAN, PlayerType.HUMAN]
 
@@ -68,6 +70,7 @@ class MainMenuState():
 
         self.fade = 0
 
+
     def setup_top_menu(self):
         self.top_menu = menu_menu.MenuMenu()        
         self.add_top_menu_button(MainMenuState.start_text, self.top_menu)
@@ -84,6 +87,7 @@ class MainMenuState():
         menu.add_button(btn)
 
         return btn
+    
 
     def setup_player_setup_menu(self):
         self.setup_menu_elements = SetupMenuElems()
@@ -118,7 +122,7 @@ class MainMenuState():
         label_btn_text = f"Player {i}"
 
         label_btn = menu_menu.MenuButton(label_btn_text, font_style, font_size)
-        label_btn.font_color = Team.to_color(team)
+        label_btn.text_color = Team.to_color(team)
         label_btn.outline_width = outline_width
         label_btn.margin = margin
         label_btn.x = 3 * self.sq_size  # do something more intelligent here to center it
@@ -129,9 +133,8 @@ class MainMenuState():
         symbols = [
                     p.image.load("Sprites/player_human.png"),
                     p.image.load("Sprites/player_computer.png")
-                   ]
+                ]
         texts = ["Human", "Computer"]
-
 
         p_type_selector = menu_menu.Selector(
             values,
@@ -144,7 +147,6 @@ class MainMenuState():
         p_type_selector.set_outline_width(3)
 
         self.setup_menu_elements.player_setup_selectors.append(p_type_selector)
-
 
 
     def add_player_setup_start_button(self):
@@ -254,8 +256,12 @@ class MainMenuState():
 
 
     def increment_slide(self, screen_width):
-        self.slide_offset += 1
-        if self.slide_offset >= screen_width:
+        slide_step = 12
+        self.slide_offset_l += slide_step
+        self.slide_offset_r -= slide_step
+        if self.slide_offset_l >= screen_width:
+            self.slide_offset_l = screen_width
+            self.slide_offset_r = 0
             self.state = State.GAME_SETUP
 
 
@@ -277,7 +283,7 @@ class MainMenuState():
         screen_width = screen.get_width()
         screen_height = screen.get_height()
         
-        grid_lines_y = [0]
+        grid_lines_y = []
         height_divisions = self.player_count + 1
         for i in range(height_divisions + 1):
             grid_lines_y.append((screen_height / height_divisions) * i)
@@ -302,11 +308,12 @@ class MainMenuState():
 
             # do the player elems labels
             x = screen_width / 2 - label_width / 2
+            x += self.slide_offset_r
             screen.blit(label_surface, (x, y))
 
             # do the selectors themselves
             width_diff = selector_width - label_width
-            x = x - width_diff
+            x = x - width_diff # we can basically use the same x and y
             y = y + label_height
 
             selector_surface = selector.gen_surface(mouse_pos)
@@ -336,7 +343,7 @@ class MainMenuState():
         x = x_screen / 2 - x_sprite / 2
         y = y_screen / 4 - y_sprite / 2 # will place it in the middle of the top half of the screen
 
-        x -= self.slide_offset
+        x -= self.slide_offset_l
 
         screen.blit(self.title, (x, y))
 
@@ -350,7 +357,7 @@ class MainMenuState():
         x = x_screen / 2 - w / 2
         y = 3 * y_screen / 4 - h / 2
 
-        x -= self.slide_offset
+        x -= self.slide_offset_l
 
         self.top_menu.x = x # should be a function
         self.top_menu.y = y
@@ -372,12 +379,23 @@ class MainMenuState():
 
     def event_handler(self, mouse_pos, events):
         if self.state == State.START_MENU:
-            btn = self.top_menu.is_clicked(mouse_pos)
-            if btn:
-                if btn.text == MainMenuState.start_text:
-                    self.start_match()
-                if btn.text == MainMenuState.quit_text:
-                    self.quit_client()
+            self.top_menu_event_handler(mouse_pos)
+        
+        if self.state == State.GAME_SETUP:
+            self.setup_menu_event_handler(mouse_pos)
+            
+
+    def top_menu_event_handler(self, mouse_pos):
+        btn = self.top_menu.is_clicked(mouse_pos)
+        if btn:
+            if btn.text == MainMenuState.start_text:
+                self.start_match()
+
+            if btn.text == MainMenuState.quit_text:
+                self.quit_client()
+
+    def setup_menu_event_handler(self, mouse_pos):
+        
 
 
     def start_match(self):
