@@ -309,6 +309,8 @@ class MainMenuState():
             # do the player elems labels
             x = screen_width / 2 - label_width / 2
             x += self.slide_offset_r
+            
+            label_surface.set_pos(x, y)
             screen.blit(label_surface, (x, y))
 
             # do the selectors themselves
@@ -318,10 +320,11 @@ class MainMenuState():
 
             selector_surface = selector.gen_surface(mouse_pos)
 
+            selector_surface.set_pos(x, y)
             screen.blit(selector_surface, (x, y))
 
 
-        #do the start button
+        # do the start button
         
 
 
@@ -383,7 +386,7 @@ class MainMenuState():
         
         if self.state == State.GAME_SETUP:
             self.setup_menu_event_handler(mouse_pos)
-            
+
 
     def top_menu_event_handler(self, mouse_pos):
         btn = self.top_menu.is_clicked(mouse_pos)
@@ -395,7 +398,18 @@ class MainMenuState():
                 self.quit_client()
 
     def setup_menu_event_handler(self, mouse_pos):
-        
+        # check if the mouse is in the position of any of the setup elements
+        mouse_x, mouse_y = mouse_pos
+        for elem in self.setup_menu_elements:
+            elem_lft = elem.x
+            elem_rgt = elem.x + elem.width
+            elem_top = elem.y
+            elem_bot = elem.y + elem.height
+            if elem_lft <= mouse_x <= elem_rgt and \
+                elem_top <= mouse_y <= elem_bot:
+                
+
+
 
 
     def start_match(self):

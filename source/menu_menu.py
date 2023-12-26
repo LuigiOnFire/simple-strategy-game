@@ -115,6 +115,9 @@ class MenuButton(): # this will be responsible for making its own surface
         self.x = 0
         self.y = 0
 
+    def set_coords(self, x, y):
+        self.x = x
+        self.y = y
 
     def find_dims(self):
         font = p.font.Font(self.font_style, self.font_size + self.text_delta)
@@ -147,7 +150,7 @@ class MenuButton(): # this will be responsible for making its own surface
 
         return surface
 
-
+# both this and MenuButton should inheirit from a superclass
 class Selector():
     def __init__(self, values, texts, font_style, font_size, symbols):
         self.values = values
@@ -172,6 +175,10 @@ class Selector():
         self.y = 0
 
         self.setup_imgs()
+
+    def set_coords(self, x, y):
+        self.x = x
+        self.y = y
 
     def find_dims(self):
         max_text_width = 0
