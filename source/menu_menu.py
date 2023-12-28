@@ -115,9 +115,10 @@ class MenuButton(): # this will be responsible for making its own surface
         self.x = 0
         self.y = 0
 
-    def set_coords(self, x, y):
+    def set_pos(self, x, y):
         self.x = x
         self.y = y
+
 
     def find_dims(self):
         font = p.font.Font(self.font_style, self.font_size + self.text_delta)
@@ -150,6 +151,7 @@ class MenuButton(): # this will be responsible for making its own surface
 
         return surface
 
+
 # both this and MenuButton should inheirit from a superclass
 class Selector():
     def __init__(self, values, texts, font_style, font_size, symbols):
@@ -164,17 +166,20 @@ class Selector():
         self._outline_width = 0
         self._outline_color = p.Color("black")
         self._margin = 2
-        self._width = 0
-        self._height = 0
+        self.width = 0
+        self.height = 0
         self._bg_color = None
+        self._arrow_width = None
 
         self._select_index = 0
+
         self._arrows = None # load default arrow assets once we've made them
 
         self.x = 0
         self.y = 0
 
-        self.setup_imgs()
+        self._setup_imgs()
+
 
     def set_coords(self, x, y):
         self.x = x
@@ -186,7 +191,6 @@ class Selector():
 
         max_text_width, my_text_height = self.get_font_dims()
         
-
         width = 2 * self._arrows[0].get_width() + \
             2 * self._margin + \
             max_text_width
@@ -201,8 +205,12 @@ class Selector():
 
         return (width, my_text_height)
 
+
     def gen_surface(self, mouse_in):
         (width, height) = self.find_dims()
+        self.width = width
+        self.height = height
+
         ind = self._select_index
         surface = p.Surface((width, height), p.SRCALPHA)
         if self._bg_color:
@@ -244,13 +252,34 @@ class Selector():
     def set_outline_width(self, width):
         self._outline_width = width
 
+    def is_clicked(self, mouse_pos):
+        # get button width (we'll save this parameter)
+        arrow_width = self._arrow_width
+        mouse_x, _ = mouse_pos
+        mouse_x -= self.x
+        width = self._width
 
-    def setup_imgs(self):
+        # if we're in the first "button width", move the selector left
+        if 0 <= mouse_x <= arrow_width:
+            self._shift_left()
+
+        # if we're in the last "button width", move the selector right
+        if width - arrow_width <= mouse_x <= width:
+            self._shift_right()
+
+        return
+
+    def set_pos(self, x, y):
+        self.x = x
+        self.y = y
+        
+    def _setup_imgs(self):
         left_arrow_img = p.image.load("Sprites/selector_left_arrow.png")
         _, target_height = self.get_font_dims() # dependends on our font_size being correct
 
         left_arrow_img = self.scale_to_height(left_arrow_img, target_height)
         right_arrow_img = p.transform.flip(left_arrow_img, 1, 1)
+        self._arrow_width = left_arrow_img.get_width()
 
         self._arrows = [left_arrow_img, right_arrow_img]
 
@@ -279,3 +308,13 @@ class Selector():
         my_text_height += self._outline_width
 
         return max_text_width, my_text_height
+    
+    def _shift_left(self):
+        value_count = len(self.values)
+        self._select_index = (self._select_index - 1) % value_count
+        self.bound_param = self.values[self._select_index]
+
+    def _shift_right(self):
+        value_count = len(self.values)
+        self._select_index = (self._select_index - 1) % value_count
+        self.bound_param = self.values[self._select_index]

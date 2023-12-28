@@ -31,7 +31,6 @@ class MainMenuState():
         self.slide_offset_r = screen_width
 
         self.player_count = 2
-        self.player_types = [PlayerType.HUMAN, PlayerType.HUMAN]
 
         self.bg_terrain_grid = [[[[0] for _ in range(MainMenuState.mm_grid_width)]
                            for _ in range(MainMenuState.mm_grid_height)]
@@ -142,7 +141,7 @@ class MainMenuState():
             font_style,
             font_size,
             symbols, # this will probably end up being an optional argument
-        )
+        ) 
 
         p_type_selector.set_outline_width(3)
 
@@ -310,7 +309,7 @@ class MainMenuState():
             x = screen_width / 2 - label_width / 2
             x += self.slide_offset_r
             
-            label_surface.set_pos(x, y)
+            label.set_pos(x, y)
             screen.blit(label_surface, (x, y))
 
             # do the selectors themselves
@@ -320,7 +319,7 @@ class MainMenuState():
 
             selector_surface = selector.gen_surface(mouse_pos)
 
-            selector_surface.set_pos(x, y)
+            selector.set_pos(x, y)
             screen.blit(selector_surface, (x, y))
 
 
@@ -400,17 +399,17 @@ class MainMenuState():
     def setup_menu_event_handler(self, mouse_pos):
         # check if the mouse is in the position of any of the setup elements
         mouse_x, mouse_y = mouse_pos
-        for elem in self.setup_menu_elements:
+        for elem in self.setup_menu_elements.player_setup_selectors:
             elem_lft = elem.x
             elem_rgt = elem.x + elem.width
             elem_top = elem.y
             elem_bot = elem.y + elem.height
+
             if elem_lft <= mouse_x <= elem_rgt and \
                 elem_top <= mouse_y <= elem_bot:
                 
-
-
-
+                elem.is_clicked(mouse_pos)
+                
 
     def start_match(self):
         self.state = State.MOVING_TO_GAME_SETUP
