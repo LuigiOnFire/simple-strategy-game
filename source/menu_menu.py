@@ -252,12 +252,19 @@ class Selector():
     def set_outline_width(self, width):
         self._outline_width = width
 
+
     def is_clicked(self, mouse_pos):
         # get button width (we'll save this parameter)
         arrow_width = self._arrow_width
-        mouse_x, _ = mouse_pos
+        mouse_x, mouse_y = mouse_pos
         mouse_x -= self.x
+        mouse_y -= self.y
         width = self._width
+
+        in_y = 0 <= mouse_y <= self.height
+
+        if not in_y:
+            return
 
         # if we're in the first "button width", move the selector left
         if 0 <= mouse_x <= arrow_width:

@@ -11,8 +11,10 @@ class MainMenuState():
     mm_grid_width = 9
     mm_grid_layers = 2
 
-    unsized_terrain_tiles = [p.image.load("Sprites/grass_tile.png"),
-        p.image.load("Sprites/wheat_tile.png")]
+    unsized_terrain_tiles = [
+        p.image.load("Sprites/grass_tile.png"),
+        p.image.load("Sprites/wheat_tile.png")
+        ]
 
     unsized_unit_tiles = [
         p.image.load("Sprites/b_footsoldier.png"),
@@ -95,18 +97,7 @@ class MainMenuState():
             self.add_player_setup_module(i)
 
         # add start game button
-        btn_text = "Start Game!"
-        font_style = "Fonts/PressStart2P-Regular.ttf"
-        font_size = self.sq_size // 3
-        btn = menu_menu.MenuButton(btn_text, font_style, font_size)
-        # can change color, bg whatever we want here
-        btn.outline_width = 3
-        btn.margin = 8
-
-        btn.x = 3 * self.sq_size # do something more intelligent here to center it
-        btn.y = 10 * self.sq_size
-
-        self.player_setup_start_btn = btn
+        self.add_player_setup_start_button()
 
 
     def add_player_setup_module(self, i):
@@ -149,19 +140,15 @@ class MainMenuState():
 
 
     def add_player_setup_start_button(self):
-        btn_text = "Start Game!"
+        btn_text = "Start!"
         font_style = "Fonts/PressStart2P-Regular.ttf"
-        font_size = self.sq_size // 3
+        font_size = self.sq_size // 2
         btn = menu_menu.MenuButton(btn_text, font_style, font_size)
         # can change color, bg whatever we want here
         btn.outline_width = 3
         btn.margin = 8
 
-        btn.x = 3 * self.sq_size  # do something more intelligent here to center it
-        btn.y = 10 * self.sq_size
-
-        start_game_button = btn
-        self.setup_menu_elements.player_setup_start_btn.append(btn)
+        self.setup_menu_elements.player_setup_start_btn = btn
 
 
     def generate_bg_grid(self, layer):
@@ -284,6 +271,7 @@ class MainMenuState():
         
         grid_lines_y = []
         height_divisions = self.player_count + 1
+        
         for i in range(height_divisions + 1):
             grid_lines_y.append((screen_height / height_divisions) * i)
 
@@ -323,8 +311,23 @@ class MainMenuState():
             screen.blit(selector_surface, (x, y))
 
 
+
         # do the start button
+        start_button = self.setup_menu_elements.player_setup_start_btn
         
+        (btn_width, btn_height) = start_button.find_dims()
+        cell_height = grid_lines_y[-2] - grid_lines_y[-1]
+
+        x = screen_width / 2 - btn_width / 2
+        x += self.slide_offset_r
+
+        y_offset = cell_height / 2 - btn_height / 2
+        y = grid_lines_y[-1] + y_offset
+        
+        start_button_surface = start_button.gen_surface(mouse_pos)
+
+        start_button.set_pos(x, y)
+        screen.blit(start_button_surface, (x, y))
 
 
     def draw_bg(self, screen):
@@ -400,15 +403,9 @@ class MainMenuState():
         # check if the mouse is in the position of any of the setup elements
         mouse_x, mouse_y = mouse_pos
         for elem in self.setup_menu_elements.player_setup_selectors:
-            elem_lft = elem.x
-            elem_rgt = elem.x + elem.width
-            elem_top = elem.y
-            elem_bot = elem.y + elem.height
+            elem.is_clicked(mouse_pos)
 
-            if elem_lft <= mouse_x <= elem_rgt and \
-                elem_top <= mouse_y <= elem_bot:
-                
-                elem.is_clicked(mouse_pos)
+        
                 
 
     def start_match(self):
