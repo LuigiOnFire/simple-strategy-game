@@ -82,7 +82,7 @@ def main():
             elif e.type == p.MOUSEBUTTONDOWN:
                 target = p.mouse.get_pos()
                 running = master_event_handler(target, mm_s, gs, events)
-
+        
         master_draw(screen, mm_s, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
@@ -252,6 +252,7 @@ def master_draw(screen, mm_s, gs):
         draw_menu_state(screen, mm_s)
         if mm_s.state == main_menu_state.State.TO_GAME:
             gs.reset_game()
+            gs.player_types = mm_s.player_types
             CURRENT_STATE = top_state.MainPhase.IN_MATCH
             mm_s.reset_menu()
 
@@ -315,6 +316,20 @@ def draw_game_state(screen, gs):
         display_map(screen)
         display_units(screen, gs)
         animate_win_banner(screen, gs)
+
+    elif gs.phase == engine.Phase.AWAITING_UNIT_SELECTION_AI:
+        gs.get_ai_move()
+        display_map(screen)
+        display_units(screen, gs)
+
+    elif gs.phase == engine.Phase.ANIMATING_MOVE_AI:
+        display_map(screen)
+        display_units(screen, gs)
+    
+    elif gs.phase == engine.Phase.ANIMATING_INSTRUCTION_AI:
+        display_map(screen)
+        display_units(screen, gs)
+
 
     # always do this
     display_info_bar(screen, gs)

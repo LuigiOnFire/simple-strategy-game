@@ -67,6 +67,8 @@ class GameState():
         self.banner_anim = anim.TurnBannerAnim(Team.BLUE)
         self.coin_anim = None
 
+        self.player_types = []
+
     def setup_still_anims(self):
         for r in range(len(self.map)):
             for c in range(len(self.map[0])):
@@ -374,13 +376,17 @@ class Move():
 
 class Phase(Enum):
     AWAITING_UNIT_SELECTION = 0
-    UNIT_SELECTED = 1
-    ANIMATING_MOVE = 2
-    AWAITING_MENU_INSTRUCTION = 3
-    SELECTING_TARGET = 4
-    ANIMATING_INSTRUCTION = 5
-    TURN_TRANSITION = 6
-    COUNTING_GOLD = 7
-    AWAITNIG_UNIT_PURCHASE = 8
-    PLAYER_WON = 9
-    READY_FOR_MAIN_MENU = 10
+    AWAITING_UNIT_SELECTION_AI = 1
+    UNIT_SELECTED = 2
+    ANIMATING_MOVE = 3
+    ANIMATING_MOVE_AI = 4
+    AWAITING_MENU_INSTRUCTION = 5
+    SELECTING_TARGET = 6
+    ANIMATING_INSTRUCTION = 7
+    ANIMATING_INSTRUCTION_AI = 8
+    TURN_TRANSITION = 9
+    COUNTING_GOLD = 10
+    AWAITNIG_UNIT_PURCHASE = 11
+    PLAYER_WON = 12
+    READY_FOR_MAIN_MENU = 13
+

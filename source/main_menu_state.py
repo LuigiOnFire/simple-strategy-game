@@ -33,6 +33,7 @@ class MainMenuState():
         self.slide_offset_r = screen_width
 
         self.player_count = 2
+        self.player_types = []
 
         self.bg_terrain_grid = [[[[0] for _ in range(MainMenuState.mm_grid_width)]
                            for _ in range(MainMenuState.mm_grid_height)]
@@ -111,12 +112,13 @@ class MainMenuState():
 
         label_btn_text = f"Player {i}"
 
-        label_btn = menu_menu.MenuButton(label_btn_text, font_style, font_size)
+        label_btn = menu_menu.StandaloneButton(label_btn_text, font_style, font_size)
         label_btn.text_color = Team.to_color(team)
         label_btn.outline_width = outline_width
         label_btn.margin = margin
         label_btn.x = 3 * self.sq_size  # do something more intelligent here to center it
         label_btn.y = (starting_y + i * 4) * self.sq_size
+        label_btn.text_delta = 0
         self.setup_menu_elements.player_setup_labels.append(label_btn)
 
         values = [PlayerType.HUMAN, PlayerType.COMPUTER]
@@ -143,7 +145,7 @@ class MainMenuState():
         btn_text = "Start!"
         font_style = "Fonts/PressStart2P-Regular.ttf"
         font_size = self.sq_size // 2
-        btn = menu_menu.MenuButton(btn_text, font_style, font_size)
+        btn = menu_menu.StandaloneButton(btn_text, font_style, font_size)
         # can change color, bg whatever we want here
         btn.outline_width = 3
         btn.margin = 8
@@ -226,19 +228,19 @@ class MainMenuState():
         if self.state == State.AWAITING_GAME:
             if self.fade > 255:
                 self.state = State.TO_GAME
+                self.fade = 255
 
-            else:
-                screen_x = screen.get_width()
-                screen_y = screen.get_height()
+            screen_x = screen.get_width()
+            screen_y = screen.get_height()
 
-                dark_surface = p.Surface((screen_x, screen_y), p.SRCALPHA)
+            dark_surface = p.Surface((screen_x, screen_y), p.SRCALPHA)
 
-                fade_step = 8
-                shade_color = (0, 0, 0, self.fade)
+            fade_step = 8
+            shade_color = (0, 0, 0, self.fade)
 
-                dark_surface.fill(shade_color)
-                screen.blit(dark_surface, (0, 0))
-                self.fade += fade_step
+            dark_surface.fill(shade_color)
+            screen.blit(dark_surface, (0, 0))
+            self.fade += fade_step
 
 
     def increment_slide(self, screen_width):
@@ -394,7 +396,7 @@ class MainMenuState():
         btn = self.top_menu.is_clicked(mouse_pos)
         if btn:
             if btn.text == MainMenuState.start_text:
-                self.start_match()
+                self.setup_game()
 
             if btn.text == MainMenuState.quit_text:
                 self.quit_client()
@@ -405,10 +407,12 @@ class MainMenuState():
         for elem in self.setup_menu_elements.player_setup_selectors:
             elem.is_clicked(mouse_pos)
 
-        
-                
+        start_button = self.setup_menu_elements.player_setup_start_btn
+        if start_button.is_clicked(mouse_pos):
+            self.start_match()
 
-    def start_match(self):
+
+    def setup_game(self):
         self.state = State.MOVING_TO_GAME_SETUP
 
     def quit_client(self):
@@ -416,6 +420,14 @@ class MainMenuState():
 
     def reset_menu(self):
         self.state = State.START_MENU
+    
+    def start_match(self):
+        player_types = []
+        for p in range(self.player_count):
+            val = self.setup_menu_elements.player_setup_selectors[p].get_val()
+            player_types.append(val)
+        self.player_types = player_types
+        self.state = State.AWAITING_GAME
 
 
 class State(Enum):

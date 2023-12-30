@@ -96,8 +96,7 @@ class MenuMenu():
 
         return None
 
-
-class MenuButton(): # this will be responsible for making its own surface
+class Button(): # this will be responsible for making its own surface
     def __init__(self, text, font_style, font_size):
         self.text = text
         self.bg_color = None
@@ -111,13 +110,6 @@ class MenuButton(): # this will be responsible for making its own surface
         self.text_delta = 4 # how much to expand the text when we hover
         # add proper getters and setters
 
-        # only used for standalone buttons
-        self.x = 0
-        self.y = 0
-
-    def set_pos(self, x, y):
-        self.x = x
-        self.y = y
 
 
     def find_dims(self):
@@ -127,6 +119,7 @@ class MenuButton(): # this will be responsible for making its own surface
         return (width + extra, height + extra)
 
 
+class MenuButton(Button):
     def gen_surface(self, mouse_in):
         (width, height) = self.find_dims()
         surface = p.Surface((width, height), p.SRCALPHA)
@@ -135,7 +128,7 @@ class MenuButton(): # this will be responsible for making its own surface
 
         font_size = self.font_size
         if mouse_in is True:
-            font_size += 4
+            font_size += self.text_delta
 
         font = p.font.Font(self.font_style, font_size)
 
@@ -151,6 +144,63 @@ class MenuButton(): # this will be responsible for making its own surface
 
         return surface
 
+    
+class StandaloneButton(Button):
+    def __init__(self, text, font_style, font_size):
+        Button.__init__(self, text, font_style, font_size)
+        self.x = 0
+        self.y = 0
+
+
+    def set_pos(self, x, y):
+        self.x = x
+        self.y = y
+
+
+    def is_clicked(self, mouse_pos):
+        mouse_x, mouse_y = mouse_pos
+        mouse_x -= self.x
+        mouse_y -= self.y
+        width = self._width
+        height = self._height
+
+        if 0 <= mouse_x <= width and \
+            0 <= mouse_y <= height:
+            return True
+        
+        return False
+    
+    def gen_surface(self, mouse_pos):
+        mouse_in = self.is_clicked(mouse_pos)
+
+        (width, height) = self.find_dims()
+        surface = p.Surface((width, height), p.SRCALPHA)
+        if self.bg_color:
+            surface.fill(self.bg_color)
+
+        font_size = self.font_size
+        if mouse_in is True:
+            font_size += self.text_delta
+
+        font = p.font.Font(self.font_style, font_size)
+
+        font_util.render_w_outline(
+            surface,
+            self.text,
+            font,
+            self.text_color,
+            self.outline_color,
+            (self.margin, self.margin),
+            self.outline_width
+        )
+
+        return surface
+    
+    def find_dims(self):
+        (w, h) = Button.find_dims(self)
+        self._width = w
+        self._height = h
+        return (w, h)
 
 # both this and MenuButton should inheirit from a superclass
 class Selector():
@@ -279,6 +329,10 @@ class Selector():
     def set_pos(self, x, y):
         self.x = x
         self.y = y
+
+    def get_val(self):
+        i = self._select_index
+        return self.values[i]
         
     def _setup_imgs(self):
         left_arrow_img = p.image.load("Sprites/selector_left_arrow.png")
