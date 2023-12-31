@@ -321,15 +321,10 @@ def draw_game_state(screen, gs):
         gs.get_ai_move()
         display_map(screen)
         display_units(screen, gs)
-
-    elif gs.phase == engine.Phase.ANIMATING_MOVE_AI:
-        display_map(screen)
-        display_units(screen, gs)
     
-    elif gs.phase == engine.Phase.ANIMATING_INSTRUCTION_AI:
+    elif gs.phase == engine.Phase.AWAITING_MENU_INSTRUCTION_AI:
         display_map(screen)
         display_units(screen, gs)
-
 
     # always do this
     display_info_bar(screen, gs)
@@ -680,7 +675,7 @@ def animate_taking_damage(this_unit, screen, gs):
 
         else:
             this_unit.anim = anim.StillAnim()
-            gs.phase = engine.Phase.AWAITING_UNIT_SELECTION
+            gs.transition_to_awaiting_unit_selection()
 
 
 def animate_dying(this_unit, screen, gs):

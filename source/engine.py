@@ -4,6 +4,8 @@ import game_menu
 from team import Team
 import copy
 import units
+from player_types import PlayerType
+import threading
 
 class GameState():
     starting_map =  [
@@ -276,7 +278,10 @@ class GameState():
 
 
     def transition_to_awaiting_unit_selection(self): # IN THEORY DEPRECATED
-        self.phase = Phase.AWAITING_UNIT_SELECTION
+        if self._current_player_is_human():
+            self.phase = Phase.AWAITING_UNIT_SELECTION
+        else:
+            self.phase = Phase.AWAITING_UNIT_SELECTION_AI
 
 
     def transition_to_turn_transition(self):
@@ -298,8 +303,10 @@ class GameState():
 
 
     def transition_from_selecting_target_to_awaiting_menu_instruction(self):
-        self.phase = Phase.AWAITING_MENU_INSTRUCTION
-
+        if self._current_player_is_human():
+            self.phase = Phase.AWAITING_MENU_INSTRUCTION
+        else:
+            self.phase = Phase.AWAITING_MENU_INSTRUCTION_AI
 
     def transition_from_selecting_target_to_awaiting_unit_purchase(self):
         self.prep_buy_menu()
@@ -311,8 +318,9 @@ class GameState():
 
 
     def transition_from_counting_gold_to_awaiting_unit_selection(self):
-        self.phase = Phase.AWAITING_UNIT_SELECTION
         self.coin_index = 0
+        self.transition_to_awaiting_unit_selection()
+
 
     def transition_to_player_winning(self):
         self.phase = Phase.PLAYER_WON
@@ -351,6 +359,29 @@ class GameState():
         self.blue_to_move = True
         self.phase = Phase.TURN_TRANSITION
 
+    def get_ai_move(self):
+        if self.ai_engine.new_turn == True:
+            self.ai_engine.do_next_turn(self.map)
+
+        queue = self.ai_engine.move_queue
+        move = queue.pop()
+
+        if move.type == MoveType.Produce:
+            self.selected_square = move.selected_square
+            unit_type = self.unit_type
+            self.buy_unit(unit_type)
+        
+        event = threading.Event()
+        event.wait(0.5)
+            
+
+
+    def _current_player_is_human(self):
+        team = self.get_active_team()
+        p_index = team.val
+        player_type = self.player_types[p_index]
+        return player_type == PlayerType.COMPUTER
+
 
 class Move():
     def __init__(self, startSq, endSq, map):
@@ -379,14 +410,13 @@ class Phase(Enum):
     AWAITING_UNIT_SELECTION_AI = 1
     UNIT_SELECTED = 2
     ANIMATING_MOVE = 3
-    ANIMATING_MOVE_AI = 4
-    AWAITING_MENU_INSTRUCTION = 5
+    AWAITING_MENU_INSTRUCTION = 4
+    AWAITING_MENU_INSTRUCTION_AI = 5 
     SELECTING_TARGET = 6
     ANIMATING_INSTRUCTION = 7
-    ANIMATING_INSTRUCTION_AI = 8
-    TURN_TRANSITION = 9
-    COUNTING_GOLD = 10
-    AWAITNIG_UNIT_PURCHASE = 11
-    PLAYER_WON = 12
-    READY_FOR_MAIN_MENU = 13
+    TURN_TRANSITION = 8
+    COUNTING_GOLD = 9
+    AWAITNIG_UNIT_PURCHASE = 10
+    PLAYER_WON = 11
+    READY_FOR_MAIN_MENU = 12
 
