@@ -7,6 +7,8 @@ class AIModule(ABC):
     def do_next_turn(self, map, unit_list):
         self.convert_map(map, unit_list)
 
+        # once the map is converted, generate the action space        
+
     def _generate_action_space(self):
         pass
 
@@ -20,3 +22,11 @@ class AIModule(ABC):
             ai_row = []
             for unit_index in engine_row:
                 unit = unit_list[unit_index] 
+                # our format shall be
+                # [unit_type][team][hp]
+                type_code = unit.abbrev
+                team = unit.team
+                team_code = team.to_abbreviation()
+                hp = unit.hp
+                code = f"{type_code}{team_code}{hp}"
+                ai_row.append(code)

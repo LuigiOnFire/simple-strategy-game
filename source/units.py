@@ -1,6 +1,6 @@
 import anim
-
 class ArmyUnit:
+    abbrev = None
     def __init__(self, **kwargs):
         self.attack_range = kwargs["attack_range"]
         self.attack_power = kwargs["attack_power"]
@@ -21,6 +21,7 @@ class ArmyUnit:
 
 class FootSoldier(ArmyUnit):
     cost = 1
+    abbrev = 'f' 
 
     def __init__(self, team):
         kwargs = {
@@ -38,6 +39,7 @@ class FootSoldier(ArmyUnit):
 
 class Lancer(ArmyUnit):
     cost = 2
+    abbrev = 'l'
 
     def __init__(self, team):
         kwargs = {
@@ -55,6 +57,7 @@ class Lancer(ArmyUnit):
 
 class Armored(ArmyUnit):
     cost = 2
+    abbrev = 'a'
 
     def __init__(self, team):
         kwargs = {
@@ -72,6 +75,7 @@ class Armored(ArmyUnit):
 
 class Archer(ArmyUnit):
     cost = 2
+    abbrev = 'r'
 
     def __init__(self, team):
         kwargs = {
@@ -89,6 +93,7 @@ class Archer(ArmyUnit):
 
 class Knight(ArmyUnit):
     cost = 2
+    abbrev = 'k'
 
     def __init__(self, team):
         kwargs = {
@@ -104,6 +109,7 @@ class Knight(ArmyUnit):
         self._team = team
 
 class Door(ArmyUnit):
+    abbrev = 'd'
     def __init__(self, team, side):
         kwargs = {
             "attack_range": 0,
@@ -121,3 +127,8 @@ class Door(ArmyUnit):
         self.side = side
         self._unit_name = self._unit_name + "_" + side
         self._team = team
+
+
+# we'll need to use this to lookup the class' stats, which means we'll need to 
+# refactor to *make the stats class variables* where possible (i.e. current hp will be an exception)
+abbrev_to_unit = {'f': FootSoldier, 'l': Lancer, 'a': Armored, 'r': Archer, 'k': Knight, 'd': Door}

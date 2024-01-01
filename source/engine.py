@@ -373,7 +373,7 @@ class GameState():
         
         event = threading.Event()
         event.wait(0.5)
-            
+
 
 
     def _current_player_is_human(self):
